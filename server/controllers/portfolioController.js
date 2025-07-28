@@ -1,5 +1,4 @@
-import { createAServer } from "../db_connect.js";
-const connection = createAServer();
+import connection from '../db_connect.js';
 
 // 获取 portfolio 下拉框选项
 export function getPortfolioOptions(req, res) {
