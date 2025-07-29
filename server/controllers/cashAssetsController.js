@@ -50,7 +50,8 @@ export function addCashAsset(req, res) {
 // 更新现金资产（根据id）
 export function updateCashAsset(req, res) {
     const { id } = req.params;
-    const { cash_amount, currency_code, bank_name, notes } = req.body;
+    const { currency_code, bank_name, notes } = req.body;
+    const cash_amount = Number(req.body.cash_amount).toFixed(2);
     const query = `UPDATE cash_assets SET 
       cash_amount = ?, currency_code = ?, bank_name = ?, notes = ? 
       WHERE id = ?`;

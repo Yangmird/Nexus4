@@ -431,84 +431,6 @@
         </div>
     </div>
 
-    <!-- 转账模态框 -->
-    <div id="transfer-modal" class="modal">
-        <div class="modal-content">
-            <h3 class="modal-title">转账</h3>
-            <div class="form-group">
-                <label>银行名称:</label>
-                <input type="text" id="transfer-from-bank" placeholder="转出银行" readonly>
-            </div>
-            <div class="form-group">
-                <label>对方银行名称:</label>
-                <input type="text" id="transfer-to-bank" placeholder="转入银行">
-            </div>
-            <div class="form-group">
-                <label>转账金额:</label>
-                <input type="number" id="transfer-amount" placeholder="转账金额">
-            </div>
-            <div class="form-group">
-                <label>原持有金额:</label>
-                <input type="number" id="transfer-original-amount" placeholder="原持有金额" readonly>
-            </div>
-            <div class="form-group">
-                <label>现持有金额:</label>
-                <input type="number" id="transfer-current-amount" placeholder="现持有金额" readonly>
-            </div>
-            <div class="modal-buttons">
-                <button class="confirm-btn" onclick="confirmTransfer()">确认交易</button>
-                <button class="cancel-btn" onclick="closeModal('transfer-modal')">取消交易</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 抛售股票模态框 -->
-    <div id="sell-stock-modal" class="modal">
-        <div class="modal-content">
-            <h3 class="modal-title">抛售股票</h3>
-            <div class="form-group">
-                <label>股票代码:</label>
-                <input type="text" id="sell-stock-code" placeholder="股票代码" readonly>
-            </div>
-            <div class="form-group">
-                <label>股票名称:</label>
-                <input type="text" id="sell-stock-name" placeholder="股票名称" readonly>
-            </div>
-            <div class="form-group">
-                <label>成交价:</label>
-                <input type="number" id="sell-price" placeholder="成交价">
-            </div>
-            <div class="form-group">
-                <label>原持有股数:</label>
-                <input type="number" id="sell-original-shares" placeholder="原持有股数" readonly>
-            </div>
-            <div class="form-group">
-                <label>抛售股票数:</label>
-                <input type="number" id="sell-shares" placeholder="抛售股票数">
-            </div>
-            <div class="form-group">
-                <label>现持有股数:</label>
-                <input type="number" id="sell-current-shares" placeholder="现持有股数" readonly>
-            </div>
-            <div class="form-group">
-                <label>股票总价值:</label>
-                <input type="number" id="sell-total-value" placeholder="股票总价值" readonly>
-            </div>
-            <div class="form-group">
-                <label>抛售价值:</label>
-                <input type="number" id="sell-value" placeholder="抛售价值" readonly>
-            </div>
-            <div class="form-group">
-                <label>交易银行:</label>
-                <input type="text" id="sell-bank" placeholder="交易银行">
-            </div>
-            <div class="modal-buttons">
-                <button class="confirm-btn" onclick="confirmSellStock()">确认交易</button>
-                <button class="cancel-btn" onclick="closeModal('sell-stock-modal')">取消交易</button>
-            </div>
-        </div>
-    </div>
-
     <!-- 添加股票模态框 -->
     <div id="add-stock-modal" class="modal">
         <div class="modal-content">
@@ -546,49 +468,101 @@
         </div>
     </div>
 
+    <!-- 抛售股票模态框 -->
+    <div id="sell-stock-modal" class="modal">
+        <div class="modal-content">
+            <h3 class="modal-title">抛售股票</h3>
+
+            <div class="form-group">
+                <label>股票代码:</label>
+                <input type="text" id="sell-stock-code" readonly>
+            </div>
+
+            <div class="form-group">
+                <label>股票名称:</label>
+                <input type="text" id="sell-stock-name" readonly>
+            </div>
+
+            <div class="form-group">
+                <label>购入价格:</label>
+                <input type="number" id="sell-purchase-price" readonly>
+            </div>
+
+            <div class="form-group">
+                <label>今日成交价:</label>
+                <input type="number" id="sell-price" readonly>
+            </div>
+
+            <div class="form-group">
+                <label>原持有股数:</label>
+                <input type="number" id="sell-original-shares" readonly>
+            </div>
+
+            <div class="form-group">
+                <label>抛售股数:</label>
+                <input type="number" id="sell-shares" min="0" step="1" placeholder="股数">
+            </div>
+
+            <div class="form-group">
+                <label>抛售金额:</label>
+                <input type="number" id="sell-total-gain" readonly>
+            </div>
+
+            <div class="form-group">
+                <label>交易银行:</label>
+                <select id="sell-bank-select"></select>
+            </div>
+
+            <div class="modal-buttons">
+                <button class="confirm-btn" onclick="confirmSellStock()">确认抛售</button>
+                <button class="cancel-btn" onclick="closeModal('sell-stock-modal')">取消</button>
+            </div>
+        </div>
+    </div>
+
     <!-- 购买股票模态框 -->
     <div id="buy-stock-modal" class="modal">
         <div class="modal-content">
             <h3 class="modal-title">购买股票</h3>
+
             <div class="form-group">
                 <label>股票代码:</label>
-                <input type="text" id="buy-stock-code" placeholder="股票代码">
+                <input type="text" id="buy-stock-code" readonly>
             </div>
+
             <div class="form-group">
                 <label>股票名称:</label>
-                <input type="text" id="buy-stock-name" placeholder="股票名称">
+                <input type="text" id="buy-stock-name" readonly>
             </div>
+
             <div class="form-group">
-                <label>成交价:</label>
-                <input type="number" id="buy-price" placeholder="成交价">
+                <label>购入价格:</label>
+                <input type="number" id="buy-purchase-price" readonly>
             </div>
+
             <div class="form-group">
-                <label>原持有股数:</label>
-                <input type="number" id="buy-original-shares" placeholder="原持有股数" readonly>
+                <label>今日成交价:</label>
+                <input type="number" id="buy-price" readonly>
             </div>
+
             <div class="form-group">
-                <label>购买股票数:</label>
-                <input type="number" id="buy-shares" placeholder="购买股票数">
+                <label>购买股数:</label>
+                <input type="number" id="buy-shares" min="0" step="1" placeholder="股数">
             </div>
-            <div class="form-group">
-                <label>现持有股数:</label>
-                <input type="number" id="buy-current-shares" placeholder="现持有股数" readonly>
-            </div>
-            <div class="form-group">
-                <label>股票总价值:</label>
-                <input type="number" id="buy-total-value" placeholder="股票总价值" readonly>
-            </div>
+
             <div class="form-group">
                 <label>购入金额:</label>
-                <input type="number" id="buy-amount" placeholder="购入金额" readonly>
+                <input type="number" id="buy-total-cost" readonly>
             </div>
+
             <div class="form-group">
                 <label>交易银行:</label>
-                <input type="text" id="buy-bank" placeholder="交易银行">
+                <select id="buy-bank-select"></select>
             </div>
+
             <div class="modal-buttons">
-                <button class="confirm-btn" onclick="confirmBuyStock()">确认交易</button>
-                <button class="cancel-btn" onclick="closeModal('buy-stock-modal')">取消交易</button>
+                <button class="confirm-btn" onclick="confirmBuyStock()">确认购买</button>
+                <button class="cancel-btn" onclick="closeModal('buy-stock-modal')">取消</button>
             </div>
         </div>
     </div>
@@ -661,7 +635,7 @@
                     assetElement.innerHTML = `
                         <div class="asset-info">
                             <div class="asset-name">${asset.name} (${asset.ticker})</div>
-                            <div class="asset-details">持股: ${asset.quantity.toLocaleString()}股 | 当前价格: ¥${asset.current_price.toLocaleString()} | 总价值: ¥${currentValue.toLocaleString()}</div>
+                            <div class="asset-details">持股: ${asset.quantity.toLocaleString()}股 | 购入价: ¥${asset.purchase_price.toLocaleString()} | 总值: ¥${currentValue.toLocaleString()}</div>
                         </div>
                         <div class="asset-actions">
                             <button class="action-btn view-btn" onclick="viewStockDetails(${asset.id})">详情</button>
@@ -676,6 +650,20 @@
                 console.error('加载股票资产失败:', error);
                 document.getElementById('stock-assets-list').innerHTML = '<div class="loading">加载失败</div>';
             }
+        }
+
+        // 把现金账户渲染成下拉框选项
+        async function loadBankSelect(selectId) {
+            const res = await fetch(`${API_BASE}/cash-assets`);
+            const banks = await res.json();
+            const sel = document.getElementById(selectId);
+            sel.innerHTML = '';
+            banks.forEach(b => {
+                const opt = document.createElement('option');
+                opt.value = b.id;
+                opt.textContent = `${b.bank_name} - ${b.cash_amount} ${b.currency_code}`;
+                sel.appendChild(opt);
+            });
         }
 
         // 打开添加现金模态框
@@ -770,27 +758,6 @@
             }
         }
 
-        // 转账现金
-        async function transferCash(assetId) {
-            try {
-                const response = await fetch(`${API_BASE}/cash-assets/${assetId}`);
-                const asset = await response.json();
-                
-                currentEditingAsset = asset;
-                
-                document.getElementById('transfer-from-bank').value = asset.bank_name;
-                document.getElementById('transfer-to-bank').value = '';
-                document.getElementById('transfer-amount').value = '';
-                document.getElementById('transfer-original-amount').value = asset.cash_amount;
-                document.getElementById('transfer-current-amount').value = asset.cash_amount;
-                
-                document.getElementById('transfer-modal').style.display = 'block';
-            } catch (error) {
-                console.error('获取现金资产详情失败:', error);
-                alert('获取资产详情失败');
-            }
-        }
-
         // 打开添加股票模态框
         function openAddStockModal() {
             document.getElementById('add-stock-code').value   = '';
@@ -799,6 +766,13 @@
             document.getElementById('add-price').value        = '';
             document.getElementById('add-date').value         = new Date().toISOString().substr(0,10);
             document.getElementById('add-stock-modal').style.display = 'block';
+        }
+
+        // 根据 ticker 和 price 查找是否存在同价记录
+        async function findSamePriceRecord(ticker, price) {
+            const res = await fetch(`${API_BASE}/stock-assets`);
+            const stocks = await res.json();
+            return stocks.find(s => s.ticker === ticker && parseFloat(s.purchase_price) === parseFloat(price));
         }
 
         // 提交添加股票
@@ -859,24 +833,19 @@
             }
         }
 
-        // 购买股票
+        // 购买股票框
         async function buyStock(assetId) {
             try {
-                const response = await fetch(`${API_BASE}/stock-assets/${assetId}`);
-                const asset = await response.json();
-                
-                currentEditingAsset = asset;
-                
-                document.getElementById('buy-stock-code').value = asset.ticker;
-                document.getElementById('buy-stock-name').value = asset.name;
-                document.getElementById('buy-price').value = asset.current_price;
-                document.getElementById('buy-original-shares').value = asset.quantity;
-                document.getElementById('buy-shares').value = '';
-                document.getElementById('buy-current-shares').value = asset.quantity;
-                document.getElementById('buy-total-value').value = asset.quantity * asset.current_price;
-                document.getElementById('buy-amount').value = '';
-                document.getElementById('buy-bank').value = '';
-                
+                const res = await fetch(`${API_BASE}/stock-assets/${assetId}`);
+                currentEditingAsset = await res.json();
+                document.getElementById('buy-stock-code').value   = currentEditingAsset.ticker;
+                document.getElementById('buy-stock-name').value   = currentEditingAsset.name;
+                document.getElementById('buy-purchase-price').value = currentEditingAsset.purchase_price;
+                document.getElementById('buy-price').value        = currentEditingAsset.current_price;
+                document.getElementById('buy-total-cost').value   = '0.00';
+                document.getElementById('buy-shares').value       = '';
+                await loadBankSelect('buy-bank-select');
+
                 document.getElementById('buy-stock-modal').style.display = 'block';
             } catch (error) {
                 console.error('获取股票资产详情失败:', error);
@@ -884,24 +853,20 @@
             }
         }
 
-        // 抛售股票
+        // 抛售股票框
         async function sellStock(assetId) {
             try {
-                const response = await fetch(`${API_BASE}/stock-assets/${assetId}`);
-                const asset = await response.json();
-                
-                currentEditingAsset = asset;
-                
-                document.getElementById('sell-stock-code').value = asset.ticker;
-                document.getElementById('sell-stock-name').value = asset.name;
-                document.getElementById('sell-price').value = asset.current_price;
-                document.getElementById('sell-original-shares').value = asset.quantity;
-                document.getElementById('sell-shares').value = '';
-                document.getElementById('sell-current-shares').value = asset.quantity;
-                document.getElementById('sell-total-value').value = asset.quantity * asset.current_price;
-                document.getElementById('sell-value').value = '';
-                document.getElementById('sell-bank').value = '';
-                
+                const res = await fetch(`${API_BASE}/stock-assets/${assetId}`);
+                currentEditingAsset = await res.json();
+                document.getElementById('sell-stock-code').value   = currentEditingAsset.ticker;
+                document.getElementById('sell-stock-name').value   = currentEditingAsset.name;
+                document.getElementById('sell-purchase-price').value = currentEditingAsset.purchase_price;
+                document.getElementById('sell-price').value       = currentEditingAsset.current_price;
+                document.getElementById('sell-total-gain').value  = '0.00';
+                document.getElementById('sell-original-shares').value = currentEditingAsset.quantity;
+                document.getElementById('sell-shares').value       = '';
+                await loadBankSelect('sell-bank-select');
+
                 document.getElementById('sell-stock-modal').style.display = 'block';
             } catch (error) {
                 console.error('获取股票资产详情失败:', error);
@@ -958,129 +923,119 @@
             }
         }
 
-        // 确认转账
-        async function confirmTransfer() {
-            const transferAmount = parseFloat(document.getElementById('transfer-amount').value);
-            const toBank = document.getElementById('transfer-to-bank').value;
-            
-            if (!transferAmount || !toBank) {
-                alert('请填写完整信息');
-                return;
-            }
-            
-            if (transferAmount > currentEditingAsset.cash_amount) {
-                alert('转账金额不能超过当前余额');
-                return;
-            }
-            
-            try {
-                // 更新原账户余额
-                const newAmount = currentEditingAsset.cash_amount - transferAmount;
-                await fetch(`${API_BASE}/cash-assets/${currentEditingAsset.id}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        bank_name: currentEditingAsset.bank_name,
-                        cash_amount: newAmount,
-                        currency_code: 'CNY'
-                    })
-                });
-                
-                alert('转账成功');
-                closeModal('transfer-modal');
-                await loadCashAssets();
-            } catch (error) {
-                console.error('转账失败:', error);
-                alert('转账失败');
-            }
-        }
-
         // 确认购买股票
         async function confirmBuyStock() {
-            const buyShares = parseInt(document.getElementById('buy-shares').value);
-            const buyPrice = parseFloat(document.getElementById('buy-price').value);
-            const buyBank = document.getElementById('buy-bank').value;
-            
-            if (!buyShares || !buyPrice || !buyBank) {
-                alert('请填写完整信息');
+            const shares   = parseInt(document.getElementById('buy-shares').value);
+            const bankId   = document.getElementById('buy-bank-select').value;
+            const price    = parseFloat(document.getElementById('buy-price').value);
+
+            if (!shares || shares <= 0) { alert('请输入正股数'); return; }
+
+            const bankRes  = await fetch(`${API_BASE}/cash-assets/${bankId}`);
+            const bank     = await bankRes.json();
+            const totalCost = shares * price;
+
+            if (totalCost > bank.cash_amount) {
+                alert(`余额不足！需要 ${totalCost} ${bank.currency_code}`);
                 return;
             }
 
-            try {
-                const newQuantity = currentEditingAsset.quantity + buyShares;
-                const newPrice = (currentEditingAsset.quantity * currentEditingAsset.current_price + buyShares * buyPrice) / newQuantity;
+            // 扣减银行余额
+            await fetch(`${API_BASE}/cash-assets/${bankId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    bank_name: bank.bank_name,
+                    cash_amount: bank.cash_amount - totalCost,
+                    currency_code: bank.currency_code
+                })
+            });
 
-                await fetch(`${API_BASE}/stock-assets/${currentEditingAsset.id}`, {
+            // 查找同价记录
+            const same = await findSamePriceRecord(currentEditingAsset.ticker, price);
+
+            if (same) {
+                // 合并：只更新数量、均价不变，日期不变
+                const newQty = parseFloat(same.quantity) + shares;
+                await fetch(`${API_BASE}/stock-assets/${same.id}`, {
                     method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        quantity: newQty,
+                        purchase_price: same.purchase_price, // 均价不变
+                        purchase_date: same.purchase_date,   // 日期不变
+                        current_price: price
+                    })
+                });
+            } else {
+                // 插入新记录
+                await fetch(`${API_BASE}/stock-assets`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         ticker: currentEditingAsset.ticker,
                         name: currentEditingAsset.name,
-                        quantity: newQuantity,
-                        current_price: newPrice
+                        quantity: shares,
+                        purchase_price: price,
+                        current_price: price,
+                        purchase_date: new Date().toISOString().substr(0, 10)
                     })
                 });
-                
-                alert('购买成功');
-                closeModal('buy-stock-modal');
-                await loadStockAssets();
-            } catch (error) {
-                console.error('购买股票失败:', error);
-                alert('购买失败');
             }
+
+            alert('购买成功');
+            closeModal('buy-stock-modal');
+            await loadStockAssets();
+            await loadCashAssets();
         }
 
         // 确认抛售股票
         async function confirmSellStock() {
-            const sellShares = parseInt(document.getElementById('sell-shares').value);
-            const sellPrice = parseFloat(document.getElementById('sell-price').value);
-            const sellBank = document.getElementById('sell-bank').value;
-            
-            if (!sellShares || !sellPrice || !sellBank) {
-                alert('请填写完整信息');
-                return;
+            const shares   = parseInt(document.getElementById('sell-shares').value);
+            const bankId   = document.getElementById('sell-bank-select').value;
+            const price    = parseFloat(document.getElementById('sell-price').value);
+
+            if (!shares || shares <= 0) { alert('请输入正股数'); return; }
+            if (shares > currentEditingAsset.quantity) { alert('超出可抛售股数'); return; }
+
+            const bankRes  = await fetch(`${API_BASE}/cash-assets/${bankId}`);
+            const bank     = await bankRes.json();
+            const totalGain = shares * price;
+
+            // 增加银行余额
+            await fetch(`${API_BASE}/cash-assets/${bankId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    bank_name: bank.bank_name,
+                    cash_amount: Number(bank.cash_amount) + totalGain, // 加钱
+                    currency_code: bank.currency_code
+                })
+            });
+
+            // 更新股票持仓
+            const newQty = currentEditingAsset.quantity - shares;
+            if (newQty === 0) {
+                await fetch(`${API_BASE}/stock-assets/${currentEditingAsset.id}`, { method: 'DELETE' });
+            } else {
+                await fetch(`${API_BASE}/stock-assets/${currentEditingAsset.id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        ticker: currentEditingAsset.ticker,
+                        name: currentEditingAsset.name,
+                        quantity: newQty,
+                        purchase_price: currentEditingAsset.purchase_price,
+                        purchase_date: currentEditingAsset.purchase_date, // 保留原日期
+                        current_price: price
+                    })
+                });
             }
-            
-            if (sellShares > currentEditingAsset.quantity) {
-                alert('抛售数量不能超过持有数量');
-                return;
-            }
-            
-            try {
-                const newQuantity = currentEditingAsset.quantity - sellShares;
-                
-                if (newQuantity === 0) {
-                    // 如果全部抛售，删除该股票记录
-                    await fetch(`${API_BASE}/stock-assets/${currentEditingAsset.id}`, {
-                        method: 'DELETE'
-                    });
-                } else {
-                    // 更新持股数量
-                    await fetch(`${API_BASE}/stock-assets/${currentEditingAsset.id}`, {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            ticker: currentEditingAsset.ticker,
-                            name: currentEditingAsset.name,
-                            quantity: newQuantity,
-                            current_price: currentEditingAsset.current_price
-                        })
-                    });
-                }
-                
-                alert('抛售成功');
-                closeModal('sell-stock-modal');
-                await loadStockAssets();
-            } catch (error) {
-                console.error('抛售股票失败:', error);
-                alert('抛售失败');
-            }
+
+            alert('抛售成功');
+            closeModal('sell-stock-modal');
+            await loadStockAssets();
+            await loadCashAssets();
         }
 
         // 关闭模态框
@@ -1089,37 +1044,18 @@
             currentEditingAsset = null;
         }
 
-        // 实时计算金额
-        document.addEventListener('input', function(e) {
-            if (e.target.id === 'edit-recharge-amount') {
-                const original = parseFloat(document.getElementById('edit-original-amount').value) || 0;
-                const recharge = parseFloat(e.target.value) || 0;
-                document.getElementById('edit-current-amount').value = original + recharge;
-            }
-            
-            if (e.target.id === 'transfer-amount') {
-                const original = parseFloat(document.getElementById('transfer-original-amount').value) || 0;
-                const transfer = parseFloat(e.target.value) || 0;
-                document.getElementById('transfer-current-amount').value = original - transfer;
-            }
-            
-            if (e.target.id === 'buy-shares') {
-                const original = parseInt(document.getElementById('buy-original-shares').value) || 0;
-                const buy = parseInt(e.target.value) || 0;
-                document.getElementById('buy-current-shares').value = original + buy;
-                
-                const price = parseFloat(document.getElementById('buy-price').value) || 0;
-                document.getElementById('buy-amount').value = buy * price;
-            }
-            
-            if (e.target.id === 'sell-shares') {
-                const original = parseInt(document.getElementById('sell-original-shares').value) || 0;
-                const sell = parseInt(e.target.value) || 0;
-                document.getElementById('sell-current-shares').value = original - sell;
-                
-                const price = parseFloat(document.getElementById('sell-price').value) || 0;
-                document.getElementById('sell-value').value = sell * price;
-            }
+        // 实时计算购入金额
+        document.getElementById('buy-shares').addEventListener('input', function () {
+            const shares = parseInt(this.value) || 0;
+            const price  = parseFloat(document.getElementById('buy-price').value) || 0;
+            document.getElementById('buy-total-cost').value = (shares * price).toFixed(2);
+        });
+
+        // 实时计算抛售金额
+        document.getElementById('sell-shares').addEventListener('input', function () {
+            const shares = parseInt(this.value) || 0;
+            const price  = parseFloat(document.getElementById('sell-price').value) || 0;
+            document.getElementById('sell-total-gain').value = (shares * price).toFixed(2);
         });
     </script>
 </body>

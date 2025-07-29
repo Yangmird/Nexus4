@@ -65,8 +65,10 @@ export function addStockAsset(req, res) {
  */
 export function updateStockAsset(req, res) {
     const { id } = req.params;
-    const { ticker, name, quantity, purchase_price, current_price, purchase_date } = req.body;
-
+    const { ticker, name, quantity } = req.body;
+    const purchase_date = req.body.purchase_date.split('T')[0];   // 取 YYYY-MM-DD
+    const purchase_price = Number(req.body.purchase_price).toFixed(4);
+    const current_price  = Number(req.body.current_price).toFixed(4);
     // 自动删除数量为 0 的记录
     if (parseFloat(quantity) === 0) {
         const deleteQuery = 'DELETE FROM stock_assets WHERE id = ?';
