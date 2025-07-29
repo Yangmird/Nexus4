@@ -141,20 +141,10 @@
             color: white;
         }
 
-        .view-btn {
-            background: #28a745;
-            color: white;
-        }
-
-        .buy-btn {
-            background: #28a745;
-            color: white;
-        }
-
-        .sell-btn {
-            background: #dc3545;
-            color: white;
-        }
+        .view-btn   { background: #007bff; color: #fff; }
+        .buy-btn    { background: #28a745; color: #fff; }
+        .sell-btn   { background: #fd7e14; color: #fff; }
+        .delete-btn { background: #dc3545; color: #fff; }
 
         .action-btn:hover {
             transform: translateY(-2px);
@@ -216,6 +206,22 @@
             box-shadow: 0 0 8px rgba(102, 126, 234, 0.3);
         }
 
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            background-color: #fff;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 8px rgba(102,126,234,0.3);
+        }
+
         .modal-buttons {
             display: flex;
             gap: 15px;
@@ -263,6 +269,30 @@
             padding: 40px;
             font-style: italic;
         }
+
+        .add-badge {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: #fff;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            transition: transform .2s;
+        }
+
+        .add-badge:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(0,0,0,.25);
+        }
+
+        .delete-btn {
+            background: #dc3545;
+            color: #fff;
+        }
     </style>
 </head>
 <body>
@@ -281,7 +311,12 @@
             <div class="center-panel">
                 <!-- 现金资产管理 -->
                 <div class="asset-section">
-                    <h2 class="section-title">Cash: 新增现金</h2>
+                    <h2 class="section-title" style="display: flex; justify-content: space-between; align-items: center;">
+                        Cash
+                        <button class="add-badge" onclick="openAddCashModal()">
+                            <span style="margin-right: 4px;">＋</span>添加
+                        </button>
+                    </h2>
                     <div class="asset-list" id="cash-assets-list">
                         <div class="loading">加载中...</div>
                     </div>
@@ -289,7 +324,12 @@
 
                 <!-- 股票资产管理 -->
                 <div class="asset-section">
-                    <h2 class="section-title">stocks: 新增一支股票</h2>
+                    <h2 class="section-title" style="display: flex; justify-content: space-between; align-items: center;">
+                        stocks
+                        <button class="add-badge" onclick="openAddStockModal()">
+                            <span style="margin-right: 4px;">＋</span>添加
+                        </button>
+                    </h2>
                     <div class="asset-list" id="stock-assets-list">
                         <div class="loading">加载中...</div>
                     </div>
@@ -298,33 +338,95 @@
         </div>
     </div>
 
-    <!-- 编辑现金模态框 -->
+    <!-- 添加现金模态框 -->
+    <div id="add-cash-modal" class="modal">
+        <div class="modal-content">
+            <h3 class="modal-title">添加现金资产</h3>
+
+            <div class="form-group">
+                <label>银行名称:</label>
+                <input type="text" id="add-bank-name" placeholder="银行名称">
+            </div>
+
+            <div class="form-group">
+                <label>货币代码:</label>
+                <select id="add-currency-code">
+                    <option value="CNY">CNY - 人民币</option>
+                    <option value="USD">USD - 美元</option>
+                    <option value="EUR">EUR - 欧元</option>
+                    <option value="JPY">JPY - 日元</option>
+                    <option value="GBP">GBP - 英镑</option>
+                    <option value="AUD">AUD - 澳元</option>
+                    <option value="CAD">CAD - 加元</option>
+                    <option value="CHF">CHF - 瑞士法郎</option>
+                    <option value="HKD">HKD - 港币</option>
+                    <option value="SGD">SGD - 新加坡元</option>
+                    <option value="KRW">KRW - 韩元</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>金额:</label>
+                <input type="number" id="add-amount" step="0.01" placeholder="请输入金额">
+            </div>
+
+            <div class="form-group">
+                <label>备注:</label>
+                <input type="text" id="add-notes" placeholder="备注（选填）">
+            </div>
+
+            <div class="modal-buttons">
+                <button class="confirm-btn" onclick="confirmAddCash()">确认添加</button>
+                <button class="cancel-btn" onclick="closeModal('add-cash-modal')">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 编辑现金模态框（已更新） -->
     <div id="edit-cash-modal" class="modal">
         <div class="modal-content">
-            <h3 class="modal-title">编辑</h3>
+            <h3 class="modal-title">编辑现金资产</h3>
+
             <div class="form-group">
                 <label>银行名称:</label>
                 <input type="text" id="edit-bank-name" placeholder="银行名称">
             </div>
+
             <div class="form-group">
-                <label>银行卡号:</label>
-                <input type="text" id="edit-bank-card" placeholder="银行卡号">
+                <label>货币代码:</label>
+                <select id="edit-currency-code">
+                    <option value="CNY">CNY - 人民币</option>
+                    <option value="USD">USD - 美元</option>
+                    <option value="EUR">EUR - 欧元</option>
+                    <option value="JPY">JPY - 日元</option>
+                    <option value="GBP">GBP - 英镑</option>
+                    <option value="AUD">AUD - 澳元</option>
+                    <option value="CAD">CAD - 加元</option>
+                    <option value="CHF">CHF - 瑞士法郎</option>
+                    <option value="HKD">HKD - 港币</option>
+                    <option value="SGD">SGD - 新加坡元</option>
+                    <option value="KRW">KRW - 韩元</option>
+                </select>
             </div>
+
             <div class="form-group">
                 <label>原持有金额:</label>
-                <input type="number" id="edit-original-amount" placeholder="原持有金额" readonly>
+                <input type="number" id="edit-original-amount" step="0.01" readonly>
             </div>
+
             <div class="form-group">
-                <label>充值金额:</label>
-                <input type="number" id="edit-recharge-amount" placeholder="充值金额">
+                <label>更新金额:</label>
+                <input type="number" id="edit-amount" step="0.01" placeholder="请输入新的金额">
             </div>
+
             <div class="form-group">
-                <label>现持有金额:</label>
-                <input type="number" id="edit-current-amount" placeholder="现持有金额" readonly>
+                <label>备注:</label>
+                <input type="text" id="edit-notes" placeholder="备注（选填）">
             </div>
+
             <div class="modal-buttons">
-                <button class="confirm-btn" onclick="confirmCashEdit()">确认交易</button>
-                <button class="cancel-btn" onclick="closeModal('edit-cash-modal')">取消交易</button>
+                <button class="confirm-btn" onclick="confirmCashEdit()">确认编辑</button>
+                <button class="cancel-btn" onclick="closeModal('edit-cash-modal')">取消编辑</button>
             </div>
         </div>
     </div>
@@ -403,6 +505,43 @@
             <div class="modal-buttons">
                 <button class="confirm-btn" onclick="confirmSellStock()">确认交易</button>
                 <button class="cancel-btn" onclick="closeModal('sell-stock-modal')">取消交易</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加股票模态框 -->
+    <div id="add-stock-modal" class="modal">
+        <div class="modal-content">
+            <h3 class="modal-title">添加股票资产</h3>
+
+            <div class="form-group">
+                <label>股票代码:</label>
+                <input type="text" id="add-stock-code" placeholder="如 NVDA">
+            </div>
+
+            <div class="form-group">
+                <label>股票名称:</label>
+                <input type="text" id="add-stock-name" placeholder="如 NVIDIA">
+            </div>
+
+            <div class="form-group">
+                <label>买入数量:</label>
+                <input type="number" id="add-quantity" min="0" step="0.01" placeholder="股数">
+            </div>
+
+            <div class="form-group">
+                <label>买入价格:</label>
+                <input type="number" id="add-price" min="0" step="0.01" placeholder="每股单价">
+            </div>
+
+            <div class="form-group">
+                <label>买入日期:</label>
+                <input type="date" id="add-date">
+            </div>
+
+            <div class="modal-buttons">
+                <button class="confirm-btn" onclick="confirmAddStock()">确认添加</button>
+                <button class="cancel-btn" onclick="closeModal('add-stock-modal')">取消</button>
             </div>
         </div>
     </div>
@@ -489,7 +628,8 @@
                         </div>
                         <div class="asset-actions">
                             <button class="action-btn edit-btn" onclick="editCashAsset(${asset.id})">编辑</button>
-                            <button class="action-btn transfer-btn" onclick="transferCash(${asset.id})">转账</button>
+                            <button class="action-btn delete-btn" onclick="deleteCashAsset(${asset.id})">删除</button>
+<!--                            <button class="action-btn transfer-btn" onclick="transferCash(${asset.id})">转账</button>-->
                         </div>
                     `;
                     container.appendChild(assetElement);
@@ -524,9 +664,10 @@
                             <div class="asset-details">持股: ${asset.quantity.toLocaleString()}股 | 当前价格: ¥${asset.current_price.toLocaleString()} | 总价值: ¥${currentValue.toLocaleString()}</div>
                         </div>
                         <div class="asset-actions">
-                            <button class="action-btn view-btn" onclick="viewStockDetails(${asset.id})">查看详情</button>
-                            <button class="action-btn buy-btn" onclick="buyStock(${asset.id})">购买股票</button>
-                            <button class="action-btn sell-btn" onclick="sellStock(${asset.id})">抛售股票</button>
+                            <button class="action-btn view-btn" onclick="viewStockDetails(${asset.id})">详情</button>
+                            <button class="action-btn buy-btn" onclick="buyStock(${asset.id})">购入</button>
+                            <button class="action-btn sell-btn" onclick="sellStock(${asset.id})">抛售</button>
+                            <button class="action-btn delete-btn" onclick="deleteStockAsset(${asset.id})">删除</button>
                         </div>
                     `;
                     container.appendChild(assetElement);
@@ -537,20 +678,91 @@
             }
         }
 
-        // 编辑现金资产
+        // 打开添加现金模态框
+        function openAddCashModal() {
+            document.getElementById('add-bank-name').value   = '';
+            document.getElementById('add-currency-code').value = 'CNY';
+            document.getElementById('add-amount').value      = '';
+            document.getElementById('add-notes').value       = '';
+            document.getElementById('add-cash-modal').style.display = 'block';
+        }
+
+        // 提交新增现金资产
+        async function confirmAddCash() {
+            const bankName = document.getElementById('add-bank-name').value.trim();
+            const amount   = parseFloat(document.getElementById('add-amount').value);
+            const currency = document.getElementById('add-currency-code').value;
+            const notes    = document.getElementById('add-notes').value.trim();
+
+            if (!bankName || isNaN(amount)) {
+                alert('请填写银行名称和有效金额');
+                return;
+            }
+
+            if (amount < 0) {
+                alert('金额不能为负数');
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_BASE}/cash-assets`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        bank_name: bankName,
+                        cash_amount: amount,
+                        currency_code: currency,
+                        notes: notes || null
+                    })
+                });
+
+                if (res.ok) {
+                    alert('现金资产已添加');
+                    closeModal('add-cash-modal');
+                    await loadCashAssets();           // 重新加载列表
+                } else {
+                    const msg = await res.text();
+                    alert('添加失败：' + msg);
+                }
+            } catch (err) {
+                console.error(err);
+                alert('网络错误，请稍后重试');
+            }
+        }
+
+        // 删除现金资产
+        async function deleteCashAsset(id) {
+            if (!confirm('确定要删除该现金资产吗？')) return;
+
+            try {
+                const res = await fetch(`${API_BASE}/cash-assets/${id}`, { method: 'DELETE' });
+                if (res.ok) {
+                    alert('已删除');
+                    await loadCashAssets();   // 重新拉取列表
+                } else {
+                    const msg = await res.text();
+                    alert('删除失败：' + msg);
+                }
+            } catch (err) {
+                console.error(err);
+                alert('网络错误，请稍后重试');
+            }
+        }
+
+        // 编辑现金资产（已更新）
         async function editCashAsset(assetId) {
             try {
                 const response = await fetch(`${API_BASE}/cash-assets/${assetId}`);
                 const asset = await response.json();
-                
+
                 currentEditingAsset = asset;
-                
-                document.getElementById('edit-bank-name').value = asset.bank_name;
-                document.getElementById('edit-bank-card').value = asset.bank_name; // 简化处理
-                document.getElementById('edit-original-amount').value = asset.cash_amount;
-                document.getElementById('edit-recharge-amount').value = '';
-                document.getElementById('edit-current-amount').value = asset.cash_amount;
-                
+
+                document.getElementById('edit-bank-name').value      = asset.bank_name;
+                document.getElementById('edit-original-amount').value = parseFloat(asset.cash_amount);
+                document.getElementById('edit-amount').value         = parseFloat(asset.cash_amount);
+                document.getElementById('edit-currency-code').value  = asset.currency_code || 'CNY';
+                document.getElementById('edit-notes').value          = asset.notes || '';
+
                 document.getElementById('edit-cash-modal').style.display = 'block';
             } catch (error) {
                 console.error('获取现金资产详情失败:', error);
@@ -576,6 +788,74 @@
             } catch (error) {
                 console.error('获取现金资产详情失败:', error);
                 alert('获取资产详情失败');
+            }
+        }
+
+        // 打开添加股票模态框
+        function openAddStockModal() {
+            document.getElementById('add-stock-code').value   = '';
+            document.getElementById('add-stock-name').value   = '';
+            document.getElementById('add-quantity').value     = '';
+            document.getElementById('add-price').value        = '';
+            document.getElementById('add-date').value         = new Date().toISOString().substr(0,10);
+            document.getElementById('add-stock-modal').style.display = 'block';
+        }
+
+        // 提交添加股票
+        async function confirmAddStock() {
+            const ticker   = document.getElementById('add-stock-code').value.trim().toUpperCase();
+            const name     = document.getElementById('add-stock-name').value.trim();
+            const quantity = parseFloat(document.getElementById('add-quantity').value);
+            const price    = parseFloat(document.getElementById('add-price').value);
+            const date     = document.getElementById('add-date').value;
+
+            if (!ticker || !name || isNaN(quantity) || quantity <= 0 || isNaN(price) || price <= 0 || !date) {
+                alert('请完整填写且数量和价格须为正数');
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_BASE}/stock-assets`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        ticker,
+                        name,
+                        quantity,
+                        purchase_price: price,
+                        current_price: price,   // 默认当前价等于买入价
+                        purchase_date: date
+                    })
+                });
+
+                if (res.ok) {
+                    alert('股票已添加');
+                    closeModal('add-stock-modal');
+                    await loadStockAssets();
+                } else {
+                    const msg = await res.text();
+                    alert('添加失败：' + msg);
+                }
+            } catch (err) {
+                console.error(err);
+                alert('网络错误，请稍后重试');
+            }
+        }
+
+        // 删除股票
+        async function deleteStockAsset(id) {
+            if (!confirm('确定要删除该股票资产吗？')) return;
+            try {
+                const res = await fetch(`${API_BASE}/stock-assets/${id}`, { method: 'DELETE' });
+                if (res.ok) {
+                    alert('已删除');
+                    await loadStockAssets();
+                } else {
+                    alert('删除失败：' + await res.text());
+                }
+            } catch (e) {
+                console.error(e);
+                alert('网络错误');
             }
         }
 
@@ -635,34 +915,46 @@
             window.location.href = `stock-details.html?id=${assetId}`;
         }
 
-        // 确认编辑现金
+        // 确认编辑现金（已更新）
         async function confirmCashEdit() {
-            const rechargeAmount = parseFloat(document.getElementById('edit-recharge-amount').value) || 0;
-            const newAmount = currentEditingAsset.cash_amount + rechargeAmount;
-            
+            const bankName   = document.getElementById('edit-bank-name').value.trim();
+            const amount     = parseFloat(document.getElementById('edit-amount').value);
+            const currency   = document.getElementById('edit-currency-code').value;
+            const notes      = document.getElementById('edit-notes').value.trim();
+
+            if (!bankName || isNaN(amount)) {
+                alert('请填写银行名称和有效金额');
+                return;
+            }
+
+            if (amount < 0) {
+                alert('金额不能为负数');
+                return;
+            }
+
             try {
                 const response = await fetch(`${API_BASE}/cash-assets/${currentEditingAsset.id}`, {
                     method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        bank_name: document.getElementById('edit-bank-name').value,
-                        cash_amount: newAmount,
-                        currency_code: 'CNY'
+                        bank_name: bankName,
+                        cash_amount: amount,
+                        currency_code: currency,
+                        notes: notes || null
                     })
                 });
-                
+
                 if (response.ok) {
-                    alert('更新成功');
+                    alert('现金资产已更新');
                     closeModal('edit-cash-modal');
-                    loadCashAssets();
+                    await loadCashAssets();
                 } else {
-                    alert('更新失败');
+                    const msg = await response.text();
+                    alert('更新失败：' + msg);
                 }
             } catch (error) {
                 console.error('更新现金资产失败:', error);
-                alert('更新失败');
+                alert('网络错误，请稍后重试');
             }
         }
 
@@ -698,7 +990,7 @@
                 
                 alert('转账成功');
                 closeModal('transfer-modal');
-                loadCashAssets();
+                await loadCashAssets();
             } catch (error) {
                 console.error('转账失败:', error);
                 alert('转账失败');
@@ -715,11 +1007,11 @@
                 alert('请填写完整信息');
                 return;
             }
-            
+
             try {
                 const newQuantity = currentEditingAsset.quantity + buyShares;
                 const newPrice = (currentEditingAsset.quantity * currentEditingAsset.current_price + buyShares * buyPrice) / newQuantity;
-                
+
                 await fetch(`${API_BASE}/stock-assets/${currentEditingAsset.id}`, {
                     method: 'PUT',
                     headers: {
@@ -735,7 +1027,7 @@
                 
                 alert('购买成功');
                 closeModal('buy-stock-modal');
-                loadStockAssets();
+                await loadStockAssets();
             } catch (error) {
                 console.error('购买股票失败:', error);
                 alert('购买失败');
@@ -784,7 +1076,7 @@
                 
                 alert('抛售成功');
                 closeModal('sell-stock-modal');
-                loadStockAssets();
+                await loadStockAssets();
             } catch (error) {
                 console.error('抛售股票失败:', error);
                 alert('抛售失败');
