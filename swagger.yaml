@@ -1,0 +1,467 @@
+openapi: 3.0.0
+info:
+  title: Portfolio Manager API / 投资组合管理接口
+  version: 1.0.0
+  description: 投资组合管理系统的 API 文档 / API documentation for the portfolio management system
+
+servers:
+  - url: http://localhost:8088
+    description: 本地开发服务器 / Local development server
+
+paths:
+  /portfolios/options:
+    get:
+      summary: 获取投资组合选项 / Get portfolio dropdown options
+      tags: [Portfolios / 投资组合]
+      responses:
+        '200':
+          description: 返回投资组合 ID 和名称列表 / Returns list of portfolio IDs and names
+
+  /portfolios/create:
+    post:
+      summary: 创建新投资组合 / Create a new portfolio
+      tags: [Portfolios / 投资组合]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name:
+                  type: string
+                  description: 投资组合名称 / Portfolio name
+      responses:
+        '201':
+          description: 创建成功 / Successfully created
+
+  /portfolios/update/{id}:
+    put:
+      summary: 更新投资组合名称 / Update portfolio name
+      tags: [Portfolios / 投资组合]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            description: 投资组合 ID / Portfolio ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name:
+                  type: string
+                  description: 新名称 / New name
+      responses:
+        '200':
+          description: 更新成功 / Successfully updated
+
+  /portfolios/delete/{id}:
+    delete:
+      summary: 删除投资组合及相关资产 / Delete a portfolio and related assets
+      tags: [Portfolios / 投资组合]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            description: 投资组合 ID / Portfolio ID
+      responses:
+        '200':
+          description: 删除成功 / Successfully deleted
+
+  /cash-assets:
+    get:
+      summary: 获取现金资产列表 / Get list of cash assets
+      tags: [CashAssets / 现金资产]
+      responses:
+        '200':
+          description: 返回现金资产 / Returns cash asset data
+
+    post:
+      summary: 添加现金资产 / Add new cash asset
+      tags: [CashAssets / 现金资产]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [cash_amount, currency_code]
+              properties:
+                cash_amount:
+                  type: number
+                  description: 金额 / Amount
+                currency_code:
+                  type: string
+                  description: 货币代码 / Currency code
+                bank_name:
+                  type: string
+                  description: 银行名称 / Bank name
+                notes:
+                  type: string
+                  description: 备注 / Notes
+      responses:
+        '201':
+          description: 创建成功 / Successfully created
+
+  /cash-assets/{id}:
+    put:
+      summary: 更新现金资产 / Update cash asset
+      tags: [CashAssets / 现金资产]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            description: 现金资产 ID / Cash asset ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cash_amount:
+                  type: number
+                  description: 金额 / Amount
+                currency_code:
+                  type: string
+                  description: 货币代码 / Currency code
+                bank_name:
+                  type: string
+                  description: 银行名称 / Bank name
+                notes:
+                  type: string
+                  description: 备注 / Notes
+      responses:
+        '200':
+          description: 更新成功 / Successfully updated
+
+    delete:
+      summary: 删除现金资产 / Delete cash asset
+      tags: [CashAssets / 现金资产]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            description: 现金资产 ID / Cash asset ID
+      responses:
+        '200':
+          description: 删除成功 / Successfully deleted
+
+  /{portfolioId}/assets:
+    get:
+      summary: 获取投资组合的资产 / Get assets of a portfolio
+      tags: [PortfolioAssets / 投资组合资产]
+      parameters:
+        - name: portfolioId
+          in: path
+          required: true
+          schema:
+            type: integer
+            description: 投资组合 ID / Portfolio ID
+      responses:
+        '200':
+          description: 返回资产列表 / Returns asset list
+
+    post:
+      summary: 添加资产到组合 / Add asset to portfolio
+      tags: [PortfolioAssets / 投资组合资产]
+      parameters:
+        - name: portfolioId
+          in: path
+          required: true
+          schema:
+            type: integer
+            description: 投资组合 ID / Portfolio ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [asset_type, asset_id, quantity]
+              properties:
+                asset_type:
+                  type: string
+                  enum: [stock, cash]
+                  description: 资产类型 / Asset type
+                asset_id:
+                  type: integer
+                  description: 资产 ID / Asset ID
+                quantity:
+                  type: number
+                  description: 数量 / Quantity
+      responses:
+        '201':
+          description: 添加成功 / Successfully added
+
+  /portfolio-assets/{id}:
+    put:
+      summary: 更新资产信息 / Update portfolio asset details
+      tags: [PortfolioAssets / 投资组合资产]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            description: 资产记录 ID / Portfolio asset record ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                quantity:
+                  type: number
+                  description: 新数量 / Updated quantity
+      responses:
+        '200':
+          description: 更新成功 / Successfully updated
+
+  /stock-assets:
+    get:
+      summary: 获取股票资产列表 / Get list of stock assets
+      tags: [StockAssets / 股票资产]
+      responses:
+        '200':
+          description: 返回股票资产列表 / Returns stock assets
+
+    post:
+      summary: 添加股票资产 / Add new stock asset
+      tags: [StockAssets / 股票资产]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [ticker, name, quantity, purchase_price]
+              properties:
+                ticker:
+                  type: string
+                  description: 股票代码 / Stock ticker
+                name:
+                  type: string
+                  description: 股票名称 / Stock name
+                quantity:
+                  type: number
+                  description: 数量 / Quantity
+                purchase_price:
+                  type: number
+                  description: 买入价格 / Purchase price
+                current_price:
+                  type: number
+                  description: 当前价格 / Current price
+                purchase_date:
+                  type: string
+                  format: date
+                  description: 买入日期 / Purchase date
+      responses:
+        '201':
+          description: 添加成功 / Successfully added
+
+  /stock-assets/{id}:
+    put:
+      summary: 更新股票资产 / Update stock asset
+      tags: [StockAssets / 股票资产]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            description: 股票资产 ID / Stock asset ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                quantity:
+                  type: number
+                  description: 数量 / Quantity
+                current_price:
+                  type: number
+                  description: 当前价格 / Current price
+      responses:
+        '200':
+          description: 更新成功 / Successfully updated
+
+    delete:
+      summary: 删除股票资产 / Delete stock asset
+      tags: [StockAssets / 股票资产]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            description: 股票资产 ID / Stock asset ID
+      responses:
+        '200':
+          description: 删除成功 / Successfully deleted
+
+components:
+  schemas:
+    Portfolio:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    StockAsset:
+      type: object
+      properties:
+        id:
+          type: integer
+        ticker:
+          type: string
+        name:
+          type: string
+        quantity:
+          type: number
+        purchase_price:
+          type: number
+          format: float
+        current_price:
+          type: number
+          format: float
+        purchase_date:
+          type: string
+          format: date
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    CashAsset:
+      type: object
+      properties:
+        id:
+          type: integer
+        cash_amount:
+          type: number
+          format: float
+        currency_code:
+          type: string
+        bank_name:
+          type: string
+        notes:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    PortfolioAsset:
+      type: object
+      properties:
+        id:
+          type: integer
+        portfolio_id:
+          type: integer
+        asset_type:
+          type: string
+          enum: [stock, cash]
+        asset_id:
+          type: integer
+        quantity:
+          type: number
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    StocksAssetsHistory:
+      type: object
+      properties:
+        id:
+          type: integer
+        stock_id:
+          type: integer
+        record_date:
+          type: string
+          format: date
+        purchase_price:
+          type: number
+          format: float
+        current_price:
+          type: number
+          format: float
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    StocksHistory:
+      type: object
+      properties:
+        id:
+          type: integer
+        stock_id:
+          type: integer
+        record_date:
+          type: string
+          format: date
+        current_price:
+          type: number
+          format: float
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    AllStock:
+      type: object
+      properties:
+        id:
+          type: integer
+        ticker:
+          type: string
+        record_date:
+          type: string
+          format: date
+        market_price:
+          type: number
+          format: float
+        name:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
