@@ -7,7 +7,7 @@ export const router = express.Router();
 router.get('/:portfolioId/assets', portfolioAssetController.getPortfolioAssets);
 router.put('/portfolio-assets/:id', portfolioAssetController.updatePortfolioAsset);
 router.post('/:portfolioId/assets', portfolioAssetController.addPortfolioAsset);
-router.get('/:portfolioId/asset-allocation', portfolioAssetController.getPortfolioAssetAllocation);
+router.get('/portfolio-performance/:id', portfolioAssetController.portfolioPerformance);
 
 // 通用的投资组合资产路由（用于前端调用）
 router.post('/portfolio-assets', portfolioAssetController.addPortfolioAsset);

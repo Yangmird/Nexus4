@@ -134,7 +134,6 @@ export function getPortfolioReturns(req, res) {
         LEFT JOIN cash_assets ca ON pa.asset_type = 'cash' AND pa.asset_id = ca.id
         WHERE pa.portfolio_id = ?
     `;
-    
     connection.query(query, [portfolioId], (err, assets) => {
         if (err) {
             console.error('Error fetching portfolio returns:', err);
@@ -431,11 +430,9 @@ function calculatePortfolioReturns(assets) {
         if (asset.asset_type === 'stock' && asset.stock_name) {
             const currentValue = asset.quantity * asset.current_price;
             const purchaseValue = asset.quantity * asset.purchase_price;
-            
             stockValue += currentValue;
             totalCurrentValue += currentValue;
             totalPurchaseValue += purchaseValue;
-            
             const difference = currentValue - purchaseValue;
             if (difference > 0) {
                 profit += difference;
@@ -459,7 +456,7 @@ function calculatePortfolioReturns(assets) {
         loss: loss,
         totalReturn: totalReturn,
         dailyReturn: dailyReturn,
-        riskRatio: 0.85 // 模拟风险比率
+        riskRatio: 0 // 模拟风险比率
     };
 }
 
@@ -476,7 +473,7 @@ function calculatePortfolioAllocation(assets) {
         }
     });
     
-    const totalValue = cashValue + stockValue;
+    const totalValue = Number(cashValue) + Number(stockValue);
     const cashPercentage = totalValue > 0 ? (cashValue / totalValue) * 100 : 0;
     const stockPercentage = totalValue > 0 ? (stockValue / totalValue) * 100 : 0;
     

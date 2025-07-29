@@ -4,16 +4,50 @@ import connection from '../db_connect.js';
  * 查询全部股票资产（未来可改为某个用户/投资组合下）
  */
 export function getStockAssets(req, res) {
+  updateStockAssetPrices().then(() => {
     const query = 'SELECT * FROM stock_assets ORDER BY purchase_date DESC';
     connection.query(query, (err, results) => {
-        if (err) {
-            console.error('Error fetching stock assets:', err);
-            res.status(500).send('Error fetching stock assets');
-            return;
-        }
-        res.json(results);
+      if (err) {
+        console.error('Error fetching stock assets:', err);
+        res.status(500).send('Error fetching stock assets');
+        return;
+      }
+      res.json(results);
+    });
+  }).catch(err => {
+    console.error('Error updating prices:', err);
+    res.status(500).send('Error updating asset prices');
+  });
+}
+
+
+async function updateStockAssetPrices() {
+    return new Promise((resolve, reject) => {
+        const updateQuery = `
+            UPDATE stock_assets sa
+            JOIN (
+                SELECT stock_id, MAX(record_date) AS latest_date
+                FROM stocks_history
+                GROUP BY stock_id
+            ) latest ON sa.id = latest.stock_id
+            JOIN stocks_history sh ON sh.stock_id = latest.stock_id AND sh.record_date = latest.latest_date
+            SET 
+                sa.current_price = sh.current_price,
+                sa.updated_at = NOW()
+            WHERE sa.id IS NOT NULL;
+        `;
+        connection.query(updateQuery, (err, result) => {
+            if (err) {
+                console.error('Failed to update current prices:', err);
+                return reject(err);
+            }
+            console.log('✅ Stock prices updated');
+            resolve(result);
+        });
     });
 }
+
+
 
 /**
  * 获取单个股票资产

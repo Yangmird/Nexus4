@@ -379,92 +379,96 @@ export function validatePurchase(req, res) {
   });
 }
 
+export function portfolioPerformance(req, res) {
+  const { id } = req.params;
 
-// 获取投资组合资产分配比例
-export async function getPortfolioAssetAllocation(req, res) {
-    const portfolioId = req.params.portfolioId;
+  // 查询股票资产
+  connection.query(
+    `SELECT pa.asset_id AS stock_id, pa.quantity, sa.purchase_price, sa.purchase_date
+     FROM portfolio_assets pa
+     JOIN stock_assets sa ON sa.id = pa.asset_id
+     WHERE pa.portfolio_id = ? AND pa.asset_type = 'stock'`,
+    [id],
+    (err, stockAssets) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ error: 'Internal server error' });
+      }
 
-    try {
-        // 使用WITH子句计算总价值和各项资产价值
-        const query = `
-            WITH portfolio_values AS (
-                SELECT 
-                    pa.id,
-                    pa.asset_type,
-                    CASE 
-                        WHEN pa.asset_type = 'stock' THEN CONCAT(s.name, ' (', s.ticker, ')')
-                        WHEN pa.asset_type = 'cash' THEN CONCAT('现金 (', c.currency_code, ')')
-                    END AS asset_name,
-                    CASE
-                        WHEN pa.asset_type = 'stock' THEN pa.quantity * s.current_price
-                        WHEN pa.asset_type = 'cash' THEN c.cash_amount
-                    END AS asset_value
-                FROM 
-                    portfolio_assets pa
-                LEFT JOIN 
-                    stock_assets s ON pa.asset_id = s.id AND pa.asset_type = 'stock'
-                LEFT JOIN 
-                    cash_assets c ON pa.asset_id = c.id AND pa.asset_type = 'cash'
-                WHERE 
-                    pa.portfolio_id = ?
-            ),
-            total_value AS (
-                SELECT SUM(asset_value) AS total FROM portfolio_values
-            )
-            SELECT 
-                pv.*,
-                ROUND((pv.asset_value / tv.total) * 100, 2) AS percentage
-            FROM 
-                portfolio_values pv
-            CROSS JOIN 
-                total_value tv
-            ORDER BY 
-                pv.asset_value DESC;
-        `;
+      if (stockAssets.length === 0) {
+        // 没有股票资产，查询现金资产
+        connection.query(
+          `SELECT ca.cash_amount
+           FROM portfolio_assets pa
+           JOIN cash_assets ca ON ca.id = pa.asset_id
+           WHERE pa.portfolio_id = ? AND pa.asset_type = 'cash'`,
+          [id],
+          (cashErr, cashAssets) => {
+            if (cashErr) {
+              console.error(cashErr);
+              return res.status(500).json({ error: 'Internal server error' });
+            }
+            if (cashAssets.length === 0) {
+              // 既无股票也无现金，返回空或提示
+              return res.status(404).json({ message: 'No assets found in this portfolio.' });
+            }
+            // 返回现金资产，前端识别没有股票，只是现金
+            return res.json({
+              cashAssets,
+              stockAssets: [],
+              message: 'Pure cash portfolio',
+            });
+          }
+        );
+        return; // 重要：这里必须return，防止继续执行下面代码
+      }
 
-        const [results] = await connection.promise().query(query, [portfolioId]);
+      // 有股票资产，继续查询股票历史收益，跟之前代码一样
+      const result = [];
+      let index = 0;
 
-        if (results.length === 0) {
-            return res.status(404).json({ message: '该投资组合没有资产或不存在' });
+      const processNext = () => {
+        if (index >= stockAssets.length) {
+          return res.json({ stockAssets: result, cashAssets: [], message: 'Has stocks' });
         }
 
-        // 计算总价值
-        const totalValue = results.reduce((sum, asset) => sum + parseFloat(asset.asset_value), 0);
+        const asset = stockAssets[index];
 
-        // 格式化返回数据
-        const response = {
-            portfolio_id: portfolioId,
-            total_value: totalValue.toFixed(2),
-            assets: results.map(asset => ({
-                asset_id: asset.id,
-                asset_type: asset.asset_type,
-                asset_name: asset.asset_name,
-                asset_value: parseFloat(asset.asset_value).toFixed(2),
-                percentage: asset.percentage
-            })),
-            // 按资产类型汇总
-            allocation_by_type: results.reduce((acc, asset) => {
-                if (!acc[asset.asset_type]) {
-                    acc[asset.asset_type] = {
-                        total_value: 0,
-                        percentage: 0,
-                        count: 0
-                    };
-                }
-                acc[asset.asset_type].total_value += parseFloat(asset.asset_value);
-                acc[asset.asset_type].percentage += parseFloat(asset.percentage);
-                acc[asset.asset_type].count++;
-                return acc;
-            }, {})
-        };
+        connection.query(
+          `SELECT record_date, current_price
+           FROM stocks_history
+           WHERE stock_id = ? AND record_date >= ?
+           ORDER BY record_date ASC`,
+          [asset.stock_id, asset.purchase_date],
+          (err2, history) => {
+            if (err2) {
+              console.error(err2);
+              return res.status(500).json({ error: 'Failed to fetch stock history.' });
+            }
 
-        res.json(response);
+            const historyWithProfit = history.map(h => ({
+              date: h.record_date,
+              price: parseFloat(h.current_price),
+              profit: parseFloat(((h.current_price - asset.purchase_price) * asset.quantity).toFixed(2)),
+            }));
 
-    } catch (err) {
-        console.error('计算资产分配比例错误:', err);
-        res.status(500).json({ 
-            error: '服务器错误',
-            details: err.message 
-        });
+            result.push({
+              stock_asset_id: asset.stock_id,
+              quantity: asset.quantity,
+              purchase_price: asset.purchase_price,
+              purchase_date: asset.purchase_date,
+              history: historyWithProfit,
+            });
+
+            index++;
+            processNext();
+          }
+        );
+      };
+
+      processNext();
     }
+  );
 }
+
+

@@ -588,7 +588,7 @@
         async function loadPortfolioData(portfolioId) {
             try {
                 // 获取投资组合收益统计
-                const returnsResponse = await fetch(`${API_BASE}/portfolios/${portfolioId}/returns`);
+                const returnsResponse = await fetch(`${API_BASE}/portfolio-performance/${portfolioId}`);
                 const returnsData = await returnsResponse.json();
                 
                 // 获取投资组合资产分配
@@ -614,72 +614,124 @@
         }
 
         // 更新收益变化折线图
+        // 传入后台返回的数组
         function updateReturnsChart(returnsData) {
+            console.log('更新收益变化图:', returnsData);
             const ctx = document.getElementById('returnsChart').getContext('2d');
-            
-            if (returnsChart) {
+
+            if(returnsChart) {
                 returnsChart.destroy();
+                returnsChart = null;
             }
-            
-            // 生成收益变化数据（模拟30天）
-            const dates = [];
-            const returns = [];
-            const today = new Date();
-            
-            for (let i = 29; i >= 0; i--) {
-                const date = new Date(today);
-                date.setDate(date.getDate() - i);
-                dates.push(date.toLocaleDateString('zh-CN'));
-                
-                // 基于总收益率生成每日收益变化
-                const baseReturn = returnsData.totalReturn;
-                const dailyVariation = (Math.random() - 0.5) * 2; // ±1% 变化
-                const dailyReturn = (baseReturn / 30) + dailyVariation;
-                returns.push(dailyReturn);
+
+            // 如果没有股票资产，显示仅持有现金
+            if (!returnsData.stockAssets || returnsData.stockAssets.length === 0) {
+                const today = new Date();
+                const dates = [];
+
+                // 默认展示近 7 天
+                for (let i = 6; i >= 0; i--) {
+                    const d = new Date(today);
+                    d.setDate(d.getDate() - i);
+                    dates.push(d.toISOString().slice(0, 10));
+                }
+
+                const displayDates = dates.map(d => {
+                    const dt = new Date(d);
+                    return dt.toLocaleDateString('zh-CN');
+                });
+
+                const zeroProfits = new Array(dates.length).fill(0);
+
+                returnsChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: displayDates,
+                        datasets: [{
+                            label: '仅持有现金',
+                            data: zeroProfits,
+                            borderColor: 'rgba(192, 192, 192, 1)',
+                            borderDash: [5, 5],
+                            fill: false,
+                            tension: 0.1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { display: true }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: { display: true, text: '收益 (元)' }
+                            },
+                            x: {
+                                title: { display: true, text: '日期' }
+                            }
+                        }
+                    }
+                });
+
+                return; // 退出函数
             }
-            
+
+            // 有股票资产时，处理收益数据
+            const dateSet = new Set();
+            returnsData.stockAssets.forEach(stock => {
+                stock.history.forEach(h => {
+                    dateSet.add(new Date(h.date).toISOString().slice(0,10));
+                });
+            });
+
+            const allDates = Array.from(dateSet).sort();
+
+            const totalProfits = allDates.map(dateStr => {
+                let dailySum = 0;
+                returnsData.stockAssets.forEach(stock => {
+                    const entry = stock.history.find(h => h.date.startsWith(dateStr));
+                    if (entry) {
+                        dailySum += entry.profit;
+                    }
+                });
+                return dailySum;
+            });
+
+            const displayDates = allDates.map(d => {
+                const dt = new Date(d);
+                return dt.toLocaleDateString('zh-CN');
+            });
+
             returnsChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: dates,
+                    labels: displayDates,
                     datasets: [{
-                        label: '日收益率 (%)',
-                        data: returns,
-                        borderColor: '#28a745',
-                        backgroundColor: 'rgba(40, 167, 69, 0.1)',
-                        borderWidth: 3,
-                        fill: true,
-                        tension: 0.4
+                        label: '投资组合每日收益',
+                        data: totalProfits,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        fill: false,
+                        tension: 0.1
                     }]
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: false,
                     plugins: {
-                        title: {
-                            display: true,
-                            text: '投资组合收益变化趋势',
-                            font: {
-                                size: 16
-                            }
-                        },
-                        legend: {
-                            display: false
-                        }
+                        legend: { display: true },
                     },
                     scales: {
                         y: {
-                            beginAtZero: false,
-                            ticks: {
-                                callback: function(value) {
-                                    return value.toFixed(2) + '%';
-                                }
-                            }
+                            beginAtZero: true,
+                            title: { display: true, text: '收益 (元)' }
+                        },
+                        x: {
+                            title: { display: true, text: '日期' }
                         }
                     }
                 }
             });
         }
+
 
         // 更新资产分配饼状图
         function updateAllocationChart(allocationData) {
@@ -771,21 +823,22 @@
                 
                 // 计算收益率（使用真实数据）
                 const totalAssets = data.total_assets;
-                const previousTotal = totalAssets * 0.95; // 假设前一天资产
-                const totalReturn = ((totalAssets - previousTotal) / previousTotal) * 100;
-                
-                // 更新收益率显示
+                const previousTotal = data.previous_total; // 前一天资产
+                const purchaseTotal = data.purchase_total; // 购买时资产
+
+                const totalReturn = ((totalAssets - purchaseTotal) / purchaseTotal) * 100;
+                const dailyReturn = ((totalAssets - previousTotal) / previousTotal) * 100;
+
+                // 更新显示
                 document.getElementById('total-return').textContent = `${totalReturn.toFixed(2)}%`;
-                document.getElementById('daily-return').textContent = `${(totalReturn / 30).toFixed(2)}%`;
-                document.getElementById('risk-ratio').textContent = '0.85';
-                
+                document.getElementById('daily-return').textContent = `${dailyReturn.toFixed(2)}%`;
+                document.getElementById('risk-ratio').textContent = '0.3';
+
                 // 更新变化率
-                const cashChange = (Math.random() - 0.5) * 2;
-                const stocksChange = (Math.random() - 0.5) * 5;
-                const totalChange = (totalReturn / 100) * 100;
-                
-                document.getElementById('cash-change').textContent = `${cashChange > 0 ? '+' : ''}${cashChange.toFixed(2)}%`;
-                document.getElementById('cash-change').className = `total-change ${cashChange >= 0 ? 'positive' : 'negative'}`;
+                const cashChange = 0;
+                const stocksChange = dailyReturn;
+                const totalChange = stocksChange;
+
                 
                 document.getElementById('stocks-change').textContent = `${stocksChange > 0 ? '+' : ''}${stocksChange.toFixed(2)}%`;
                 document.getElementById('stocks-change').className = `total-change ${stocksChange >= 0 ? 'positive' : 'negative'}`;
