@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus-4 Personal Asset Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="container">
+    <!-- Header -->
+    <header class="header">
+        <h1>Welcome to the Nexus-4</h1>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Left Panel - Personal Assets -->
+        <aside class="left-panel">
+            <section class="asset-composition">
+                <h2>个人资产组成</h2>
+
+                <div class="cash-section">
+                    <h3>Cash:</h3>
+                    <!-- 由 script.js 加载真实现金数据 -->
+                </div>
+
+                <div class="stocks-section">
+                    <h3>Stocks:</h3>
+                    <!-- 由 script.js 加载真实股票数据 -->
+                </div>
+
+                <div class="total-assets">
+                    <h3>个人资产总额:</h3>
+                    <div class="total-item">
+                        <span>现金:</span>
+                        <span id="total-cash">Loading...</span>
+                    </div>
+                    <div class="total-item">
+                        <span>股票:</span>
+                        <span id="total-stocks">Loading...</span>
+                    </div>
+                    <div class="total-item">
+                        <span>总额:</span>
+                        <span id="total-amount">Loading...</span>
+                    </div>
+                </div>
+            </section>
+        </aside>
+
+        <!-- Right Panel - Portfolio -->
+        <section class="right-panel">
+            <div class="portfolio-header">
+                <h2>个人资产组合:</h2>
+                <div class="portfolio-buttons">
+                    <button class="portfolio-btn active" data-portfolio="1">组合1</button>
+                    <button class="portfolio-btn" data-portfolio="2">组合2</button>
+                    <button class="portfolio-btn" data-portfolio="3">组合3</button>
+                    <button class="portfolio-btn" data-portfolio="4">...</button>
+                    <button class="portfolio-btn" data-portfolio="n">组合n</button>
+                </div>
+            </div>
+
+            <div class="charts-container">
+                <div class="line-chart-container">
+                    <h3>总资产历史走向折线图</h3>
+                    <p class="chart-subtitle">(横坐标：时间，纵坐标：金额)</p>
+                    <canvas id="lineChart"></canvas>
+                </div>
+
+                <div class="bottom-charts">
+                    <div class="profit-chart-container">
+                        <h3>该资产组合盈利情况</h3>
+                        <canvas id="profitChart"></canvas>
+                    </div>
+                    <div class="pie-chart-container">
+                        <h3>该资产分配的饼状图</h3>
+                        <canvas id="pieChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="action-btn management-btn">个人资产组合管理</button>
+                <button class="action-btn details-btn">查看所有股票详情</button>
+            </div>
+        </section>
+    </main>
+</div>
+
+<!-- 加载动态脚本 -->
+<script src="script.js"></script>
+</body>
+</html>
