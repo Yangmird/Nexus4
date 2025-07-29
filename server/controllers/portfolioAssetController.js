@@ -253,6 +253,132 @@ export function addPortfolioAsset(req, res) {
   });
 }
 
+// 购买验证函数
+export function validatePurchase(req, res) {
+  const { portfolio_id, asset_type, amount, ticker, quantity } = req.body;
+
+  if (!portfolio_id || !asset_type) {
+    return res.status(400).json({ error: '缺少必要参数' });
+  }
+
+  // 验证投资组合是否存在
+  connection.query('SELECT id FROM portfolios WHERE id = ?', [portfolio_id], (err, portfolioRows) => {
+    if (err) {
+      console.error('Error checking portfolio:', err);
+      return res.status(500).json({ error: '验证投资组合失败' });
+    }
+
+    if (portfolioRows.length === 0) {
+      return res.status(404).json({ error: '投资组合不存在' });
+    }
+
+    if (asset_type === 'cash') {
+      // 验证现金购买
+      if (!amount || amount <= 0) {
+        return res.status(400).json({ error: '投入金额必须大于0' });
+      }
+
+      // 检查是否有足够的现金资产
+      connection.query(
+        'SELECT SUM(cash_amount) as total_cash FROM cash_assets',
+        (err, cashRows) => {
+          if (err) {
+            console.error('Error checking cash assets:', err);
+            return res.status(500).json({ error: '验证现金资产失败' });
+          }
+
+          const totalCash = Number(cashRows[0].total_cash) || 0;
+          
+          if (amount > totalCash) {
+            return res.status(400).json({ 
+              error: `投入金额 ${amount} 超过可用现金 ${totalCash}` 
+            });
+          }
+
+          res.json({ 
+            message: '现金购买验证通过',
+            available_cash: totalCash,
+            requested_amount: amount
+          });
+        }
+      );
+    } else if (asset_type === 'stock') {
+      // 验证股票购买
+      if (!ticker || !quantity || !amount) {
+        return res.status(400).json({ error: '股票购买参数不完整' });
+      }
+
+      if (quantity <= 0) {
+        return res.status(400).json({ error: '购买股数必须大于0' });
+      }
+
+      if (amount <= 0) {
+        return res.status(400).json({ error: '购买金额必须大于0' });
+      }
+
+      // 检查股票是否存在
+      connection.query(
+        'SELECT id, name, current_price FROM stock_assets WHERE ticker = ?',
+        [ticker],
+        (err, stockRows) => {
+          if (err) {
+            console.error('Error checking stock:', err);
+            return res.status(500).json({ error: '验证股票失败' });
+          }
+
+          if (stockRows.length === 0) {
+            return res.status(404).json({ error: `股票 ${ticker} 不存在` });
+          }
+
+          const stock = stockRows[0];
+          const expectedAmount = quantity * stock.current_price;
+          
+          // 检查购买金额是否合理（允许10%的误差）
+          const priceDifference = Math.abs(amount - expectedAmount);
+          const priceTolerance = expectedAmount * 0.1;
+          
+          if (priceDifference > priceTolerance) {
+            return res.status(400).json({ 
+              error: `购买金额 ${amount} 与预期金额 ${expectedAmount} 差异过大` 
+            });
+          }
+
+          // 检查是否有足够的现金购买
+          connection.query(
+            'SELECT SUM(cash_amount) as total_cash FROM cash_assets',
+            (err, cashRows) => {
+              if (err) {
+                console.error('Error checking cash for stock purchase:', err);
+                return res.status(500).json({ error: '验证购买资金失败' });
+              }
+
+              const totalCash = Number(cashRows[0].total_cash) || 0;
+              
+              if (amount > totalCash) {
+                return res.status(400).json({ 
+                  error: `购买金额 ${amount} 超过可用现金 ${totalCash}` 
+                });
+              }
+
+              res.json({ 
+                message: '股票购买验证通过',
+                stock_name: stock.name,
+                stock_ticker: ticker,
+                quantity: quantity,
+                price_per_share: stock.current_price,
+                total_amount: amount,
+                available_cash: totalCash
+              });
+            }
+          );
+        }
+      );
+    } else {
+      return res.status(400).json({ error: '不支持的资产类型' });
+    }
+  });
+}
+
 
 // 获取投资组合资产分配比例
 export async function getPortfolioAssetAllocation(req, res) {

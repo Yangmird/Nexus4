@@ -16,6 +16,26 @@ export function getStockAssets(req, res) {
 }
 
 /**
+ * 获取单个股票资产
+ */
+export function getStockAsset(req, res) {
+    const { id } = req.params;
+    const query = 'SELECT * FROM stock_assets WHERE id = ?';
+    connection.query(query, [id], (err, results) => {
+        if (err) {
+            console.error('Error fetching stock asset:', err);
+            res.status(500).send('Error fetching stock asset');
+            return;
+        }
+        if (results.length === 0) {
+            res.status(404).send('Stock asset not found');
+            return;
+        }
+        res.json(results[0]);
+    });
+}
+
+/**
  * 添加股票资产记录（如买入一只股票）
  * 前端传入：{ ticker, name, quantity, purchase_price, current_price, purchase_date }
  */

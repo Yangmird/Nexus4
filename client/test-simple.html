@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>简单测试页面</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .portfolio-item {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .portfolio-item:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+        .portfolio-item.active {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .portfolio-name {
+            font-weight: 600;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+        }
+        .portfolio-info {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+        .assets-section {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        .asset-table {
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .table-header {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .header-cell {
+            padding: 15px;
+            font-weight: 600;
+            color: #333;
+            text-align: center;
+        }
+        .table-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .table-cell {
+            padding: 15px;
+            text-align: center;
+        }
+        .error {
+            color: red;
+            background: #f8d7da;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .success {
+            color: green;
+            background: #d4edda;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>投资组合测试页面</h1>
+        
+        <div id="status" class="success">正在加载数据...</div>
+        
+        <h2>投资组合列表</h2>
+        <div id="portfolio-list">
+            <!-- 投资组合将在这里显示 -->
+        </div>
+        
+        <div class="assets-section">
+            <h2>选中投资组合的资产</h2>
+            <div id="selected-portfolio-info">请选择一个投资组合</div>
+            
+            <h3>现金资产</h3>
+            <div class="asset-table">
+                <div class="table-header">
+                    <div class="header-cell">名称</div>
+                    <div class="header-cell">金额</div>
+                    <div class="header-cell">银行</div>
+                    <div class="header-cell">操作</div>
+                </div>
+                <div id="cash-assets-table">
+                    <!-- 现金资产将在这里显示 -->
+                </div>
+            </div>
+            
+            <h3>股票资产</h3>
+            <div class="asset-table">
+                <div class="table-header">
+                    <div class="header-cell">名称</div>
+                    <div class="header-cell">数量</div>
+                    <div class="header-cell">当前价格</div>
+                    <div class="header-cell">操作</div>
+                </div>
+                <div id="stocks-assets-table">
+                    <!-- 股票资产将在这里显示 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8088/api';
+        let currentPortfolioId = null;
+        let allPortfolios = [];
+
+        // 加载所有投资组合及其资产
+        async function loadAllPortfoliosAssets() {
+            try {
+                console.log('开始加载投资组合数据...');
+                const response = await fetch(`${API_BASE}/portfolios-all-assets`);
+                console.log('API响应状态:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const portfolios = await response.json();
+                console.log('获取到的投资组合数据:', portfolios);
+                
+                allPortfolios = portfolios;
+                
+                const container = document.getElementById('portfolio-list');
+                if (!container) {
+                    console.error('找不到portfolio-list容器');
+                    return;
+                }
+                
+                container.innerHTML = '';
+                
+                portfolios.forEach((portfolio, index) => {
+                    const item = document.createElement('div');
+                    item.className = `portfolio-item ${index === 0 ? 'active' : ''}`;
+                    item.dataset.portfolioId = portfolio.id;
+                    item.onclick = () => selectPortfolio(portfolio.id);
+                    
+                    const totalAssets = portfolio.assets.cash.length + portfolio.assets.stock.length;
+                    
+                    item.innerHTML = `
+                        <div class="portfolio-name">${portfolio.name}</div>
+                        <div class="portfolio-info">
+                            <span>创建时间: ${new Date(portfolio.created_at).toLocaleDateString()}</span><br>
+                            <span>资产数量: ${totalAssets}</span>
+                        </div>
+                    `;
+                    
+                    container.appendChild(item);
+                });
+                
+                console.log(`成功加载了 ${portfolios.length} 个投资组合`);
+                
+                // 默认选择第一个投资组合
+                if (portfolios.length > 0) {
+                    currentPortfolioId = portfolios[0].id;
+                    console.log('默认选择投资组合:', portfolios[0].name);
+                    displayPortfolioAssets(portfolios[0]);
+                } else {
+                    console.log('没有找到投资组合数据');
+                }
+                
+                document.getElementById('status').className = 'success';
+                document.getElementById('status').textContent = `成功加载了 ${portfolios.length} 个投资组合`;
+                
+            } catch (error) {
+                console.error('加载投资组合失败:', error);
+                document.getElementById('status').className = 'error';
+                document.getElementById('status').textContent = `加载失败: ${error.message}`;
+            }
+        }
+
+        // 选择投资组合
+        function selectPortfolio(portfolioId) {
+            currentPortfolioId = portfolioId;
+            
+            // 更新选中状态
+            document.querySelectorAll('.portfolio-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // 找到对应的投资组合项并设置为活跃状态
+            const portfolioItem = document.querySelector(`[data-portfolio-id="${portfolioId}"]`);
+            if (portfolioItem) {
+                portfolioItem.classList.add('active');
+            }
+            
+            // 找到选中的投资组合数据
+            const selectedPortfolio = allPortfolios.find(p => p.id === portfolioId);
+            if (selectedPortfolio) {
+                displayPortfolioAssets(selectedPortfolio);
+            }
+        }
+
+        // 显示投资组合资产
+        function displayPortfolioAssets(portfolio) {
+            console.log('显示投资组合资产:', portfolio);
+            
+            // 更新选中投资组合信息
+            document.getElementById('selected-portfolio-info').textContent = 
+                `当前选中: ${portfolio.name} (ID: ${portfolio.id})`;
+            
+            updateCashAssetsList(portfolio.assets.cash);
+            updateStockAssetsList(portfolio.assets.stock);
+        }
+
+        // 更新现金资产列表
+        function updateCashAssetsList(cashAssets) {
+            const container = document.getElementById('cash-assets-table');
+            console.log('更新现金资产列表:', cashAssets);
+            
+            if (cashAssets.length === 0) {
+                container.innerHTML = `
+                    <div class="table-row">
+                        <div class="table-cell" style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+                            暂无现金资产
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = cashAssets.map(asset => `
+                <div class="table-row">
+                    <div class="table-cell">${asset.bank_name}</div>
+                    <div class="table-cell">¥${asset.cash_amount.toLocaleString()}</div>
+                    <div class="table-cell">${asset.bank_name}</div>
+                    <div class="table-cell">
+                        <button onclick="alert('查看功能开发中...')">查看</button>
+                        <button onclick="alert('编辑功能开发中...')">编辑</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 更新股票资产列表
+        function updateStockAssetsList(stockAssets) {
+            const container = document.getElementById('stocks-assets-table');
+            console.log('更新股票资产列表:', stockAssets);
+            
+            if (stockAssets.length === 0) {
+                container.innerHTML = `
+                    <div class="table-row">
+                        <div class="table-cell" style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+                            暂无股票资产
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = stockAssets.map(asset => `
+                <div class="table-row">
+                    <div class="table-cell">${asset.ticker} - ${asset.name}</div>
+                    <div class="table-cell">${asset.quantity.toLocaleString()}</div>
+                    <div class="table-cell">¥${asset.current_price.toLocaleString()}</div>
+                    <div class="table-cell">
+                        <button onclick="alert('查看功能开发中...')">查看</button>
+                        <button onclick="alert('编辑功能开发中...')">编辑</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('页面加载完成，开始加载数据...');
+            loadAllPortfoliosAssets();
+        });
+    </script>
+</body>
+</html> 

@@ -30,3 +30,15 @@ export function getAllAssets(req, res) {
         }
     );
 }
+
+// 获取所有股票信息
+export function getAllStocks(req, res) {
+    const query = 'SELECT * FROM all_stocks ORDER BY record_date DESC, ticker ASC';
+    connection.query(query, (err, results) => {
+        if (err) {
+            console.error('获取所有股票失败:', err);
+            return res.status(500).json({ error: '获取股票信息失败' });
+        }
+        res.json(results);
+    });
+}

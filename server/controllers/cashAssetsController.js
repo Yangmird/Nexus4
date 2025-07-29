@@ -13,6 +13,24 @@ export function getCashAssets(req, res) {
     });
 }
 
+// 获取单个现金资产
+export function getCashAsset(req, res) {
+    const { id } = req.params;
+    const query = 'SELECT * FROM cash_assets WHERE id = ?';
+    connection.query(query, [id], (err, results) => {
+        if (err) {
+            console.error('Error fetching cash asset:', err);
+            res.status(500).send('Error fetching cash asset');
+            return;
+        }
+        if (results.length === 0) {
+            res.status(404).send('Cash asset not found');
+            return;
+        }
+        res.json(results[0]);
+    });
+}
+
 // 添加新的现金资产
 export function addCashAsset(req, res) {
     const { cash_amount, currency_code, bank_name, notes } = req.body;

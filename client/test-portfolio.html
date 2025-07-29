@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>投资组合数据测试 - Nexus-4</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .main-content {
+            padding: 30px;
+        }
+
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            background: #f8f9fa;
+        }
+
+        .test-section h2 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .portfolio-selector {
+            margin-bottom: 20px;
+        }
+
+        .portfolio-btn {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .portfolio-btn.active {
+            background: #28a745;
+        }
+
+        .data-display {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border: 1px solid #dee2e6;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 1px solid #dee2e6;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .stat-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #dee2e6;
+        }
+
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .loading {
+            text-align: center;
+            color: #6c757d;
+            padding: 20px;
+        }
+
+        .error {
+            color: #dc3545;
+            padding: 10px;
+            background: #f8d7da;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        .success {
+            color: #155724;
+            padding: 10px;
+            background: #d4edda;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>投资组合数据测试</h1>
+            <p>验证真实数据获取和图表显示功能</p>
+        </div>
+
+        <div class="main-content">
+            <!-- 投资组合选择 -->
+            <div class="test-section">
+                <h2>📊 投资组合选择</h2>
+                <div class="portfolio-selector" id="portfolio-selector">
+                    <div class="loading">加载投资组合中...</div>
+                </div>
+            </div>
+
+            <!-- 历史趋势图 -->
+            <div class="test-section">
+                <h2>📈 历史趋势图（近5天）</h2>
+                <div class="chart-container">
+                    <canvas id="trendChart" height="300"></canvas>
+                </div>
+            </div>
+
+            <!-- 收益统计 -->
+            <div class="test-section">
+                <h2>💰 收益统计</h2>
+                <div class="stats-grid" id="returns-stats">
+                    <div class="loading">加载收益数据中...</div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="profitChart" height="300"></canvas>
+                </div>
+            </div>
+
+            <!-- 资产分配 -->
+            <div class="test-section">
+                <h2>📋 资产分配</h2>
+                <div class="stats-grid" id="allocation-stats">
+                    <div class="loading">加载分配数据中...</div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="allocationChart" height="300"></canvas>
+                </div>
+            </div>
+
+            <!-- API状态 -->
+            <div class="test-section">
+                <h2>🔧 API状态</h2>
+                <div id="api-status">
+                    <div class="loading">检查API状态中...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8088/api';
+        let currentPortfolioId = null;
+        let trendChart = null;
+        let profitChart = null;
+        let allocationChart = null;
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadPortfolios();
+            checkAPIStatus();
+        });
+
+        // 检查API状态
+        async function checkAPIStatus() {
+            const statusContainer = document.getElementById('api-status');
+            const apis = [
+                { name: '投资组合列表', endpoint: '/portfolios' },
+                { name: '历史数据', endpoint: '/portfolios/1/history' },
+                { name: '收益统计', endpoint: '/portfolios/1/returns' },
+                { name: '资产分配', endpoint: '/portfolios/1/allocation' }
+            ];
+
+            statusContainer.innerHTML = '';
+
+            for (const api of apis) {
+                try {
+                    const response = await fetch(`${API_BASE}${api.endpoint}`);
+                    const status = response.ok ? 'success' : 'error';
+                    const statusText = response.ok ? '正常' : '错误';
+                    
+                    const statusItem = document.createElement('div');
+                    statusItem.className = 'data-display';
+                    statusItem.innerHTML = `
+                        <strong>${api.name}:</strong> 
+                        <span style="color: ${response.ok ? '#28a745' : '#dc3545'}">${statusText}</span>
+                    `;
+                    statusContainer.appendChild(statusItem);
+                } catch (error) {
+                    const statusItem = document.createElement('div');
+                    statusItem.className = 'data-display';
+                    statusItem.innerHTML = `
+                        <strong>${api.name}:</strong> 
+                        <span style="color: #dc3545">连接失败</span>
+                    `;
+                    statusContainer.appendChild(statusItem);
+                }
+            }
+        }
+
+        // 加载投资组合
+        async function loadPortfolios() {
+            try {
+                const response = await fetch(`${API_BASE}/portfolios`);
+                const portfolios = await response.json();
+                
+                const selector = document.getElementById('portfolio-selector');
+                selector.innerHTML = '';
+                
+                if (portfolios.length === 0) {
+                    selector.innerHTML = '<div class="error">暂无投资组合数据</div>';
+                    return;
+                }
+                
+                portfolios.forEach((portfolio, index) => {
+                    const btn = document.createElement('button');
+                    btn.className = `portfolio-btn ${index === 0 ? 'active' : ''}`;
+                    btn.textContent = portfolio.name;
+                    btn.onclick = () => selectPortfolio(portfolio.id);
+                    selector.appendChild(btn);
+                });
+                
+                if (portfolios.length > 0) {
+                    currentPortfolioId = portfolios[0].id;
+                    loadPortfolioData(portfolios[0].id);
+                }
+            } catch (error) {
+                console.error('加载投资组合失败:', error);
+                document.getElementById('portfolio-selector').innerHTML = '<div class="error">加载失败</div>';
+            }
+        }
+
+        // 选择投资组合
+        async function selectPortfolio(portfolioId) {
+            currentPortfolioId = portfolioId;
+            
+            // 更新按钮状态
+            document.querySelectorAll('.portfolio-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // 加载投资组合数据
+            await loadPortfolioData(portfolioId);
+        }
+
+        // 加载投资组合数据
+        async function loadPortfolioData(portfolioId) {
+            try {
+                // 获取历史数据
+                const historyResponse = await fetch(`${API_BASE}/portfolios/${portfolioId}/history`);
+                const historyData = await historyResponse.json();
+                
+                // 获取收益统计
+                const returnsResponse = await fetch(`${API_BASE}/portfolios/${portfolioId}/returns`);
+                const returnsData = await returnsResponse.json();
+                
+                // 获取资产分配
+                const allocationResponse = await fetch(`${API_BASE}/portfolios/${portfolioId}/allocation`);
+                const allocationData = await allocationResponse.json();
+                
+                // 更新图表和统计
+                updateTrendChart(historyData);
+                updateReturnsStats(returnsData);
+                updateProfitChart(returnsData);
+                updateAllocationStats(allocationData);
+                updateAllocationChart(allocationData);
+                
+            } catch (error) {
+                console.error('加载投资组合数据失败:', error);
+            }
+        }
+
+        // 更新趋势图
+        function updateTrendChart(data) {
+            const ctx = document.getElementById('trendChart').getContext('2d');
+            
+            if (trendChart) {
+                trendChart.destroy();
+            }
+            
+            trendChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.dates,
+                    datasets: [{
+                        label: '总资产价值',
+                        data: data.values,
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '投资组合历史趋势图',
+                            font: { size: 16 }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            ticks: {
+                                callback: function(value) {
+                                    return '¥' + value.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 更新收益统计
+        function updateReturnsStats(data) {
+            const container = document.getElementById('returns-stats');
+            container.innerHTML = `
+                <div class="stat-item">
+                    <div class="stat-value">¥${data.totalValue.toLocaleString()}</div>
+                    <div class="stat-label">总资产</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">¥${data.cashValue.toLocaleString()}</div>
+                    <div class="stat-label">现金资产</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">¥${data.stockValue.toLocaleString()}</div>
+                    <div class="stat-label">股票资产</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">${data.totalReturn.toFixed(2)}%</div>
+                    <div class="stat-label">总收益率</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">${data.dailyReturn.toFixed(2)}%</div>
+                    <div class="stat-label">日收益率</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">${data.riskRatio}</div>
+                    <div class="stat-label">风险比率</div>
+                </div>
+            `;
+        }
+
+        // 更新盈利饼状图
+        function updateProfitChart(data) {
+            const ctx = document.getElementById('profitChart').getContext('2d');
+            
+            if (profitChart) {
+                profitChart.destroy();
+            }
+            
+            profitChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['盈利', '亏损'],
+                    datasets: [{
+                        data: [data.profit, data.loss],
+                        backgroundColor: ['#28a745', '#dc3545'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '收益情况分析',
+                            font: { size: 16 }
+                        },
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        // 更新资产分配统计
+        function updateAllocationStats(data) {
+            const container = document.getElementById('allocation-stats');
+            container.innerHTML = `
+                <div class="stat-item">
+                    <div class="stat-value">¥${data.cash.value.toLocaleString()}</div>
+                    <div class="stat-label">现金 (${data.cash.percentage.toFixed(1)}%)</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">¥${data.stock.value.toLocaleString()}</div>
+                    <div class="stat-label">股票 (${data.stock.percentage.toFixed(1)}%)</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">¥${data.total.toLocaleString()}</div>
+                    <div class="stat-label">总资产</div>
+                </div>
+            `;
+        }
+
+        // 更新资产分配饼状图
+        function updateAllocationChart(data) {
+            const ctx = document.getElementById('allocationChart').getContext('2d');
+            
+            if (allocationChart) {
+                allocationChart.destroy();
+            }
+            
+            allocationChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['现金', '股票'],
+                    datasets: [{
+                        data: [data.cash.value, data.stock.value],
+                        backgroundColor: ['#17a2b8', '#ffc107'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '资产分配情况',
+                            font: { size: 16 }
+                        },
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html> 

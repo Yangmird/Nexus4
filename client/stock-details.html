@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>查看股票详情 - Nexus-4</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .nav-bar {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .nav-btn:hover {
+            background: #5a6fd8;
+        }
+
+        .main-content {
+            padding: 30px;
+        }
+
+        .search-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .search-label {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .search-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .search-btn:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+        }
+
+        .stock-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stock-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .stock-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .stock-card.dark-blue {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+        }
+
+        .stock-card.light-blue {
+            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+            color: white;
+        }
+
+        .stock-name {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .stock-code {
+            font-size: 0.9em;
+            opacity: 0.8;
+            margin-bottom: 15px;
+        }
+
+        .stock-price {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stock-change {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .stock-change.positive {
+            color: #00b894;
+        }
+
+        .stock-change.negative {
+            color: #d63031;
+        }
+
+        .loading {
+            text-align: center;
+            color: #6c757d;
+            padding: 40px;
+            font-size: 1.1em;
+        }
+
+        .error {
+            color: #dc3545;
+            padding: 20px;
+            background: #f8d7da;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #6c757d;
+            padding: 40px;
+            font-style: italic;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .stock-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                gap: 15px;
+            }
+            
+            .search-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-input {
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Check ALL Stocks Details</h1>
+        </div>
+
+        <div class="nav-bar">
+            <a href="index.html" class="nav-btn">返回主页</a>
+            <a href="portfolio-management.html" class="nav-btn">投资组合管理</a>
+            <a href="asset-management.html" class="nav-btn">个人资产管理</a>
+        </div>
+
+        <div class="main-content">
+            <!-- 搜索区域 -->
+            <div class="search-section">
+                <span class="search-label">搜索股票信息:</span>
+                <input type="text" class="search-input" id="search-input" placeholder="输入股票代码或名称进行搜索...">
+                <button class="search-btn" onclick="searchStocks()">搜索</button>
+            </div>
+
+            <!-- 股票网格 -->
+            <div class="stock-grid" id="stock-grid">
+                <div class="loading">加载中...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API基础URL
+        const API_BASE = 'http://localhost:8088/api';
+        let allStocks = [];
+        let filteredStocks = [];
+
+        // 页面加载时获取数据
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAllStocks();
+        });
+
+        // 加载所有股票
+        async function loadAllStocks() {
+            try {
+                const response = await fetch(`${API_BASE}/all-stocks`);
+                allStocks = await response.json();
+                filteredStocks = [...allStocks];
+                renderStocks();
+            } catch (error) {
+                console.error('加载股票数据失败:', error);
+                document.getElementById('stock-grid').innerHTML = '<div class="error">加载失败，请检查网络连接</div>';
+            }
+        }
+
+        // 渲染股票卡片
+        function renderStocks() {
+            const grid = document.getElementById('stock-grid');
+            grid.innerHTML = '';
+
+            if (filteredStocks.length === 0) {
+                grid.innerHTML = '<div class="empty-state">没有找到相关股票</div>';
+                return;
+            }
+
+            filteredStocks.forEach((stock, index) => {
+                const card = document.createElement('div');
+                card.className = `stock-card ${index % 2 === 0 ? 'dark-blue' : 'light-blue'}`;
+                card.onclick = () => viewStockDetail(stock);
+                
+                // 计算价格变化（模拟数据）
+                const priceChange = (Math.random() - 0.5) * 10;
+                const isPositive = priceChange >= 0;
+                
+                card.innerHTML = `
+                    <div class="stock-name">${stock.name}</div>
+                    <div class="stock-code">${stock.ticker}</div>
+                    <div class="stock-price">¥${stock.market_price.toLocaleString()}</div>
+                    <div class="stock-change ${isPositive ? 'positive' : 'negative'}">
+                        ${isPositive ? '+' : ''}${priceChange.toFixed(2)}%
+                    </div>
+                `;
+                
+                grid.appendChild(card);
+            });
+        }
+
+        // 搜索股票
+        function searchStocks() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase().trim();
+            
+            if (!searchTerm) {
+                filteredStocks = [...allStocks];
+            } else {
+                filteredStocks = allStocks.filter(stock => 
+                    stock.name.toLowerCase().includes(searchTerm) ||
+                    stock.ticker.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            renderStocks();
+        }
+
+        // 实时搜索
+        document.getElementById('search-input').addEventListener('input', function() {
+            searchStocks();
+        });
+
+        // 查看股票详情
+        function viewStockDetail(stock) {
+            // 这里可以跳转到详细的股票页面，或者打开模态框显示更多信息
+            alert(`查看 ${stock.name} (${stock.ticker}) 的详细信息\n当前价格: ¥${stock.market_price.toLocaleString()}`);
+        }
+
+        // 键盘事件处理
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                searchStocks();
+            }
+        });
+    </script>
+</body>
+</html> 
