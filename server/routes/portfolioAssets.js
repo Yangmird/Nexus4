@@ -15,3 +15,5 @@ router.post('/portfolio-assets', portfolioAssetController.addPortfolioAsset);
 // 购买验证路由
 router.post('/portfolio-assets/validate', portfolioAssetController.validatePurchase);
 
+router.get('/available-shares/:ticker', portfolioAssetController.getAvailableShares);
+

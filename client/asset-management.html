@@ -518,8 +518,13 @@
             </div>
 
             <div class="form-group">
-                <label>原持有股数:</label>
+                <label>总持有股数:</label>
                 <input type="number" id="sell-original-shares" readonly>
+            </div>
+
+            <div class="form-group">
+                <label>可支配股数:</label>
+                <input type="number" id="sell-available-shares" readonly>
             </div>
 
             <div class="form-group">
@@ -905,13 +910,19 @@
             try {
                 const res = await fetch(`${API_BASE}/stock-assets/${assetId}`);
                 currentEditingAsset = await res.json();
+
+                // 拿可支配数量
+                const avRes = await fetch(`${API_BASE}/available-shares/${currentEditingAsset.ticker}`);
+                const { available } = await avRes.json();
+
                 document.getElementById('sell-stock-code').value   = currentEditingAsset.ticker;
                 document.getElementById('sell-stock-name').value   = currentEditingAsset.name;
                 document.getElementById('sell-purchase-price').value = currentEditingAsset.purchase_price;
                 document.getElementById('sell-price').value       = currentEditingAsset.current_price;
-                document.getElementById('sell-total-gain').value  = '0.00';
                 document.getElementById('sell-original-shares').value = currentEditingAsset.quantity;
+                document.getElementById('sell-available-shares').value = available;
                 document.getElementById('sell-shares').value       = '';
+                document.getElementById('sell-shares').max         = available; // 限制最大数量
                 await loadBankSelect('sell-bank-select');
 
                 document.getElementById('sell-stock-modal').style.display = 'block';
@@ -1056,11 +1067,15 @@
                 })
             });
 
-            // 更新股票持仓
+            // 更新或删除股票持仓
             const newQty = currentEditingAsset.quantity - shares;
             if (newQty === 0) {
-                await fetch(`${API_BASE}/stock-assets/${currentEditingAsset.id}`, { method: 'DELETE' });
+                // 全部抛售 → 直接删除
+                await fetch(`${API_BASE}/stock-assets/${currentEditingAsset.id}`, {
+                    method: 'DELETE'
+                });
             } else {
+                // 部分抛售 → 更新数量
                 await fetch(`${API_BASE}/stock-assets/${currentEditingAsset.id}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
@@ -1069,7 +1084,7 @@
                         name: currentEditingAsset.name,
                         quantity: newQty,
                         purchase_price: currentEditingAsset.purchase_price,
-                        purchase_date: currentEditingAsset.purchase_date, // 保留原日期
+                        purchase_date: currentEditingAsset.purchase_date,
                         current_price: price
                     })
                 });
