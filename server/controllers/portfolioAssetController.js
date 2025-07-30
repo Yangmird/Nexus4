@@ -763,3 +763,20 @@ export function getAvailableShares(req, res) {
         });
     });
 }
+
+// GET /api/cash-usage/:cashId
+export function getCashUsage(req, res) {
+    const cashId = req.params.cashId;
+    const sql = `
+    SELECT p.name, pa.quantity
+    FROM portfolio_assets pa
+    JOIN portfolios p ON p.id = pa.portfolio_id
+    WHERE pa.asset_type='cash' AND pa.asset_id = ?
+  `;
+    connection.query(sql, [cashId], (err, rows) => {
+        if (err) return res.status(500).send(err);
+        const lockedAmount = rows.reduce((sum, r) => sum + Number(r.quantity), 0);
+        const portfolios = rows.map(r => r.name);
+        res.json({ lockedAmount, portfolios });
+    });
+}
