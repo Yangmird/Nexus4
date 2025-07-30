@@ -153,12 +153,14 @@ export function getPortfolioAllocation(req, res) {
     
     const query = `
         SELECT pa.*, 
-               sa.ticker, sa.name as stock_name, sa.quantity, sa.current_price,
-               ca.bank_name, ca.cash_amount
+            sa.ticker, sa.name as stock_name, sa.quantity as stock_quantity, sa.current_price,
+            ca.bank_name, ca.cash_amount, 
+            IF(pa.asset_type = 'cash', pa.quantity, 0) AS cash_quantity, -- 对于现金资产使用 portfolio_assets 中的 quantity
+            pa.quantity AS portfolio_quantity
         FROM portfolio_assets pa
         LEFT JOIN stock_assets sa ON pa.asset_type = 'stock' AND pa.asset_id = sa.id
         LEFT JOIN cash_assets ca ON pa.asset_type = 'cash' AND pa.asset_id = ca.id
-        WHERE pa.portfolio_id = ?
+        WHERE pa.portfolio_id = ?;
     `;
     
     connection.query(query, [portfolioId], (err, assets) => {
@@ -167,7 +169,7 @@ export function getPortfolioAllocation(req, res) {
             res.status(500).send('Error fetching portfolio allocation');
             return;
         }
-        
+        console.log('Assets:', assets);
         // 计算资产分配
         const allocation = calculatePortfolioAllocation(assets);
         res.json(allocation);
@@ -469,7 +471,7 @@ function calculatePortfolioAllocation(assets) {
         if (asset.asset_type === 'stock' && asset.stock_name) {
             stockValue += asset.quantity * asset.current_price;
         } else if (asset.asset_type === 'cash' && asset.bank_name) {
-            cashValue += asset.cash_amount;
+            cashValue += asset.quantity;
         }
     });
     
