@@ -283,18 +283,142 @@
             color: #333;
         }
 
+        /* 购买按钮样式 */
+        .buy-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .buy-btn:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        /* 模态框样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .modal-title {
+            font-size: 1.5em;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            background-color: #fff;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 8px rgba(102,126,234,0.3);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .confirm-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .cancel-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .confirm-btn:hover, .cancel-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
         /* 响应式设计 */
         @media (max-width: 768px) {
             .stock-grid {
                 grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
                 gap: 15px;
             }
-            
+
             .search-section {
                 flex-direction: column;
                 align-items: stretch;
             }
-            
+
             .search-input {
                 margin-bottom: 10px;
             }
@@ -312,316 +436,371 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>Check ALL Stocks Details</h1>
+<div class="container">
+    <div class="header">
+        <h1>Check ALL Stocks Details</h1>
+    </div>
+
+    <div class="nav-bar">
+        <a href="index.html" class="nav-btn">返回主页</a>
+        <a href="portfolio-management.html" class="nav-btn">投资组合管理</a>
+        <a href="asset-management.html" class="nav-btn">个人资产管理</a>
+    </div>
+
+    <div class="main-content">
+        <!-- 搜索区域 -->
+        <div class="search-section">
+            <span class="search-label">搜索股票信息:</span>
+            <input type="text" class="search-input" id="search-input" placeholder="输入股票代码或名称进行搜索...">
+            <button class="search-btn" onclick="searchStocks()">搜索</button>
+            <button class="search-btn" onclick="refreshData()" style="background: #28a745;">刷新数据</button>
         </div>
 
-        <div class="nav-bar">
-            <a href="index.html" class="nav-btn">返回主页</a>
-            <a href="portfolio-management.html" class="nav-btn">投资组合管理</a>
-            <a href="asset-management.html" class="nav-btn">个人资产管理</a>
+        <!-- 股票网格 -->
+        <div class="stock-grid" id="stock-grid">
+            <div class="loading">加载中...</div>
         </div>
 
-        <div class="main-content">
-            <!-- 搜索区域 -->
-            <div class="search-section">
-                <span class="search-label">搜索股票信息:</span>
-                <input type="text" class="search-input" id="search-input" placeholder="输入股票代码或名称进行搜索...">
-                <button class="search-btn" onclick="searchStocks()">搜索</button>
-                <button class="search-btn" onclick="refreshData()" style="background: #28a745;">刷新数据</button>
+        <!-- 图表容器 -->
+        <div class="chart-container" id="chart-container">
+            <div class="chart-header">
+                <div>
+                    <div class="chart-title" id="chart-title">股票价格历史</div>
+                    <div class="chart-subtitle" id="chart-subtitle">最近5天价格走势</div>
+                </div>
             </div>
-
-            <!-- 股票网格 -->
-            <div class="stock-grid" id="stock-grid">
-                <div class="loading">加载中...</div>
+            <div class="chart-canvas">
+                <canvas id="priceChart"></canvas>
             </div>
-
-            <!-- 图表容器 -->
-            <div class="chart-container" id="chart-container">
-                <div class="chart-header">
-                    <div>
-                        <div class="chart-title" id="chart-title">股票价格历史</div>
-                        <div class="chart-subtitle" id="chart-subtitle">最近5天价格走势</div>
-                    </div>
-                </div>
-                <div class="chart-canvas">
-                    <canvas id="priceChart"></canvas>
-                </div>
-                <div class="stats-grid" id="stats-grid">
-                    <!-- 统计数据将在这里动态生成 -->
-                </div>
+            <div class="stats-grid" id="stats-grid">
+                <!-- 统计数据将在这里动态生成 -->
             </div>
         </div>
     </div>
+</div>
 
-    <script>
-        // API基础URL
-        const API_BASE = 'http://localhost:8088/api';
-        let allStocks = [];
-        let filteredStocks = [];
-        let selectedStock = null;
-        let priceChart = null;
+<!-- 购买单只股票模态框 -->
+<div id="buy-stock-modal" class="modal">
+    <div class="modal-content">
+        <h3 class="modal-title">购买股票</h3>
 
-        // 页面加载时获取数据
-        document.addEventListener('DOMContentLoaded', function() {
-            loadAllStocks();
+        <div class="form-group">
+            <label>股票代码:</label>
+            <input type="text" id="buy-stock-code" readonly>
+        </div>
+
+        <div class="form-group">
+            <label>股票名称:</label>
+            <input type="text" id="buy-stock-name" readonly>
+        </div>
+
+        <div class="form-group">
+            <label>今日成交价:</label>
+            <input type="number" id="buy-stock-price" readonly>
+        </div>
+
+        <div class="form-group">
+            <label>购买股数:</label>
+            <input type="number" id="buy-stock-shares" min="1" step="1" placeholder="输入股数">
+        </div>
+
+        <div class="form-group">
+            <label>购入金额:</label>
+            <input type="number" id="buy-stock-total" readonly>
+        </div>
+
+        <div class="form-group">
+            <label>交易银行:</label>
+            <select id="buy-stock-bank"></select>
+        </div>
+
+        <div class="modal-buttons">
+            <button class="confirm-btn" onclick="confirmBuyStock()">确认购买</button>
+            <button class="cancel-btn" onclick="closeModal('buy-stock-modal')">取消</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // API基础URL
+    const API_BASE = 'http://localhost:8088/api';
+    let allStocks = [];
+    let filteredStocks = [];
+    let selectedStock = null;
+    let priceChart = null;
+
+    // 页面加载时获取数据
+    document.addEventListener('DOMContentLoaded', function() {
+        loadAllStocks();
+
+        // 绑定实时计算事件
+        document.getElementById('buy-stock-shares').addEventListener('input', function() {
+            updateBuyStockTotal();
         });
+    });
 
-        // 加载所有股票
-        async function loadAllStocks() {
-            try {
-                const response = await fetch(`${API_BASE}/all-stocks`, {
-                    method: 'GET',
-                    headers: {
-                        'Cache-Control': 'no-cache',
-                        'Pragma': 'no-cache'
-                    }
-                });
-                const data = await response.json();
-                
-                if (data.stocks) {
-                    allStocks = data.stocks;
-                } else {
-                    allStocks = data; // 兼容旧格式
+    // 加载所有股票
+    async function loadAllStocks() {
+        try {
+            const response = await fetch(`${API_BASE}/all-stocks`, {
+                method: 'GET',
+                headers: {
+                    'Cache-Control': 'no-cache',
+                    'Pragma': 'no-cache'
                 }
-                
-                filteredStocks = [...allStocks];
-                await renderStocks(); // 等待异步渲染完成
-            } catch (error) {
-                console.error('加载股票数据失败:', error);
-                document.getElementById('stock-grid').innerHTML = '<div class="error">加载失败，请检查网络连接</div>';
+            });
+            const data = await response.json();
+
+            if (data.stocks) {
+                allStocks = data.stocks;
+            } else {
+                allStocks = data; // 兼容旧格式
             }
-        }
 
-        // 获取股票最新价格和历史数据
-        async function getStockLatestData(stock) {
-            try {
-                // 调用API获取股票历史数据
-                const response = await fetch(`${API_BASE}/stock-history/${stock.ticker}`, {
-                    method: 'GET',
-                    headers: {
-                        'Cache-Control': 'no-cache',
-                        'Pragma': 'no-cache'
-                    }
-                });
-                const historyData = await response.json();
-                
-                if (historyData.history && historyData.history.length >= 2) {
-                    // 获取最新价格
-                    const latestPrice = historyData.history[historyData.history.length - 1].price;
-                    const previousPrice = historyData.history[historyData.history.length - 2].price;
-                    const priceChange = ((latestPrice - previousPrice) / previousPrice) * 100;
-                    return {
-                        latestPrice: latestPrice,
-                        priceChange: priceChange
-                    };
-                } else {
-                    return {
-                        latestPrice: stock.market_price,
-                        priceChange: 0
-                    };
+            filteredStocks = [...allStocks];
+            await renderStocks(); // 等待异步渲染完成
+        } catch (error) {
+            console.error('加载股票数据失败:', error);
+            document.getElementById('stock-grid').innerHTML = '<div class="error">加载失败，请检查网络连接</div>';
+        }
+    }
+
+    // 获取股票最新价格和历史数据
+    async function getStockLatestData(stock) {
+        try {
+            // 调用API获取股票历史数据
+            const response = await fetch(`${API_BASE}/stock-history/${stock.ticker}`, {
+                method: 'GET',
+                headers: {
+                    'Cache-Control': 'no-cache',
+                    'Pragma': 'no-cache'
                 }
-            } catch (error) {
-                console.error('获取股票历史数据失败:', error);
+            });
+            const historyData = await response.json();
+
+            if (historyData.history && historyData.history.length >= 2) {
+                // 获取最新价格
+                const latestPrice = historyData.history[historyData.history.length - 1].price;
+                const previousPrice = historyData.history[historyData.history.length - 2].price;
+                const priceChange = ((latestPrice - previousPrice) / previousPrice) * 100;
+                return {
+                    latestPrice: latestPrice,
+                    priceChange: priceChange
+                };
+            } else {
                 return {
                     latestPrice: stock.market_price,
                     priceChange: 0
                 };
             }
+        } catch (error) {
+            console.error('获取股票历史数据失败:', error);
+            return {
+                latestPrice: stock.market_price,
+                priceChange: 0
+            };
+        }
+    }
+
+    // 把现金账户渲染成下拉框选项
+    async function loadBankSelect(selectId) {
+        const res = await fetch(`${API_BASE}/cash-assets`);
+        const banks = await res.json();
+        const sel = document.getElementById(selectId);
+        sel.innerHTML = '';
+        banks.forEach(b => {
+            const opt = document.createElement('option');
+            opt.value = b.id;
+            opt.textContent = `${b.bank_name} - ${b.cash_amount} ${b.currency_code}`;
+            sel.appendChild(opt);
+        });
+    }
+
+    // 渲染股票卡片（优化版本，减少API调用）
+    async function renderStocks() {
+        const grid = document.getElementById('stock-grid');
+        grid.innerHTML = '';
+
+        if (filteredStocks.length === 0) {
+            grid.innerHTML = '<div class="empty-state">没有找到相关股票</div>';
+            return;
         }
 
-        // 计算价格变化（基于真实历史数据）
-        async function calculatePriceChange(stock) {
-            const data = await getStockLatestData(stock);
-            return data.priceChange;
-        }
+        // 为每个股票创建卡片
+        for (const stock of filteredStocks) {
+            const card = document.createElement('div');
+            card.className = 'stock-card';
+            card.onclick = () => selectStock(stock);
 
-        // 渲染股票卡片（优化版本，减少API调用）
-        async function renderStocks() {
-            const grid = document.getElementById('stock-grid');
-            grid.innerHTML = '';
+            card.innerHTML = `
+<div class="stock-header">
+    <div class="stock-info">
+        <div class="stock-name">${stock.name}</div>
+        <div class="stock-code">${stock.ticker}</div>
+    </div>
+    <div class="stock-price-section">
+        <div class="stock-price">¥${parseFloat(stock.market_price).toLocaleString()}</div>
+        <div class="stock-change neutral">计算中...</div>
+    </div>
+</div>
+<button class="buy-btn" onclick="event.stopPropagation(); openBuyStockModal('${stock.ticker}', '${stock.name}', ${stock.market_price})">购买</button>
+`;
 
-            if (filteredStocks.length === 0) {
-                grid.innerHTML = '<div class="empty-state">没有找到相关股票</div>';
-                return;
-            }
+            grid.appendChild(card);
 
-            // 为每个股票创建卡片
-            for (const stock of filteredStocks) {
-                const card = document.createElement('div');
-                card.className = 'stock-card';
-                card.onclick = () => selectStock(stock);
-                
-                // 先显示基本信息，价格变化稍后更新
-                card.innerHTML = `
-                    <div class="stock-header">
-                        <div class="stock-info">
-                            <div class="stock-name">${stock.name}</div>
-                            <div class="stock-code">${stock.ticker}</div>
-                        </div>
-                        <div class="stock-price-section">
-                            <div class="stock-price">¥${parseFloat(stock.market_price).toLocaleString()}</div>
-                            <div class="stock-change neutral">计算中...</div>
-                        </div>
-                    </div>
-                `;
-                
-                grid.appendChild(card);
-                
-                // 异步获取最新价格和价格变化数据
-                try {
-                    const stockData = await getStockLatestData(stock);
-                    const isPositive = stockData.priceChange >= 0;
-                    const changeClass = stockData.priceChange === 0 ? 'neutral' : (isPositive ? 'positive' : 'negative');
-                    
-                    // 更新价格显示
-                    const priceElement = card.querySelector('.stock-price');
-                    priceElement.textContent = `¥${parseFloat(stockData.latestPrice).toLocaleString()}`;
-                    
-                    // 更新价格变化
-                    const changeElement = card.querySelector('.stock-change');
-                    changeElement.className = `stock-change ${changeClass}`;
-                    changeElement.textContent = `${stockData.priceChange === 0 ? '0.00' : (isPositive ? '+' : '')}${stockData.priceChange.toFixed(2)}%`;
-                } catch (error) {
-                    console.error(`获取 ${stock.ticker} 价格数据失败:`, error);
-                    const changeElement = card.querySelector('.stock-change');
-                    changeElement.className = 'stock-change neutral';
-                    changeElement.textContent = '0.00%';
-                }
-            }
-        }
-
-        // 选择股票并显示图表
-        async function selectStock(stock) {
-            // 移除之前选中的卡片样式
-            document.querySelectorAll('.stock-card').forEach(card => {
-                card.classList.remove('selected');
-            });
-            
-            // 添加选中样式
-            event.target.closest('.stock-card').classList.add('selected');
-            
-            selectedStock = stock;
-            
+            // 异步获取最新价格和价格变化数据
             try {
-                // 获取股票历史数据
-                const response = await fetch(`${API_BASE}/stock-history/${stock.ticker}`, {
-                    method: 'GET',
-                    headers: {
-                        'Cache-Control': 'no-cache',
-                        'Pragma': 'no-cache'
-                    }
-                });
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const historyData = await response.json();
-                
-                // 显示图表容器
-                const chartContainer = document.getElementById('chart-container');
-                chartContainer.classList.add('active');
-                
-                // 更新图表标题
-                document.getElementById('chart-title').textContent = `${stock.name} (${stock.ticker}) 价格历史`;
-                
-                // 绘制价格图表
-                renderPriceChart(historyData);
-                
-                // 生成统计数据
-                renderStats(historyData);
-                
+                const stockData = await getStockLatestData(stock);
+                const isPositive = stockData.priceChange >= 0;
+                const changeClass = stockData.priceChange === 0 ? 'neutral' : (isPositive ? 'positive' : 'negative');
+
+                // 更新价格显示
+                const priceElement = card.querySelector('.stock-price');
+                priceElement.textContent = `¥${parseFloat(stockData.latestPrice).toLocaleString()}`;
+
+                // 更新价格变化
+                const changeElement = card.querySelector('.stock-change');
+                changeElement.className = `stock-change ${changeClass}`;
+                changeElement.textContent = `${stockData.priceChange === 0 ? '0.00' : (isPositive ? '+' : '')}${stockData.priceChange.toFixed(2)}%`;
             } catch (error) {
-                console.error('获取股票历史数据失败:', error);
-                // 显示错误信息，不使用模拟数据
-                const chartContainer = document.getElementById('chart-container');
-                chartContainer.classList.add('active');
-                document.getElementById('chart-title').textContent = `${stock.name} (${stock.ticker}) 价格历史`;
-                document.getElementById('priceChart').innerHTML = '<div class="error">无法获取历史数据，请检查网络连接</div>';
-                // 移除错误信息，保持统计表格为空
-                document.getElementById('stats-grid').innerHTML = '';
+                console.error(`获取 ${stock.ticker} 价格数据失败:`, error);
+                const changeElement = card.querySelector('.stock-change');
+                changeElement.className = 'stock-change neutral';
+                changeElement.textContent = '0.00%';
             }
         }
+    }
 
-        // 渲染价格图表
-        function renderPriceChart(historyData) {
-            const ctx = document.getElementById('priceChart').getContext('2d');
-            
-            // 销毁之前的图表
-            if (priceChart) {
-                priceChart.destroy();
-            }
-            
-            const labels = historyData.history.map(item => {
-                const date = new Date(item.date);
-                return date.toLocaleDateString('zh-CN');
+    // 选择股票并显示图表
+    async function selectStock(stock) {
+        // 移除之前选中的卡片样式
+        document.querySelectorAll('.stock-card').forEach(card => {
+            card.classList.remove('selected');
+        });
+
+        // 添加选中样式
+        event.target.closest('.stock-card').classList.add('selected');
+
+        selectedStock = stock;
+
+        try {
+            // 获取股票历史数据
+            const response = await fetch(`${API_BASE}/stock-history/${stock.ticker}`, {
+                method: 'GET',
+                headers: {
+                    'Cache-Control': 'no-cache',
+                    'Pragma': 'no-cache'
+                }
             });
-            
-            const prices = historyData.history.map(item => item.price);
-            const changes = historyData.history.map(item => item.priceChangePercent);
-            
-            priceChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: '价格 (¥)',
-                        data: prices,
-                        borderColor: '#667eea',
-                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                        borderWidth: 3,
-                        fill: true,
-                        tension: 0.4
-                    }]
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const historyData = await response.json();
+
+            // 显示图表容器
+            const chartContainer = document.getElementById('chart-container');
+            chartContainer.classList.add('active');
+
+            // 更新图表标题
+            document.getElementById('chart-title').textContent = `${stock.name} (${stock.ticker}) 价格历史`;
+
+            // 绘制价格图表
+            renderPriceChart(historyData);
+
+            // 生成统计数据
+            renderStats(historyData);
+
+        } catch (error) {
+            console.error('获取股票历史数据失败:', error);
+            // 显示错误信息，不使用模拟数据
+            const chartContainer = document.getElementById('chart-container');
+            chartContainer.classList.add('active');
+            document.getElementById('chart-title').textContent = `${stock.name} (${stock.ticker}) 价格历史`;
+            document.getElementById('priceChart').innerHTML = '<div class="error">无法获取历史数据，请检查网络连接</div>';
+            // 移除错误信息，保持统计表格为空
+            document.getElementById('stats-grid').innerHTML = '';
+        }
+    }
+
+    // 渲染价格图表
+    function renderPriceChart(historyData) {
+        const ctx = document.getElementById('priceChart').getContext('2d');
+
+        // 销毁之前的图表
+        if (priceChart) {
+            priceChart.destroy();
+        }
+
+        const labels = historyData.history.map(item => {
+            const date = new Date(item.date);
+            return date.toLocaleDateString('zh-CN');
+        });
+
+        const prices = historyData.history.map(item => item.price);
+        const changes = historyData.history.map(item => item.priceChangePercent);
+
+        priceChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: '价格 (¥)',
+                    data: prices,
+                    borderColor: '#667eea',
+                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    }
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        title: {
                             display: true,
-                            position: 'top'
+                            text: '价格 (¥)'
                         }
                     },
-                    scales: {
-                        y: {
-                            beginAtZero: false,
-                            title: {
-                                display: true,
-                                text: '价格 (¥)'
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: '日期'
-                            }
+                    x: {
+                        title: {
+                            display: true,
+                            text: '日期'
                         }
                     }
                 }
-            });
+            }
+        });
+    }
+
+    // 渲染统计数据
+    function renderStats(historyData) {
+        const statsGrid = document.getElementById('stats-grid');
+        const history = historyData.history;
+
+        if (history.length < 2) {
+            statsGrid.innerHTML = '<div class="stat-item"><div class="stat-label">数据不足</div><div class="stat-value">-</div></div>';
+            return;
         }
 
-        // 渲染统计数据
-        function renderStats(historyData) {
-            const statsGrid = document.getElementById('stats-grid');
-            const history = historyData.history;
-            
-            if (history.length < 2) {
-                statsGrid.innerHTML = '<div class="stat-item"><div class="stat-label">数据不足</div><div class="stat-value">-</div></div>';
-                return;
-            }
-            
-            const currentPrice = history[history.length - 1].price;
-            const previousPrice = history[history.length - 2].price;
-            const priceChange = currentPrice - previousPrice;
-            const priceChangePercent = (priceChange / previousPrice) * 100;
-            
-            const maxPrice = Math.max(...history.map(h => h.price));
-            const minPrice = Math.min(...history.map(h => h.price));
-            const avgPrice = history.reduce((sum, h) => sum + h.price, 0) / history.length;
-            
-            statsGrid.innerHTML = `
+        const currentPrice = history[history.length - 1].price;
+        const previousPrice = history[history.length - 2].price;
+        const priceChange = currentPrice - previousPrice;
+        const priceChangePercent = (priceChange / previousPrice) * 100;
+
+        const maxPrice = Math.max(...history.map(h => h.price));
+        const minPrice = Math.min(...history.map(h => h.price));
+        const avgPrice = history.reduce((sum, h) => sum + h.price, 0) / history.length;
+
+        statsGrid.innerHTML = `
                 <div class="stat-item">
                     <div class="stat-label">当前价格</div>
                     <div class="stat-value">¥${currentPrice.toFixed(2)}</div>
@@ -649,41 +828,129 @@
                     <div class="stat-value">${((maxPrice - minPrice) / avgPrice * 100).toFixed(2)}%</div>
                 </div>
             `;
+    }
+
+    // 搜索股票
+    async function searchStocks() {
+        const searchTerm = document.getElementById('search-input').value.toLowerCase().trim();
+
+        if (!searchTerm) {
+            filteredStocks = [...allStocks];
+        } else {
+            filteredStocks = allStocks.filter(stock =>
+                stock.name.toLowerCase().includes(searchTerm) ||
+                stock.ticker.toLowerCase().includes(searchTerm)
+            );
         }
 
-        // 搜索股票
-        async function searchStocks() {
-            const searchTerm = document.getElementById('search-input').value.toLowerCase().trim();
-            
-            if (!searchTerm) {
-                filteredStocks = [...allStocks];
+        await renderStocks(); // 等待异步渲染完成
+    }
+
+    // 打开购买股票模态框
+    async function openBuyStockModal(ticker, name, price) {
+        document.getElementById('buy-stock-code').value = ticker;
+        document.getElementById('buy-stock-name').value = name;
+        document.getElementById('buy-stock-price').value = price;
+        document.getElementById('buy-stock-shares').value = '';
+        document.getElementById('buy-stock-total').value = '0.00';
+
+        await loadBankSelect('buy-stock-bank');
+
+        document.getElementById('buy-stock-modal').style.display = 'block';
+    }
+
+    // 更新购买总金额
+    function updateBuyStockTotal() {
+        const price = parseFloat(document.getElementById('buy-stock-price').value) || 0;
+        const shares = parseInt(document.getElementById('buy-stock-shares').value) || 0;
+        const total = price * shares;
+        document.getElementById('buy-stock-total').value = total.toFixed(2);
+    }
+
+    // 确认购买股票
+    async function confirmBuyStock() {
+        const ticker = document.getElementById('buy-stock-code').value;
+        const name = document.getElementById('buy-stock-name').value;
+        const price = parseFloat(document.getElementById('buy-stock-price').value);
+        const shares = parseInt(document.getElementById('buy-stock-shares').value);
+        const bankId = document.getElementById('buy-stock-bank').value;
+        const totalCost = parseFloat(document.getElementById('buy-stock-total').value);
+
+        if (!shares || shares <= 0) {
+            alert('请输入有效的股数');
+            return;
+        }
+
+        if (!bankId) {
+            alert('请选择交易银行');
+            return;
+        }
+
+        try {
+            // 检查银行余额
+            const bankResponse = await fetch(`${API_BASE}/cash-assets/${bankId}`);
+            const bank = await bankResponse.json();
+
+            if (totalCost > bank.cash_amount) {
+                alert(`余额不足！需要 ${totalCost.toFixed(2)} ${bank.currency_code}，当前余额为 ${bank.cash_amount.toFixed(2)}`);
+                return;
+            }
+
+            // 扣减银行余额
+            await fetch(`${API_BASE}/cash-assets/${bankId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    ...bank,
+                    cash_amount: bank.cash_amount - totalCost
+                })
+            });
+
+            // 添加股票资产
+            const response = await fetch(`${API_BASE}/stock-assets`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    ticker: ticker,
+                    name: name,
+                    quantity: shares,
+                    purchase_price: price,
+                    current_price: price,
+                    purchase_date: new Date().toISOString().substr(0, 10)
+                })
+            });
+
+            if (response.ok) {
+                alert('购买成功！');
+                closeModal('buy-stock-modal');
+                // 刷新股票列表
+                await loadAllStocks();
             } else {
-                filteredStocks = allStocks.filter(stock => 
-                    stock.name.toLowerCase().includes(searchTerm) ||
-                    stock.ticker.toLowerCase().includes(searchTerm)
-                );
+                throw new Error('添加股票资产失败');
             }
-            
-            await renderStocks(); // 等待异步渲染完成
+        } catch (error) {
+            console.error('购买股票失败:', error);
+            alert('购买股票失败: ' + error.message);
         }
+    }
 
-        // 实时搜索
-        document.getElementById('search-input').addEventListener('input', function() {
+    // 关闭模态框
+    function closeModal(modalId) {
+        document.getElementById(modalId).style.display = 'none';
+    }
+
+    // 刷新数据函数
+    async function refreshData() {
+        console.log('正在刷新数据...');
+        await loadAllStocks();
+    }
+
+    // 键盘事件处理
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
             searchStocks();
-        });
-
-        // 刷新数据函数
-        async function refreshData() {
-            console.log('正在刷新数据...');
-            await loadAllStocks();
         }
-
-        // 键盘事件处理
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                searchStocks();
-            }
-        });
-    </script>
+    });
+</script>
 </body>
-</html> 
+</html>
