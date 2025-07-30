@@ -724,16 +724,23 @@
 
             try {
                 const res = await fetch(`${API_BASE}/cash-assets/${id}`, { method: 'DELETE' });
-                if (res.ok) {
-                    alert('已删除');
-                    await loadCashAssets();   // 重新拉取列表
-                } else {
-                    const msg = await res.text();
-                    alert('删除失败：' + msg);
+
+                // ✅ 统一处理 409
+                if (res.status === 409) {
+                    const data = await res.json();
+                    alert(`无法删除！\n被以下组合占用：\n${data.portfolios.join('\n')}`);
+                    return;
                 }
-            } catch (err) {
-                console.error(err);
-                alert('网络错误，请稍后重试');
+
+                if (res.ok) {
+                    alert('已删除cash');
+                    await loadCashAssets();
+                } else {
+                    alert('删除失败：' + await res.text());
+                }
+            } catch (e) {
+                console.error(e);
+                alert('网络错误');
             }
         }
 
@@ -819,10 +826,19 @@
         // 删除股票
         async function deleteStockAsset(id) {
             if (!confirm('确定要删除该股票资产吗？')) return;
+
             try {
                 const res = await fetch(`${API_BASE}/stock-assets/${id}`, { method: 'DELETE' });
+
+                // ✅ 统一处理 409
+                if (res.status === 409) {
+                    const data = await res.json();
+                    alert(`无法删除！\n被以下组合占用：\n${data.portfolios.join('\n')}`);
+                    return;
+                }
+
                 if (res.ok) {
-                    alert('已删除');
+                    alert('已删除stock及其历史记录');
                     await loadStockAssets();
                 } else {
                     alert('删除失败：' + await res.text());

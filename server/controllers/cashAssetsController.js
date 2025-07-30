@@ -69,20 +69,44 @@ export function updateCashAsset(req, res) {
     });
 }
 
-// 删除现金资产（根据id）
+/**
+ * 删除现金资产（带“是否被组合占用”检查）
+ */
 export function deleteCashAsset(req, res) {
     const { id } = req.params;
-    const query = 'DELETE FROM cash_assets WHERE id = ?';
-    connection.query(query, [id], (err, results) => {
+
+    // 1. 检查是否被组合引用
+    const checkQuery = `
+        SELECT p.name AS portfolio_name
+        FROM portfolio_assets pa
+        JOIN portfolios p ON pa.portfolio_id = p.id
+        WHERE pa.asset_type = 'cash' AND pa.asset_id = ?
+    `;
+    connection.query(checkQuery, [id], (err, rows) => {
         if (err) {
-            console.error('Error deleting cash asset:', err);
-            res.status(500).send('Error deleting cash asset');
-            return;
+            console.error('Error checking cash usage:', err);
+            return res.status(500).send('检查失败');
         }
-        if (results.affectedRows === 0) {
-            res.status(404).send('Cash asset not found');
-            return;
+
+        if (rows.length > 0) {
+            const portfolios = rows.map(r => r.portfolio_name);
+            return res.status(409).json({
+                error: '该现金资产已被以下组合使用，无法删除',
+                portfolios
+            });
         }
-        res.status(204).send();
+
+        // 2. 未被占用，执行删除
+        const deleteHistory = 'DELETE FROM stocks_assets_history WHERE stock_id = ?'; // 如有
+        const deleteAsset   = 'DELETE FROM cash_assets WHERE id = ?';
+
+        connection.query(deleteHistory, [id], (hErr) => {
+            if (hErr) return res.status(500).send('删除历史失败');
+            connection.query(deleteAsset, [id], (aErr, results) => {
+                if (aErr) return res.status(500).send('删除资产失败');
+                if (results.affectedRows === 0) return res.status(404).send('资产不存在');
+                res.status(204).send(); // 成功
+            });
+        });
     });
 }
