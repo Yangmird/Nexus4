@@ -2,7 +2,7 @@ import mysql from 'mysql2';
 const connection = mysql.createConnection({
         host: "localhost",
         user: "root",
-        password: "123456",
+        password: "12345678",
         database: "portfolio_manager"})
         connection.connect((err) => {
         if (err) {
