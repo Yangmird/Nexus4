@@ -1049,7 +1049,11 @@
             const price    = parseFloat(document.getElementById('sell-price').value);
 
             if (!shares || shares <= 0) { alert('请输入正股数'); return; }
-            if (shares > currentEditingAsset.quantity) { alert('超出可抛售股数'); return; }
+            const availableShares = parseInt(document.getElementById('sell-available-shares').value);
+            if (shares > availableShares) {
+                alert(`超出可抛售股数，最多可卖 ${availableShares} 股`);
+                return;
+            }
 
             const bankRes  = await fetch(`${API_BASE}/cash-assets/${bankId}`);
             const bank     = await bankRes.json();
