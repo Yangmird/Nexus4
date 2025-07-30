@@ -626,34 +626,6 @@ export function deleteStockAsset(req, res) {
           });
         }
 
-// GET /api/available-shares/:ticker
-export function getAvailableShares(req, res) {
-    const { ticker } = req.params;
-
-    const sqlTotal = `
-    SELECT SUM(quantity) AS total
-    FROM stock_assets
-    WHERE ticker = ?`;
-    const sqlLocked = `
-    SELECT SUM(pa.quantity) AS locked
-    FROM portfolio_assets pa
-    JOIN stock_assets sa ON sa.id = pa.asset_id
-    WHERE sa.ticker = ? AND pa.asset_type = 'stock'`;
-
-    connection.query(sqlTotal, [ticker], (err, totalRows) => {
-        if (err) return res.status(500).json({ error: '查询总股数失败' });
-        connection.query(sqlLocked, [ticker], (err2, lockedRows) => {
-            if (err2) return res.status(500).json({ error: '查询锁定股数失败' });
-
-            const total   = Number(totalRows[0]?.total || 0);
-            const locked  = Number(lockedRows[0]?.locked || 0);
-            const available = total - locked;
-
-            res.json({ available });
-        });
-    });
-}
-
         const portfolioAsset = portfolioAssets[0];
         const portfolioId = portfolioAsset.portfolio_id;
         const quantity = portfolioAsset.quantity;
@@ -762,4 +734,32 @@ export function updateCashAllocation(req, res) {
       }
     );
   });
+}
+
+// GET /api/available-shares/:ticker
+export function getAvailableShares(req, res) {
+    const { ticker } = req.params;
+
+    const sqlTotal = `
+    SELECT SUM(quantity) AS total
+    FROM stock_assets
+    WHERE ticker = ?`;
+    const sqlLocked = `
+    SELECT SUM(pa.quantity) AS locked
+    FROM portfolio_assets pa
+    JOIN stock_assets sa ON sa.id = pa.asset_id
+    WHERE sa.ticker = ? AND pa.asset_type = 'stock'`;
+
+    connection.query(sqlTotal, [ticker], (err, totalRows) => {
+        if (err) return res.status(500).json({ error: '查询总股数失败' });
+        connection.query(sqlLocked, [ticker], (err2, lockedRows) => {
+            if (err2) return res.status(500).json({ error: '查询锁定股数失败' });
+
+            const total   = Number(totalRows[0]?.total || 0);
+            const locked  = Number(lockedRows[0]?.locked || 0);
+            const available = total - locked;
+
+            res.json({ available });
+        });
+    });
 }
