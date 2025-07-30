@@ -469,9 +469,9 @@ function calculatePortfolioAllocation(assets) {
     
     assets.forEach(asset => {
         if (asset.asset_type === 'stock' && asset.stock_name) {
-            stockValue += asset.quantity * asset.current_price;
+            stockValue += Number(asset.quantity * asset.current_price);
         } else if (asset.asset_type === 'cash' && asset.bank_name) {
-            cashValue += asset.quantity;
+            cashValue += Number(asset.quantity);
         }
     });
     
