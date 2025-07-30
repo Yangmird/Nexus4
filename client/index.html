@@ -789,11 +789,11 @@
                 
                 if (asset.stock) {
                     assetName = `${asset.stock.name} (${asset.stock.ticker})`;
-                    assetValue = asset.stock.quantity * asset.stock.current_price;
+                    assetValue = asset.quantity * asset.stock.current_price;
                     assetType = '股票';
                 } else if (asset.cash) {
                     assetName = `${asset.cash.bank_name}`;
-                    assetValue = asset.cash.cash_amount;
+                    assetValue = asset.quantity;
                     assetType = '现金';
                 }
                 

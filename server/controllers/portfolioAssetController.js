@@ -302,14 +302,14 @@ export function validatePurchase(req, res) {
 
               const allocatedCash = Number(allocatedRows[0].allocated_cash) || 0;
               const availableCash = totalCash - allocatedCash;
-              
+
               if (amount > availableCash) {
-                return res.status(400).json({ 
-                  error: `投入金额 ${amount} 超过可支配现金 ${availableCash}（总现金：${totalCash}，已分配：${allocatedCash}）` 
+                return res.status(400).json({
+                  error: `投入金额 ${amount} 超过可支配现金 ${availableCash}（总现金：${totalCash}，已分配：${allocatedCash}）`
                 });
               }
 
-              res.json({ 
+              res.json({
                 message: '现金购买验证通过',
                 total_cash: totalCash,
                 allocated_cash: allocatedCash,
@@ -369,20 +369,20 @@ export function validatePurchase(req, res) {
               const totalQuantity = Number(stockQuantityRows[0].total_quantity) || 0;
               const allocatedQuantity = Number(stockQuantityRows[0].allocated_quantity) || 0;
               const availableQuantity = totalQuantity - allocatedQuantity;
-              
+
                             if (quantity > availableQuantity) {
-                return res.status(400).json({ 
-                  error: `购买股数 ${quantity} 超过可支配股数 ${availableQuantity}（总股数：${totalQuantity}，已分配：${allocatedQuantity}）` 
+                return res.status(400).json({
+                  error: `购买股数 ${quantity} 超过可支配股数 ${availableQuantity}（总股数：${totalQuantity}，已分配：${allocatedQuantity}）`
                 });
               }
-              
+
               // 检查购买金额是否合理（允许10%的误差）
               const priceDifference = Math.abs(amount - expectedAmount);
               const priceTolerance = expectedAmount * 0.1;
-              
+
               if (priceDifference > priceTolerance) {
-                return res.status(400).json({ 
-                  error: `购买金额 ${amount} 与预期金额 ${expectedAmount} 差异过大` 
+                return res.status(400).json({
+                  error: `购买金额 ${amount} 与预期金额 ${expectedAmount} 差异过大`
                 });
               }
 
@@ -409,14 +409,14 @@ export function validatePurchase(req, res) {
 
                       const allocatedCash = Number(allocatedRows[0].allocated_cash) || 0;
                       const availableCash = totalCash - allocatedCash;
-                      
+
                       if (amount > availableCash) {
-                        return res.status(400).json({ 
-                          error: `购买金额 ${amount} 超过可支配现金 ${availableCash}（总现金：${totalCash}，已分配：${allocatedCash}）` 
+                        return res.status(400).json({
+                          error: `购买金额 ${amount} 超过可支配现金 ${availableCash}（总现金：${totalCash}，已分配：${allocatedCash}）`
                         });
                       }
 
-                      res.json({ 
+                      res.json({
                         message: '股票购买验证通过',
                         stock_name: stock.name,
                         stock_ticker: ticker,
@@ -536,7 +536,7 @@ export function portfolioPerformance(req, res) {
 // 删除现金资产（返回到现金池）
 export function deleteCashAsset(req, res) {
   const assetId = req.params.assetId;
-  
+
   connection.beginTransaction(err => {
     if (err) {
       console.error('Transaction start error:', err);
@@ -585,7 +585,7 @@ export function deleteCashAsset(req, res) {
                 });
               }
 
-              res.json({ 
+              res.json({
                 message: '现金资产删除成功，已返回到现金池',
                 returned_amount: quantity,
                 portfolio_id: portfolioId
@@ -601,7 +601,7 @@ export function deleteCashAsset(req, res) {
 // 删除股票资产（返回到股票池）
 export function deleteStockAsset(req, res) {
   const assetId = req.params.assetId;
-  
+
   connection.beginTransaction(err => {
     if (err) {
       console.error('Transaction start error:', err);
@@ -625,6 +625,34 @@ export function deleteStockAsset(req, res) {
             res.status(404).json({ error: '未找到该股票资产' });
           });
         }
+
+// GET /api/available-shares/:ticker
+export function getAvailableShares(req, res) {
+    const { ticker } = req.params;
+
+    const sqlTotal = `
+    SELECT SUM(quantity) AS total
+    FROM stock_assets
+    WHERE ticker = ?`;
+    const sqlLocked = `
+    SELECT SUM(pa.quantity) AS locked
+    FROM portfolio_assets pa
+    JOIN stock_assets sa ON sa.id = pa.asset_id
+    WHERE sa.ticker = ? AND pa.asset_type = 'stock'`;
+
+    connection.query(sqlTotal, [ticker], (err, totalRows) => {
+        if (err) return res.status(500).json({ error: '查询总股数失败' });
+        connection.query(sqlLocked, [ticker], (err2, lockedRows) => {
+            if (err2) return res.status(500).json({ error: '查询锁定股数失败' });
+
+            const total   = Number(totalRows[0]?.total || 0);
+            const locked  = Number(lockedRows[0]?.locked || 0);
+            const available = total - locked;
+
+            res.json({ available });
+        });
+    });
+}
 
         const portfolioAsset = portfolioAssets[0];
         const portfolioId = portfolioAsset.portfolio_id;
@@ -650,7 +678,7 @@ export function deleteStockAsset(req, res) {
                 });
               }
 
-              res.json({ 
+              res.json({
                 message: '股票资产删除成功，股数已返回到股票池',
                 returned_quantity: quantity,
                 portfolio_id: portfolioId
@@ -666,14 +694,14 @@ export function deleteStockAsset(req, res) {
 // 更新投资组合中的现金分配
 export function updateCashAllocation(req, res) {
   const { portfolio_id, asset_id, new_quantity } = req.body;
-  
+
   console.log('收到更新现金分配请求:', { portfolio_id, asset_id, new_quantity });
-  
+
   if (!portfolio_id || !asset_id || new_quantity === undefined || new_quantity < 0) {
     console.error('参数验证失败:', { portfolio_id, asset_id, new_quantity });
     return res.status(400).json({ error: '参数不完整或无效' });
   }
-  
+
   connection.beginTransaction(err => {
     if (err) {
       console.error('Transaction start error:', err);
@@ -721,7 +749,7 @@ export function updateCashAllocation(req, res) {
                 });
               }
 
-              res.json({ 
+              res.json({
                 message: '现金分配更新成功',
                 old_quantity: currentQuantity,
                 new_quantity: new_quantity,

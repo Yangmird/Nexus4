@@ -99,8 +99,10 @@ export function addStockAsset(req, res) {
  */
 export function updateStockAsset(req, res) {
     const { id } = req.params;
-    const { ticker, name, quantity, purchase_price, current_price, purchase_date } = req.body;
-
+    const { ticker, name, quantity } = req.body;
+    const purchase_date = req.body.purchase_date.split('T')[0];   // 取 YYYY-MM-DD
+    const purchase_price = Number(req.body.purchase_price).toFixed(4);
+    const current_price  = Number(req.body.current_price).toFixed(4);
     // 自动删除数量为 0 的记录
     if (parseFloat(quantity) === 0) {
         const deleteQuery = 'DELETE FROM stock_assets WHERE id = ?';
@@ -134,21 +136,43 @@ export function updateStockAsset(req, res) {
 }
 
 /**
- * 删除某一持仓记录（彻底清除）
+ * 删除股票资产（带“是否被组合占用”检查）
  */
 export function deleteStockAsset(req, res) {
     const { id } = req.params;
-    const query = 'DELETE FROM stock_assets WHERE id = ?';
-    connection.query(query, [id], (err, results) => {
+
+    // 1. 检查是否被组合引用
+    const checkQuery = `
+        SELECT p.name AS portfolio_name
+        FROM portfolio_assets pa
+        JOIN portfolios p ON pa.portfolio_id = p.id
+        WHERE pa.asset_type = 'stock' AND pa.asset_id = ?
+    `;
+    connection.query(checkQuery, [id], (err, rows) => {
         if (err) {
-            console.error('Error deleting stock asset:', err);
-            res.status(500).send('Error deleting stock asset');
-            return;
+            console.error('Error checking stock usage:', err);
+            return res.status(500).send('检查失败');
         }
-        if (results.affectedRows === 0) {
-            res.status(404).send('Stock asset not found');
-            return;
+
+        if (rows.length > 0) {
+            const portfolios = rows.map(r => r.portfolio_name);
+            return res.status(409).json({
+                error: '该股票已被以下组合使用，无法删除',
+                portfolios
+            });
         }
-        res.status(204).send(); // No content
+
+        // 2. 未被占用，执行级联删除
+        const deleteHistory = 'DELETE FROM stocks_assets_history WHERE stock_id = ?';
+        const deleteAsset   = 'DELETE FROM stock_assets WHERE id = ?';
+
+        connection.query(deleteHistory, [id], (hErr) => {
+            if (hErr) return res.status(500).send('删除历史失败');
+            connection.query(deleteAsset, [id], (aErr, results) => {
+                if (aErr) return res.status(500).send('删除资产失败');
+                if (results.affectedRows === 0) return res.status(404).send('资产不存在');
+                res.status(204).send(); // 成功
+            });
+        });
     });
 }

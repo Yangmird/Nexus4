@@ -24,3 +24,5 @@ router.put('/portfolio-assets/update-cash', portfolioAssetController.updateCashA
 // 通用的投资组合资产更新路由（必须在特定路由之后）
 router.put('/portfolio-assets/:id', portfolioAssetController.updatePortfolioAsset);
 
+router.get('/available-shares/:ticker', portfolioAssetController.getAvailableShares);
+

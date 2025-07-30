@@ -18,9 +18,9 @@ CREATE TABLE stock_assets (
   id INT PRIMARY KEY AUTO_INCREMENT,
   ticker VARCHAR(20),
   name VARCHAR(100),
-  quantity DECIMAL(18,4),
-  purchase_price DECIMAL(18,4),
-  current_price DECIMAL(18,4),
+  quantity DECIMAL(18,0),
+  purchase_price DECIMAL(18,2),
+  current_price DECIMAL(18,2),
   purchase_date DATE,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -30,7 +30,7 @@ CREATE TABLE stock_assets (
 DROP TABLE IF EXISTS cash_assets;
 CREATE TABLE cash_assets (
   id INT PRIMARY KEY AUTO_INCREMENT,
-  cash_amount DECIMAL(18,4),
+  cash_amount DECIMAL(18,2),
   currency_code VARCHAR(10),
   bank_name VARCHAR(100),
   notes TEXT,
@@ -45,7 +45,7 @@ CREATE TABLE portfolio_assets (
   portfolio_id INT,
   asset_type ENUM('stock', 'cash'),
   asset_id INT,
-  quantity DECIMAL(18,4),
+  quantity DECIMAL(18,2),
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (portfolio_id) REFERENCES portfolios(id)
@@ -57,8 +57,8 @@ CREATE TABLE stocks_assets_history (
   id INT PRIMARY KEY AUTO_INCREMENT,
   stock_id INT,
   record_date DATE,
-  purchase_price DECIMAL(18,4),
-  current_price DECIMAL(18,4),
+  purchase_price DECIMAL(18,2),
+  current_price DECIMAL(18,2),
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (stock_id) REFERENCES stock_assets(id)
@@ -70,7 +70,7 @@ CREATE TABLE stocks_history (
   id INT PRIMARY KEY AUTO_INCREMENT,
   stock_id INT,
   record_date DATE,
-  current_price DECIMAL(18,4),
+  current_price DECIMAL(18,2),
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
@@ -81,7 +81,7 @@ CREATE TABLE all_stocks (
   id INT PRIMARY KEY AUTO_INCREMENT,
   ticker VARCHAR(20),
   record_date DATE,
-  market_price DECIMAL(18,4),
+  market_price DECIMAL(18,2),
   name VARCHAR(100),
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
