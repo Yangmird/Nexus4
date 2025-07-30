@@ -35,16 +35,13 @@ export function getStockPrice(req, res) {
     const sql = `
         SELECT sh.current_price AS price
         FROM stocks_history sh
-                 JOIN stock_assets sa ON sa.id = sh.stock_id
-        WHERE sa.ticker = ? AND sh.record_date = ?
+                 JOIN all_stocks a ON a.id = sh.stock_id
+        WHERE a.ticker = ? AND sh.record_date = ?
             LIMIT 1
     `;
 
     connection.query(sql, [ticker, date], (err, results) => {
-        if (err) {
-            console.error('获取价格失败:', err);
-            return res.status(500).send('获取失败');
-        }
-        res.json(results.length > 0 ? { price: results[0].price } : { price: null });
+        if (err) return res.status(500).json({ error: '服务器错误' });
+        res.json(results.length ? { price: results[0].price } : { price: null });
     });
 }

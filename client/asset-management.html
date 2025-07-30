@@ -602,34 +602,42 @@
             loadStockAssets();
         });
 
-        // 加载现金资产
+        // 加载现金资产（已更新，显示备注）
         async function loadCashAssets() {
             try {
                 const response = await fetch(`${API_BASE}/cash-assets`);
                 const cashAssets = await response.json();
-                
+
                 const container = document.getElementById('cash-assets-list');
                 container.innerHTML = '';
-                
+
                 if (cashAssets.length === 0) {
                     container.innerHTML = '<div class="empty-state">暂无现金资产</div>';
                     return;
                 }
-                
+
                 cashAssets.forEach(asset => {
                     const assetElement = document.createElement('div');
                     assetElement.className = 'asset-item';
                     assetElement.innerHTML = `
-                        <div class="asset-info">
-                            <div class="asset-name">${asset.bank_name}</div>
-                            <div class="asset-details">金额: ¥${asset.cash_amount.toLocaleString()} | 货币: ${asset.currency_code}</div>
-                        </div>
-                        <div class="asset-actions">
-                            <button class="action-btn edit-btn" onclick="editCashAsset(${asset.id})">编辑</button>
-                            <button class="action-btn delete-btn" onclick="deleteCashAsset(${asset.id})">删除</button>
-<!--                            <button class="action-btn transfer-btn" onclick="transferCash(${asset.id})">转账</button>-->
-                        </div>
-                    `;
+        <div class="asset-info" style="flex: 1 1 auto; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <div class="asset-name">${asset.bank_name}</div>
+                <div class="asset-details">金额: ¥${asset.cash_amount.toLocaleString()} ${asset.currency_code}</div>
+            </div>
+
+            ${asset.notes ? `
+                <div style="color:#666; font-size:1em; margin-left: 16px;">
+                    ${asset.notes}
+                </div>
+            ` : ''}
+        </div>
+
+        <div class="asset-actions" style="margin-left: 16px;">
+            <button class="action-btn edit-btn" onclick="editCashAsset(${asset.id})">编辑</button>
+            <button class="action-btn delete-btn" onclick="deleteCashAsset(${asset.id})">删除</button>
+        </div>
+    `;
                     container.appendChild(assetElement);
                 });
             } catch (error) {
@@ -979,8 +987,9 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     bank_name: bank.bank_name,
-                    cash_amount: bank.cash_amount - totalCost,
-                    currency_code: bank.currency_code
+                    cash_amount: Number(bank.cash_amount) - totalCost,
+                    currency_code: bank.currency_code,
+                    notes: bank.notes || null
                 })
             });
 
@@ -1042,7 +1051,8 @@
                 body: JSON.stringify({
                     bank_name: bank.bank_name,
                     cash_amount: Number(bank.cash_amount) + totalGain, // 加钱
-                    currency_code: bank.currency_code
+                    currency_code: bank.currency_code,
+                    notes: bank.notes || null
                 })
             });
 
@@ -1114,7 +1124,7 @@
                     item.innerHTML = `
                 <div style="font-weight: bold;">${stock.ticker}</div>
                 <div style="color: #666; font-size: 0.9em;">${stock.name}</div>
-                <div style="color: #28a745; font-size: 0.8em;">¥${stock.market_price}</div>
+                <div style="color: #28a745; font-size: 0.8em;">当天价格：¥${stock.market_price}</div>
             `;
 
                     item.addEventListener('click', () => {
