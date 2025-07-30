@@ -34,16 +34,46 @@ export function getCashAsset(req, res) {
 // 添加新的现金资产
 export function addCashAsset(req, res) {
     const { cash_amount, currency_code, bank_name, notes } = req.body;
-    const query = `INSERT INTO cash_assets 
-      (cash_amount, currency_code, bank_name, notes) 
-      VALUES (?, ?, ?, ?)`;
-    connection.query(query, [cash_amount, currency_code, bank_name, notes], (err, results) => {
+    
+    // 首先检查该银行是否已有现金资产记录
+    const checkQuery = 'SELECT id, cash_amount FROM cash_assets WHERE bank_name = ?';
+    connection.query(checkQuery, [bank_name], (err, results) => {
         if (err) {
-            console.error('Error adding cash asset:', err);
-            res.status(500).send('Error adding cash asset');
+            console.error('Error checking existing cash asset:', err);
+            res.status(500).send('Error checking existing cash asset');
             return;
         }
-        res.status(201).json({ id: results.insertId, cash_amount, currency_code, bank_name, notes });
+        
+        if (results.length > 0) {
+            // 如果该银行已有现金资产记录，返回现有记录
+            const existingAsset = results[0];
+            res.status(200).json({ 
+                id: existingAsset.id, 
+                cash_amount: existingAsset.cash_amount, 
+                currency_code, 
+                bank_name, 
+                notes 
+            });
+        } else {
+            // 如果该银行没有现金资产记录，创建新记录
+            const insertQuery = `INSERT INTO cash_assets 
+                (cash_amount, currency_code, bank_name, notes) 
+                VALUES (?, ?, ?, ?)`;
+            connection.query(insertQuery, [cash_amount, currency_code, bank_name, notes], (err, results) => {
+                if (err) {
+                    console.error('Error adding cash asset:', err);
+                    res.status(500).send('Error adding cash asset');
+                    return;
+                }
+                res.status(201).json({ 
+                    id: results.insertId, 
+                    cash_amount, 
+                    currency_code, 
+                    bank_name, 
+                    notes 
+                });
+            });
+        }
     });
 }
 

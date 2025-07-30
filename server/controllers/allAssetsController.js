@@ -139,27 +139,48 @@ export function getAllStocks(req, res) {
 
 // 获取银行资产分布信息（显示剩余可支配金额）
 export function getBankAssetsDistribution(req, res) {
-    const query = `
+    // 首先获取所有银行的总现金资产
+    const totalQuery = `
         SELECT 
-            ca.bank_name,
-            SUM(ca.cash_amount) as total_amount,
-            COUNT(ca.id) as asset_count,
-            SUM(CASE WHEN pa.portfolio_id IS NOT NULL THEN ca.cash_amount ELSE 0 END) as allocated_amount
-        FROM cash_assets ca
-        LEFT JOIN portfolio_assets pa ON ca.id = pa.asset_id AND pa.asset_type = 'cash'
-        GROUP BY ca.bank_name
+            bank_name,
+            SUM(cash_amount) as total_amount,
+            COUNT(id) as asset_count
+        FROM cash_assets 
+        GROUP BY bank_name
         ORDER BY total_amount DESC
     `;
     
-    connection.query(query, (err, results) => {
+    connection.query(totalQuery, (err, totalResults) => {
         if (err) {
-            console.error('Error fetching bank assets distribution:', err);
-            return res.status(500).json({ error: '获取银行资产分布失败' });
+            console.error('Error fetching total bank amounts:', err);
+            return res.status(500).json({ error: '获取银行总金额失败' });
         }
         
-        res.json({
-            banks: results.map(row => {
-                const allocatedAmount = row.allocated_amount || 0;
+        // 然后获取所有银行已分配的金额
+        const allocatedQuery = `
+            SELECT 
+                ca.bank_name,
+                SUM(pa.quantity) as allocated_amount
+            FROM portfolio_assets pa
+            JOIN cash_assets ca ON pa.asset_id = ca.id AND pa.asset_type = 'cash'
+            GROUP BY ca.bank_name
+        `;
+        
+        connection.query(allocatedQuery, (err, allocatedResults) => {
+            if (err) {
+                console.error('Error fetching allocated amounts:', err);
+                return res.status(500).json({ error: '获取已分配金额失败' });
+            }
+            
+            // 创建已分配金额的映射
+            const allocatedMap = new Map();
+            allocatedResults.forEach(row => {
+                allocatedMap.set(row.bank_name, row.allocated_amount);
+            });
+            
+            // 合并结果
+            const banks = totalResults.map(row => {
+                const allocatedAmount = allocatedMap.get(row.bank_name) || 0;
                 const availableAmount = row.total_amount - allocatedAmount;
                 
                 return {
@@ -169,36 +190,59 @@ export function getBankAssetsDistribution(req, res) {
                     available_amount: availableAmount,
                     asset_count: row.asset_count
                 };
-            })
+            });
+            
+            res.json({ banks });
         });
     });
 }
 
 // 获取股票资产分布信息（显示剩余可支配股数）
 export function getStockAssetsDistribution(req, res) {
-    const query = `
+    // 首先获取所有股票的总股数
+    const totalQuery = `
         SELECT 
-            s.ticker,
-            s.name,
-            s.current_price,
-            SUM(s.quantity) as total_quantity,
-            COUNT(s.id) as asset_count,
-            SUM(CASE WHEN pa.portfolio_id IS NOT NULL THEN pa.quantity ELSE 0 END) as allocated_quantity
-        FROM stock_assets s
-        LEFT JOIN portfolio_assets pa ON s.id = pa.asset_id AND pa.asset_type = 'stock'
-        GROUP BY s.ticker, s.name, s.current_price
+            ticker,
+            name,
+            current_price,
+            SUM(quantity) as total_quantity,
+            COUNT(id) as asset_count
+        FROM stock_assets 
+        GROUP BY ticker, name, current_price
         ORDER BY total_quantity DESC
     `;
     
-    connection.query(query, (err, results) => {
+    connection.query(totalQuery, (err, totalResults) => {
         if (err) {
-            console.error('Error fetching stock assets distribution:', err);
-            return res.status(500).json({ error: '获取股票资产分布失败' });
+            console.error('Error fetching total stock quantities:', err);
+            return res.status(500).json({ error: '获取股票总股数失败' });
         }
         
-        res.json({
-            stocks: results.map(row => {
-                const allocatedQuantity = row.allocated_quantity || 0;
+        // 然后获取所有股票已分配的股数
+        const allocatedQuery = `
+            SELECT 
+                s.ticker,
+                SUM(pa.quantity) as allocated_quantity
+            FROM portfolio_assets pa
+            JOIN stock_assets s ON pa.asset_id = s.id AND pa.asset_type = 'stock'
+            GROUP BY s.ticker
+        `;
+        
+        connection.query(allocatedQuery, (err, allocatedResults) => {
+            if (err) {
+                console.error('Error fetching allocated quantities:', err);
+                return res.status(500).json({ error: '获取已分配股数失败' });
+            }
+            
+            // 创建已分配股数的映射
+            const allocatedMap = new Map();
+            allocatedResults.forEach(row => {
+                allocatedMap.set(row.ticker, row.allocated_quantity);
+            });
+            
+            // 合并结果
+            const stocks = totalResults.map(row => {
+                const allocatedQuantity = allocatedMap.get(row.ticker) || 0;
                 const availableQuantity = row.total_quantity - allocatedQuantity;
                 
                 return {
@@ -210,7 +254,9 @@ export function getStockAssetsDistribution(req, res) {
                     available_quantity: availableQuantity,
                     asset_count: row.asset_count
                 };
-            })
+            });
+            
+            res.json({ stocks });
         });
     });
 }
@@ -219,53 +265,78 @@ export function getStockAssetsDistribution(req, res) {
 export function getBankDetails(req, res) {
     const { bankName } = req.params;
     
-    const query = `
-        SELECT 
-            ca.id,
-            ca.cash_amount,
-            ca.currency_code,
-            ca.notes,
-            p.name as portfolio_name,
-            p.id as portfolio_id
-        FROM cash_assets ca
-        LEFT JOIN portfolio_assets pa ON ca.id = pa.asset_id AND pa.asset_type = 'cash'
-        LEFT JOIN portfolios p ON pa.portfolio_id = p.id
-        WHERE ca.bank_name = ?
-        ORDER BY ca.cash_amount DESC
+    // 首先获取该银行的总现金资产
+    const totalQuery = `
+        SELECT SUM(cash_amount) as total_amount
+        FROM cash_assets 
+        WHERE bank_name = ?
     `;
     
-    connection.query(query, [bankName], (err, results) => {
+    connection.query(totalQuery, [bankName], (err, totalResults) => {
         if (err) {
-            console.error('Error fetching bank details:', err);
-            return res.status(500).json({ error: '获取银行详情失败' });
+            console.error('Error fetching total bank amount:', err);
+            return res.status(500).json({ error: '获取银行总金额失败' });
         }
         
-        // 计算总金额
-        const totalAmount = results.reduce((sum, row) => sum + row.cash_amount, 0);
+        const totalAmount = totalResults[0].total_amount || 0;
         
-        // 计算已分配金额（所有已分配的）
-        const allocatedAmount = results
-            .filter(row => row.portfolio_id)
-            .reduce((sum, row) => sum + row.cash_amount, 0);
+        // 然后获取该银行已分配的金额
+        const allocatedQuery = `
+            SELECT SUM(pa.quantity) as allocated_amount
+            FROM portfolio_assets pa
+            JOIN cash_assets ca ON pa.asset_id = ca.id AND pa.asset_type = 'cash'
+            WHERE ca.bank_name = ?
+        `;
         
-        // 计算剩余可支配金额
-        const availableAmount = totalAmount - allocatedAmount;
-        
-        const portfolioAllocations = results
-            .filter(row => row.portfolio_id) // 只显示已分配的
-            .map(row => ({
-                portfolio_name: row.portfolio_name,
-                portfolio_id: row.portfolio_id,
-                amount: row.cash_amount,
-                notes: row.notes
-            }));
-        
-        res.json({
-            bank_name: bankName,
-            total_amount: totalAmount,
-            allocated_amount: allocatedAmount,
-            available_amount: availableAmount,
-            portfolio_allocations: portfolioAllocations
+        connection.query(allocatedQuery, [bankName], (err, allocatedResults) => {
+            if (err) {
+                console.error('Error fetching allocated amount:', err);
+                return res.status(500).json({ error: '获取已分配金额失败' });
+            }
+            
+            const allocatedAmount = allocatedResults[0].allocated_amount || 0;
+            const availableAmount = totalAmount - allocatedAmount;
+            
+            // 获取分配详情
+            const detailsQuery = `
+                SELECT 
+                    ca.id,
+                    ca.cash_amount,
+                    ca.currency_code,
+                    ca.notes,
+                    p.name as portfolio_name,
+                    p.id as portfolio_id,
+                    pa.quantity as allocated_quantity
+                FROM cash_assets ca
+                LEFT JOIN portfolio_assets pa ON ca.id = pa.asset_id AND pa.asset_type = 'cash'
+                LEFT JOIN portfolios p ON pa.portfolio_id = p.id
+                WHERE ca.bank_name = ?
+                ORDER BY ca.cash_amount DESC
+            `;
+            
+            connection.query(detailsQuery, [bankName], (err, detailResults) => {
+                if (err) {
+                    console.error('Error fetching bank details:', err);
+                    return res.status(500).json({ error: '获取银行详情失败' });
+                }
+                
+                const portfolioAllocations = detailResults
+                    .filter(row => row.portfolio_id) // 只显示已分配的
+                    .map(row => ({
+                        portfolio_name: row.portfolio_name,
+                        portfolio_id: row.portfolio_id,
+                        amount: row.allocated_quantity, // 使用实际分配的数量
+                        notes: row.notes
+                    }));
+                
+                res.json({
+                    bank_name: bankName,
+                    total_amount: totalAmount,
+                    allocated_amount: allocatedAmount,
+                    available_amount: availableAmount,
+                    portfolio_allocations: portfolioAllocations
+                });
+            });
         });
     });
 }
@@ -274,58 +345,95 @@ export function getBankDetails(req, res) {
 export function getStockDetails(req, res) {
     const { ticker } = req.params;
     
-    const query = `
+    // 首先获取该股票的总股数
+    const totalQuery = `
         SELECT 
-            s.id,
-            s.quantity,
-            s.purchase_price,
-            s.current_price,
-            s.purchase_date,
-            p.name as portfolio_name,
-            p.id as portfolio_id
-        FROM stock_assets s
-        LEFT JOIN portfolio_assets pa ON s.id = pa.asset_id AND pa.asset_type = 'stock'
-        LEFT JOIN portfolios p ON pa.portfolio_id = p.id
-        WHERE s.ticker = ?
-        ORDER BY s.quantity DESC
+            ticker,
+            name,
+            current_price,
+            SUM(quantity) as total_quantity
+        FROM stock_assets 
+        WHERE ticker = ?
+        GROUP BY ticker, name, current_price
     `;
     
-    connection.query(query, [ticker], (err, results) => {
+    connection.query(totalQuery, [ticker], (err, totalResults) => {
         if (err) {
-            console.error('Error fetching stock details:', err);
-            return res.status(500).json({ error: '获取股票详情失败' });
+            console.error('Error fetching total stock quantity:', err);
+            return res.status(500).json({ error: '获取股票总股数失败' });
         }
         
-        // 计算总股数
-        const totalQuantity = results.reduce((sum, row) => sum + row.quantity, 0);
+        if (totalResults.length === 0) {
+            return res.status(404).json({ error: '股票不存在' });
+        }
         
-        // 计算已分配股数（所有已分配的）
-        const allocatedQuantity = results
-            .filter(row => row.portfolio_id)
-            .reduce((sum, row) => sum + row.quantity, 0);
+        const totalQuantity = totalResults[0].total_quantity || 0;
+        const stockName = totalResults[0].name || '';
+        const currentPrice = totalResults[0].current_price || 0;
         
-        // 计算剩余可支配股数
-        const availableQuantity = totalQuantity - allocatedQuantity;
+        // 然后获取该股票已分配的股数
+        const allocatedQuery = `
+            SELECT SUM(pa.quantity) as allocated_quantity
+            FROM portfolio_assets pa
+            JOIN stock_assets s ON pa.asset_id = s.id AND pa.asset_type = 'stock'
+            WHERE s.ticker = ?
+        `;
         
-        const portfolioAllocations = results
-            .filter(row => row.portfolio_id) // 只显示已分配的
-            .map(row => ({
-                portfolio_name: row.portfolio_name,
-                portfolio_id: row.portfolio_id,
-                quantity: row.quantity,
-                purchase_price: row.purchase_price,
-                current_price: row.current_price,
-                purchase_date: row.purchase_date
-            }));
-        
-        res.json({
-            ticker: ticker,
-            name: results[0]?.name || '',
-            current_price: results[0]?.current_price || 0,
-            total_quantity: totalQuantity,
-            allocated_quantity: allocatedQuantity,
-            available_quantity: availableQuantity,
-            portfolio_allocations: portfolioAllocations
+        connection.query(allocatedQuery, [ticker], (err, allocatedResults) => {
+            if (err) {
+                console.error('Error fetching allocated quantity:', err);
+                return res.status(500).json({ error: '获取已分配股数失败' });
+            }
+            
+            const allocatedQuantity = allocatedResults[0].allocated_quantity || 0;
+            const availableQuantity = totalQuantity - allocatedQuantity;
+            
+            // 获取分配详情
+            const detailsQuery = `
+                SELECT 
+                    s.id,
+                    s.quantity,
+                    s.purchase_price,
+                    s.current_price,
+                    s.purchase_date,
+                    p.name as portfolio_name,
+                    p.id as portfolio_id,
+                    pa.quantity as allocated_quantity
+                FROM stock_assets s
+                LEFT JOIN portfolio_assets pa ON s.id = pa.asset_id AND pa.asset_type = 'stock'
+                LEFT JOIN portfolios p ON pa.portfolio_id = p.id
+                WHERE s.ticker = ?
+                ORDER BY s.quantity DESC
+            `;
+            
+            connection.query(detailsQuery, [ticker], (err, detailResults) => {
+                if (err) {
+                    console.error('Error fetching stock details:', err);
+                    return res.status(500).json({ error: '获取股票详情失败' });
+                }
+                
+                const portfolioAllocations = detailResults
+                    .filter(row => row.portfolio_id) // 只显示已分配的
+                    .map(row => ({
+                        portfolio_name: row.portfolio_name,
+                        portfolio_id: row.portfolio_id,
+                        quantity: row.allocated_quantity, // 使用实际分配的数量
+                        purchase_price: row.purchase_price,
+                        current_price: row.current_price,
+                        purchase_date: row.purchase_date
+                    }));
+                
+                res.json({
+                    id: detailResults[0]?.id || null, // 返回第一个股票资产的ID
+                    ticker: ticker,
+                    name: stockName,
+                    current_price: currentPrice,
+                    total_quantity: totalQuantity,
+                    allocated_quantity: allocatedQuantity,
+                    available_quantity: availableQuantity,
+                    portfolio_allocations: portfolioAllocations
+                });
+            });
         });
     });
 }

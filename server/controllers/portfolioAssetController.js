@@ -279,28 +279,45 @@ export function validatePurchase(req, res) {
         return res.status(400).json({ error: '投入金额必须大于0' });
       }
 
-      // 检查是否有足够的现金资产
+      // 检查可支配的现金资产（总现金减去已分配的）
+      // 首先获取总现金
       connection.query(
-        'SELECT SUM(cash_amount) as total_cash FROM cash_assets',
-        (err, cashRows) => {
+        `SELECT SUM(cash_amount) as total_cash FROM cash_assets`,
+        (err, totalRows) => {
           if (err) {
-            console.error('Error checking cash assets:', err);
+            console.error('Error checking total cash assets:', err);
             return res.status(500).json({ error: '验证现金资产失败' });
           }
 
-          const totalCash = Number(cashRows[0].total_cash) || 0;
-          
-          if (amount > totalCash) {
-            return res.status(400).json({ 
-              error: `投入金额 ${amount} 超过可用现金 ${totalCash}` 
-            });
-          }
+          const totalCash = Number(totalRows[0].total_cash) || 0;
 
-          res.json({ 
-            message: '现金购买验证通过',
-            available_cash: totalCash,
-            requested_amount: amount
-          });
+          // 然后获取已分配的现金
+          connection.query(
+            `SELECT SUM(quantity) as allocated_cash FROM portfolio_assets WHERE asset_type = 'cash'`,
+            (err, allocatedRows) => {
+              if (err) {
+                console.error('Error checking allocated cash:', err);
+                return res.status(500).json({ error: '验证已分配现金失败' });
+              }
+
+              const allocatedCash = Number(allocatedRows[0].allocated_cash) || 0;
+              const availableCash = totalCash - allocatedCash;
+              
+              if (amount > availableCash) {
+                return res.status(400).json({ 
+                  error: `投入金额 ${amount} 超过可支配现金 ${availableCash}（总现金：${totalCash}，已分配：${allocatedCash}）` 
+                });
+              }
+
+              res.json({ 
+                message: '现金购买验证通过',
+                total_cash: totalCash,
+                allocated_cash: allocatedCash,
+                available_cash: availableCash,
+                requested_amount: amount
+              });
+            }
+          );
         }
       );
     } else if (asset_type === 'stock') {
@@ -334,42 +351,86 @@ export function validatePurchase(req, res) {
           const stock = stockRows[0];
           const expectedAmount = quantity * stock.current_price;
           
-          // 检查购买金额是否合理（允许10%的误差）
-          const priceDifference = Math.abs(amount - expectedAmount);
-          const priceTolerance = expectedAmount * 0.1;
-          
-          if (priceDifference > priceTolerance) {
-            return res.status(400).json({ 
-              error: `购买金额 ${amount} 与预期金额 ${expectedAmount} 差异过大` 
-            });
-          }
-
-          // 检查是否有足够的现金购买
+          // 检查是否有足够的股票股数可以分配
           connection.query(
-            'SELECT SUM(cash_amount) as total_cash FROM cash_assets',
-            (err, cashRows) => {
+            `SELECT 
+              SUM(s.quantity) as total_quantity,
+              SUM(CASE WHEN pa.portfolio_id IS NOT NULL THEN pa.quantity ELSE 0 END) as allocated_quantity
+            FROM stock_assets s
+            LEFT JOIN portfolio_assets pa ON s.id = pa.asset_id AND pa.asset_type = 'stock'
+            WHERE s.ticker = ?`,
+            [ticker],
+            (err, stockQuantityRows) => {
               if (err) {
-                console.error('Error checking cash for stock purchase:', err);
-                return res.status(500).json({ error: '验证购买资金失败' });
+                console.error('Error checking stock quantity:', err);
+                return res.status(500).json({ error: '验证股票股数失败' });
               }
 
-              const totalCash = Number(cashRows[0].total_cash) || 0;
+              const totalQuantity = Number(stockQuantityRows[0].total_quantity) || 0;
+              const allocatedQuantity = Number(stockQuantityRows[0].allocated_quantity) || 0;
+              const availableQuantity = totalQuantity - allocatedQuantity;
               
-              if (amount > totalCash) {
+                            if (quantity > availableQuantity) {
                 return res.status(400).json({ 
-                  error: `购买金额 ${amount} 超过可用现金 ${totalCash}` 
+                  error: `购买股数 ${quantity} 超过可支配股数 ${availableQuantity}（总股数：${totalQuantity}，已分配：${allocatedQuantity}）` 
+                });
+              }
+              
+              // 检查购买金额是否合理（允许10%的误差）
+              const priceDifference = Math.abs(amount - expectedAmount);
+              const priceTolerance = expectedAmount * 0.1;
+              
+              if (priceDifference > priceTolerance) {
+                return res.status(400).json({ 
+                  error: `购买金额 ${amount} 与预期金额 ${expectedAmount} 差异过大` 
                 });
               }
 
-              res.json({ 
-                message: '股票购买验证通过',
-                stock_name: stock.name,
-                stock_ticker: ticker,
-                quantity: quantity,
-                price_per_share: stock.current_price,
-                total_amount: amount,
-                available_cash: totalCash
-              });
+              // 检查是否有足够的现金购买（考虑已分配的现金）
+              // 首先获取总现金
+              connection.query(
+                `SELECT SUM(cash_amount) as total_cash FROM cash_assets`,
+                (err, totalRows) => {
+                  if (err) {
+                    console.error('Error checking total cash for stock purchase:', err);
+                    return res.status(500).json({ error: '验证购买资金失败' });
+                  }
+
+                  const totalCash = Number(totalRows[0].total_cash) || 0;
+
+                  // 然后获取已分配的现金
+                  connection.query(
+                    `SELECT SUM(quantity) as allocated_cash FROM portfolio_assets WHERE asset_type = 'cash'`,
+                    (err, allocatedRows) => {
+                      if (err) {
+                        console.error('Error checking allocated cash for stock purchase:', err);
+                        return res.status(500).json({ error: '验证已分配现金失败' });
+                      }
+
+                      const allocatedCash = Number(allocatedRows[0].allocated_cash) || 0;
+                      const availableCash = totalCash - allocatedCash;
+                      
+                      if (amount > availableCash) {
+                        return res.status(400).json({ 
+                          error: `购买金额 ${amount} 超过可支配现金 ${availableCash}（总现金：${totalCash}，已分配：${allocatedCash}）` 
+                        });
+                      }
+
+                      res.json({ 
+                        message: '股票购买验证通过',
+                        stock_name: stock.name,
+                        stock_ticker: ticker,
+                        quantity: quantity,
+                        price_per_share: stock.current_price,
+                        total_amount: amount,
+                        total_cash: totalCash,
+                        allocated_cash: allocatedCash,
+                        available_cash: availableCash
+                      });
+                    }
+                  );
+                }
+              );
             }
           );
         }
@@ -472,4 +533,205 @@ export function portfolioPerformance(req, res) {
   );
 }
 
+// 删除现金资产（返回到现金池）
+export function deleteCashAsset(req, res) {
+  const assetId = req.params.assetId;
+  
+  connection.beginTransaction(err => {
+    if (err) {
+      console.error('Transaction start error:', err);
+      return res.status(500).json({ error: '数据库事务错误' });
+    }
 
+    // 1. 获取投资组合资产信息
+    connection.query(
+      'SELECT * FROM portfolio_assets WHERE asset_id = ? AND asset_type = "cash"',
+      [assetId],
+      (err, portfolioAssets) => {
+        if (err) {
+          return connection.rollback(() => {
+            console.error('Error querying portfolio assets:', err);
+            res.status(500).json({ error: '查询投资组合资产失败' });
+          });
+        }
+
+        if (portfolioAssets.length === 0) {
+          return connection.rollback(() => {
+            res.status(404).json({ error: '未找到该现金资产' });
+          });
+        }
+
+        const portfolioAsset = portfolioAssets[0];
+        const portfolioId = portfolioAsset.portfolio_id;
+        const quantity = portfolioAsset.quantity;
+
+        // 2. 删除投资组合中的资产记录（只删除分配关系，不修改银行总资产）
+        connection.query(
+          'DELETE FROM portfolio_assets WHERE id = ?',
+          [portfolioAsset.id],
+          (err, deleteResult) => {
+            if (err) {
+              return connection.rollback(() => {
+                console.error('Error deleting portfolio asset:', err);
+                res.status(500).json({ error: '删除投资组合资产失败' });
+              });
+            }
+
+            connection.commit(err => {
+              if (err) {
+                return connection.rollback(() => {
+                  console.error('Transaction commit error:', err);
+                  res.status(500).json({ error: '提交事务失败' });
+                });
+              }
+
+              res.json({ 
+                message: '现金资产删除成功，已返回到现金池',
+                returned_amount: quantity,
+                portfolio_id: portfolioId
+              });
+            });
+          }
+        );
+      }
+    );
+  });
+}
+
+// 删除股票资产（返回到股票池）
+export function deleteStockAsset(req, res) {
+  const assetId = req.params.assetId;
+  
+  connection.beginTransaction(err => {
+    if (err) {
+      console.error('Transaction start error:', err);
+      return res.status(500).json({ error: '数据库事务错误' });
+    }
+
+    // 1. 获取投资组合资产信息
+    connection.query(
+      'SELECT * FROM portfolio_assets WHERE asset_id = ? AND asset_type = "stock"',
+      [assetId],
+      (err, portfolioAssets) => {
+        if (err) {
+          return connection.rollback(() => {
+            console.error('Error querying portfolio assets:', err);
+            res.status(500).json({ error: '查询投资组合资产失败' });
+          });
+        }
+
+        if (portfolioAssets.length === 0) {
+          return connection.rollback(() => {
+            res.status(404).json({ error: '未找到该股票资产' });
+          });
+        }
+
+        const portfolioAsset = portfolioAssets[0];
+        const portfolioId = portfolioAsset.portfolio_id;
+        const quantity = portfolioAsset.quantity;
+
+        // 2. 删除投资组合中的资产记录（只删除分配关系，不修改股票池总股数）
+        connection.query(
+          'DELETE FROM portfolio_assets WHERE id = ?',
+          [portfolioAsset.id],
+          (err, deleteResult) => {
+            if (err) {
+              return connection.rollback(() => {
+                console.error('Error deleting portfolio asset:', err);
+                res.status(500).json({ error: '删除投资组合资产失败' });
+              });
+            }
+
+            connection.commit(err => {
+              if (err) {
+                return connection.rollback(() => {
+                  console.error('Transaction commit error:', err);
+                  res.status(500).json({ error: '提交事务失败' });
+                });
+              }
+
+              res.json({ 
+                message: '股票资产删除成功，股数已返回到股票池',
+                returned_quantity: quantity,
+                portfolio_id: portfolioId
+              });
+            });
+          }
+        );
+      }
+    );
+  });
+}
+
+// 更新投资组合中的现金分配
+export function updateCashAllocation(req, res) {
+  const { portfolio_id, asset_id, new_quantity } = req.body;
+  
+  console.log('收到更新现金分配请求:', { portfolio_id, asset_id, new_quantity });
+  
+  if (!portfolio_id || !asset_id || new_quantity === undefined || new_quantity < 0) {
+    console.error('参数验证失败:', { portfolio_id, asset_id, new_quantity });
+    return res.status(400).json({ error: '参数不完整或无效' });
+  }
+  
+  connection.beginTransaction(err => {
+    if (err) {
+      console.error('Transaction start error:', err);
+      return res.status(500).json({ error: '数据库事务错误' });
+    }
+
+    // 1. 获取当前分配金额
+    connection.query(
+      'SELECT quantity FROM portfolio_assets WHERE portfolio_id = ? AND asset_id = ? AND asset_type = "cash"',
+      [portfolio_id, asset_id],
+      (err, results) => {
+        if (err) {
+          return connection.rollback(() => {
+            console.error('Error querying current allocation:', err);
+            res.status(500).json({ error: '查询当前分配失败' });
+          });
+        }
+
+        if (results.length === 0) {
+          return connection.rollback(() => {
+            res.status(404).json({ error: '未找到该现金资产分配记录' });
+          });
+        }
+
+        const currentQuantity = results[0].quantity;
+        const quantityDifference = new_quantity - currentQuantity;
+
+        // 2. 更新投资组合中的分配金额（只修改分配关系，不修改银行总资产）
+        connection.query(
+          'UPDATE portfolio_assets SET quantity = ? WHERE portfolio_id = ? AND asset_id = ? AND asset_type = "cash"',
+          [new_quantity, portfolio_id, asset_id],
+          (err, updateResult) => {
+            if (err) {
+              return connection.rollback(() => {
+                console.error('Error updating portfolio allocation:', err);
+                res.status(500).json({ error: '更新投资组合分配失败' });
+              });
+            }
+
+            connection.commit(err => {
+              if (err) {
+                return connection.rollback(() => {
+                  console.error('Transaction commit error:', err);
+                  res.status(500).json({ error: '提交事务失败' });
+                });
+              }
+
+              res.json({ 
+                message: '现金分配更新成功',
+                old_quantity: currentQuantity,
+                new_quantity: new_quantity,
+                difference: quantityDifference,
+                portfolio_id: portfolio_id
+              });
+            });
+          }
+        );
+      }
+    );
+  });
+}

@@ -226,9 +226,9 @@ export function getPortfolioAssets(req, res) {
 export function getAllPortfoliosAssets(req, res) {
     const query = `
         SELECT p.id as portfolio_id, p.name as portfolio_name, p.created_at,
-               pa.asset_type, pa.asset_id,
-               sa.ticker, sa.name as stock_name, sa.quantity, sa.current_price, sa.purchase_price,
-               ca.bank_name, ca.cash_amount
+               pa.asset_type, pa.asset_id, pa.quantity as allocated_quantity,
+               sa.ticker, sa.name as stock_name, sa.quantity as stock_total_quantity, sa.current_price, sa.purchase_price,
+               ca.bank_name, ca.cash_amount as bank_total_amount
         FROM portfolios p
         LEFT JOIN portfolio_assets pa ON p.id = pa.portfolio_id
         LEFT JOIN stock_assets sa ON pa.asset_type = 'stock' AND pa.asset_id = sa.id
@@ -266,7 +266,7 @@ export function getAllPortfoliosAssets(req, res) {
                     id: row.asset_id,
                     ticker: row.ticker,
                     name: row.stock_name,
-                    quantity: row.quantity,
+                    quantity: row.allocated_quantity, // 使用分配到该组合的股数
                     current_price: row.current_price,
                     purchase_price: row.purchase_price
                 });
@@ -274,7 +274,7 @@ export function getAllPortfoliosAssets(req, res) {
                 portfolio.assets.cash.push({
                     id: row.asset_id,
                     bank_name: row.bank_name,
-                    cash_amount: row.cash_amount
+                    cash_amount: row.allocated_quantity // 使用分配到该组合的金额
                 });
             }
         });
@@ -323,8 +323,12 @@ export function deletePortfolio(req, res) {
         }
 
         try {
-            // 1. 获取该投资组合的所有资产
-            const assetsQuery = 'SELECT asset_type, asset_id FROM portfolio_assets WHERE portfolio_id = ?';
+            // 1. 获取该投资组合的所有资产及其数量
+            const assetsQuery = `
+                SELECT pa.asset_type, pa.asset_id, pa.quantity 
+                FROM portfolio_assets pa 
+                WHERE pa.portfolio_id = ?
+            `;
             const assets = await new Promise((resolve, reject) => {
                 connection.query(assetsQuery, [portfolioId], (err, results) => {
                     if (err) reject(err);
@@ -332,7 +336,36 @@ export function deletePortfolio(req, res) {
                 });
             });
 
-            // 2. 删除投资组合资产关联
+            // 2. 将资产返回到对应的池子中
+            for (const asset of assets) {
+                if (asset.asset_type === 'stock') {
+                    // 股票资产：增加股票池中的股数
+                    await new Promise((resolve, reject) => {
+                        connection.query(
+                            'UPDATE stock_assets SET quantity = quantity + ? WHERE id = ?',
+                            [asset.quantity, asset.asset_id],
+                            (err) => {
+                                if (err) reject(err);
+                                else resolve();
+                            }
+                        );
+                    });
+                } else if (asset.asset_type === 'cash') {
+                    // 现金资产：增加现金池中的金额
+                    await new Promise((resolve, reject) => {
+                        connection.query(
+                            'UPDATE cash_assets SET cash_amount = cash_amount + ? WHERE id = ?',
+                            [asset.quantity, asset.asset_id],
+                            (err) => {
+                                if (err) reject(err);
+                                else resolve();
+                            }
+                        );
+                    });
+                }
+            }
+
+            // 3. 删除投资组合资产关联
             await new Promise((resolve, reject) => {
                 connection.query('DELETE FROM portfolio_assets WHERE portfolio_id = ?', [portfolioId], (err) => {
                     if (err) reject(err);
@@ -340,32 +373,13 @@ export function deletePortfolio(req, res) {
                 });
             });
 
-            // 3. 删除投资组合
+            // 4. 删除投资组合
             await new Promise((resolve, reject) => {
                 connection.query('DELETE FROM portfolios WHERE id = ?', [portfolioId], (err) => {
                     if (err) reject(err);
                     else resolve();
                 });
             });
-
-            // 4. 删除孤立的资产（可选，根据业务需求决定）
-            for (const asset of assets) {
-                if (asset.asset_type === 'stock') {
-                    await new Promise((resolve, reject) => {
-                        connection.query('DELETE FROM stock_assets WHERE id = ?', [asset.asset_id], (err) => {
-                            if (err) reject(err);
-                            else resolve();
-                        });
-                    });
-                } else if (asset.asset_type === 'cash') {
-                    await new Promise((resolve, reject) => {
-                        connection.query('DELETE FROM cash_assets WHERE id = ?', [asset.asset_id], (err) => {
-                            if (err) reject(err);
-                            else resolve();
-                        });
-                    });
-                }
-            }
 
             connection.commit((err) => {
                 if (err) {
@@ -375,7 +389,10 @@ export function deletePortfolio(req, res) {
                     });
                     return;
                 }
-                res.json({ message: '投资组合删除成功' });
+                res.json({ 
+                    message: '投资组合删除成功，所有资产已返回到对应的池子中',
+                    returned_assets: assets.length
+                });
             });
         } catch (error) {
             connection.rollback(() => {
