@@ -293,6 +293,18 @@
             background: #dc3545;
             color: #fff;
         }
+
+        .modal-content {
+            max-height: 90vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-buttons {
+            margin-top: auto;
+            padding: 20px 0 0 0;
+        }
     </style>
 </head>
 <body>
@@ -431,19 +443,26 @@
         </div>
     </div>
 
-    <!-- 添加股票模态框 -->
+    <!-- 添加股票模态框（已更新） -->
     <div id="add-stock-modal" class="modal">
         <div class="modal-content">
             <h3 class="modal-title">添加股票资产</h3>
 
+            <!-- 新增搜索区域 -->
+            <div class="form-group">
+                <label>搜索股票:</label>
+                <input type="text" id="stock-search" placeholder="输入股票代码或名称搜索" autocomplete="off">
+                <div id="search-results" style="display: none; max-height: 200px; overflow-y: auto; border: 1px solid #ddd; border-radius: 4px; margin-top: 5px;"></div>
+            </div>
+
             <div class="form-group">
                 <label>股票代码:</label>
-                <input type="text" id="add-stock-code" placeholder="如 NVDA">
+                <input type="text" id="add-stock-code" placeholder="如 NVDA" readonly>
             </div>
 
             <div class="form-group">
                 <label>股票名称:</label>
-                <input type="text" id="add-stock-name" placeholder="如 NVIDIA">
+                <input type="text" id="add-stock-name" placeholder="如 NVIDIA" readonly>
             </div>
 
             <div class="form-group">
@@ -453,12 +472,17 @@
 
             <div class="form-group">
                 <label>买入价格:</label>
-                <input type="number" id="add-price" min="0" step="0.01" placeholder="每股单价">
+                <input type="number" id="add-price" min="0" step="0.01" placeholder="请选择日期自动获取价格" readonly>
             </div>
 
             <div class="form-group">
                 <label>买入日期:</label>
                 <input type="date" id="add-date">
+            </div>
+
+            <div class="form-group">
+                <label>总价值:</label>
+                <input type="number" id="add-total-price" readonly placeholder="自动计算">
             </div>
 
             <div class="modal-buttons">
@@ -638,7 +662,6 @@
                             <div class="asset-details">持股: ${asset.quantity.toLocaleString()}股 | 购入价: ¥${asset.purchase_price.toLocaleString()} | 总值: ¥${currentValue.toLocaleString()}</div>
                         </div>
                         <div class="asset-actions">
-                            <button class="action-btn view-btn" onclick="viewStockDetails(${asset.id})">详情</button>
                             <button class="action-btn buy-btn" onclick="buyStock(${asset.id})">购入</button>
                             <button class="action-btn sell-btn" onclick="sellStock(${asset.id})">抛售</button>
                             <button class="action-btn delete-btn" onclick="deleteStockAsset(${asset.id})">删除</button>
@@ -890,12 +913,6 @@
             }
         }
 
-        // 查看股票详情
-        function viewStockDetails(assetId) {
-            // 跳转到股票详情页面
-            window.location.href = `stock-details.html?id=${assetId}`;
-        }
-
         // 确认编辑现金（已更新）
         async function confirmCashEdit() {
             const bankName   = document.getElementById('edit-bank-name').value.trim();
@@ -1059,6 +1076,120 @@
             document.getElementById(modalId).style.display = 'none';
             currentEditingAsset = null;
         }
+
+        // 股票搜索功能
+        let searchTimeout;
+        document.getElementById('stock-search').addEventListener('input', function(e) {
+            const query = e.target.value.trim();
+
+            if (query.length < 1) {
+                document.getElementById('search-results').style.display = 'none';
+                return;
+            }
+
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                searchStocks(query);
+            }, 300); // 防抖
+        });
+
+        // 搜索股票函数
+        async function searchStocks(query) {
+            try {
+                const response = await fetch(`${API_BASE}/search-stocks?query=${encodeURIComponent(query)}`);
+                const stocks = await response.json();
+
+                const resultsDiv = document.getElementById('search-results');
+                resultsDiv.innerHTML = '';
+
+                if (stocks.length === 0) {
+                    resultsDiv.innerHTML = '<div style="padding: 10px; color: #666;">未找到匹配的股票</div>';
+                    resultsDiv.style.display = 'block';
+                    return;
+                }
+
+                stocks.forEach(stock => {
+                    const item = document.createElement('div');
+                    item.style.cssText = 'padding: 10px; cursor: pointer; border-bottom: 1px solid #eee;';
+                    item.innerHTML = `
+                <div style="font-weight: bold;">${stock.ticker}</div>
+                <div style="color: #666; font-size: 0.9em;">${stock.name}</div>
+                <div style="color: #28a745; font-size: 0.8em;">¥${stock.market_price}</div>
+            `;
+
+                    item.addEventListener('click', () => {
+                        selectStock(stock);
+                    });
+
+                    resultsDiv.appendChild(item);
+                });
+
+                resultsDiv.style.display = 'block';
+            } catch (error) {
+                console.error('搜索股票失败:', error);
+            }
+        }
+
+        // 修改 selectStock 函数，移除价格填充
+        function selectStock(stock) {
+            document.getElementById('add-stock-code').value = stock.ticker;
+            document.getElementById('add-stock-name').value = stock.name;
+            document.getElementById('add-price').value = ''; // 清空价格输入框
+            document.getElementById('stock-search').value = '';
+            document.getElementById('search-results').style.display = 'none';
+
+            // 获取选中日期对应的价格
+            getHistoricalPrice(stock.ticker);
+        }
+
+        // 新增获取历史价格的函数
+        async function getHistoricalPrice(ticker) {
+            const date = document.getElementById('add-date').value;
+            if (!date || !ticker) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/stock-price?ticker=${encodeURIComponent(ticker)}&date=${date}`);
+                const data = await response.json();
+
+                if (data.price) {
+                    document.getElementById('add-price').value = data.price;
+                } else {
+                    alert(`在 ${date} 没有找到 ${ticker} 的价格数据`);
+                    document.getElementById('add-price').value = '';
+                }
+            } catch (error) {
+                console.error('获取历史价格失败:', error);
+                alert('获取历史价格失败，请手动输入价格');
+            }
+        }
+
+        // 监听日期变化
+        document.getElementById('add-date').addEventListener('change', function() {
+            const ticker = document.getElementById('add-stock-code').value;
+            if (ticker) {
+                getHistoricalPrice(ticker);
+            }
+        });
+
+        // 点击模态框外部关闭搜索结果
+        document.addEventListener('click', function(e) {
+            const searchContainer = document.getElementById('stock-search').parentElement;
+            if (!searchContainer.contains(e.target)) {
+                document.getElementById('search-results').style.display = 'none';
+            }
+        });
+
+        // 实时计算总价格
+        function updateTotalPrice() {
+            const price = parseFloat(document.getElementById('add-price').value) || 0;
+            const quantity = parseFloat(document.getElementById('add-quantity').value) || 0;
+            const total = price * quantity;
+            document.getElementById('add-total-price').value = total.toFixed(2);
+        }
+
+        // 绑定事件
+        document.getElementById('add-price').addEventListener('input', updateTotalPrice);
+        document.getElementById('add-quantity').addEventListener('input', updateTotalPrice);
 
         // 实时计算购入金额
         document.getElementById('buy-shares').addEventListener('input', function () {
