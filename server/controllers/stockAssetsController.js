@@ -25,16 +25,19 @@ async function updateStockAssetPrices() {
     return new Promise((resolve, reject) => {
         const updateQuery = `
             UPDATE stock_assets sa
-            JOIN (
-                SELECT stock_id, MAX(record_date) AS latest_date
-                FROM stocks_history
-                GROUP BY stock_id
-            ) latest ON sa.id = latest.stock_id
-            JOIN stocks_history sh ON sh.stock_id = latest.stock_id AND sh.record_date = latest.latest_date
-            SET 
-                sa.current_price = sh.current_price,
-                sa.updated_at = NOW()
-            WHERE sa.id IS NOT NULL;
+                JOIN all_stocks s ON sa.ticker = s.ticker
+                JOIN (
+                    SELECT stock_id, MAX(record_date) AS latest_date
+                    FROM stocks_history
+                    GROUP BY stock_id
+                ) latest ON s.id = latest.stock_id
+                JOIN stocks_history sh 
+                    ON sh.stock_id = latest.stock_id 
+                    AND sh.record_date = latest.latest_date
+                SET 
+                    sa.current_price = sh.current_price,
+                    sa.updated_at = NOW()
+                WHERE sa.ticker IS NOT NULL;
         `;
         connection.query(updateQuery, (err, result) => {
             if (err) {
