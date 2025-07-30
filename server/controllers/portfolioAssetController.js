@@ -763,3 +763,101 @@ export function getAvailableShares(req, res) {
         });
     });
 }
+
+// 获取投资组合中特定股票的分配记录ID
+export function getPortfolioStockAsset(req, res) {
+    const { portfolioId, stockId } = req.params;
+
+    const query = `
+        SELECT pa.*, sa.ticker, sa.name, sa.current_price
+        FROM portfolio_assets pa
+        JOIN stock_assets sa ON sa.id = pa.asset_id
+        WHERE pa.portfolio_id = ? AND pa.asset_id = ? AND pa.asset_type = 'stock'
+    `;
+
+    connection.query(query, [portfolioId, stockId], (err, results) => {
+        if (err) {
+            console.error('Error fetching portfolio stock asset:', err);
+            return res.status(500).json({ error: '查询投资组合股票资产失败' });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ error: '未找到该股票资产分配记录' });
+        }
+
+        res.json(results[0]);
+    });
+}
+
+// 更新投资组合中的股票分配
+export function updateStockAllocation(req, res) {
+    const { portfolio_id, asset_id, new_quantity } = req.body;
+
+    console.log('收到更新股票分配请求:', { portfolio_id, asset_id, new_quantity });
+
+    if (!portfolio_id || !asset_id || new_quantity === undefined || new_quantity < 0) {
+        console.error('参数验证失败:', { portfolio_id, asset_id, new_quantity });
+        return res.status(400).json({ error: '参数不完整或无效' });
+    }
+
+    connection.beginTransaction(err => {
+        if (err) {
+            console.error('Transaction start error:', err);
+            return res.status(500).json({ error: '数据库事务错误' });
+        }
+
+        // 1. 获取当前分配数量
+        connection.query(
+            'SELECT quantity FROM portfolio_assets WHERE portfolio_id = ? AND asset_id = ? AND asset_type = "stock"',
+            [portfolio_id, asset_id],
+            (err, results) => {
+                if (err) {
+                    return connection.rollback(() => {
+                        console.error('Error querying current allocation:', err);
+                        res.status(500).json({ error: '查询当前分配失败' });
+                    });
+                }
+
+                if (results.length === 0) {
+                    return connection.rollback(() => {
+                        res.status(404).json({ error: '未找到该股票资产分配记录' });
+                    });
+                }
+
+                const currentQuantity = results[0].quantity;
+                const quantityDifference = new_quantity - currentQuantity;
+
+                // 2. 更新投资组合中的分配数量
+                connection.query(
+                    'UPDATE portfolio_assets SET quantity = ? WHERE portfolio_id = ? AND asset_id = ? AND asset_type = "stock"',
+                    [new_quantity, portfolio_id, asset_id],
+                    (err, updateResult) => {
+                        if (err) {
+                            return connection.rollback(() => {
+                                console.error('Error updating portfolio allocation:', err);
+                                res.status(500).json({ error: '更新投资组合分配失败' });
+                            });
+                        }
+
+                        connection.commit(err => {
+                            if (err) {
+                                return connection.rollback(() => {
+                                    console.error('Transaction commit error:', err);
+                                    res.status(500).json({ error: '提交事务失败' });
+                                });
+                            }
+
+                            res.json({
+                                message: '股票分配更新成功',
+                                old_quantity: currentQuantity,
+                                new_quantity: new_quantity,
+                                difference: quantityDifference,
+                                portfolio_id: portfolio_id
+                            });
+                        });
+                    }
+                );
+            }
+        );
+    });
+}

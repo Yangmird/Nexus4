@@ -15,13 +15,19 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
+            height: 100vh;
+            width: 100vw;
             color: #333;
+            overflow-x: hidden;
         }
 
         .container {
             max-width: 1400px;
             margin: 0 auto;
             padding: 20px;
+            min-height: calc(100vh - 40px);
+            display: flex;
+            flex-direction: column;
         }
 
         .back-btn {
@@ -48,9 +54,53 @@
             color: white;
             font-size: 32px;
             font-weight: 600;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             text-align: center;
             text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        /* 导航按钮区域样式 */
+        .navigation-section {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .navigation-buttons {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+            background: linear-gradient(135deg, #f7931e, #ff6b35);
+        }
+
+        .nav-btn:active {
+            transform: translateY(0);
         }
 
         .main-content {
@@ -61,6 +111,8 @@
             border-radius: 20px;
             overflow: hidden;
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            flex: 1;
+            min-height: 0;
         }
 
         /* 左侧投资组合列表 */
@@ -760,11 +812,18 @@
 </head>
 <body>
     <div class="container">
-        <div class="back-btn" onclick="window.location.href='index.html'">
-            <span>←</span> 返回首页
-        </div>
+        <!-- 删除左上角返回首页按钮 -->
         
         <h1 class="page-title">个人资产组合管理</h1>
+        
+        <!-- 导航按钮区域 -->
+        <div class="navigation-section">
+            <div class="navigation-buttons">
+                <a href="index.html" class="nav-btn">返回首页</a>
+                <a href="asset-management.html" class="nav-btn">个人资产管理</a>
+                <a href="stock-details.html" class="nav-btn">查看所有股票详情</a>
+            </div>
+        </div>
         
         <div class="main-content">
             <!-- 左侧投资组合列表 -->
@@ -865,7 +924,7 @@
                             <span class="summary-value" id="summary-amount">¥0.00</span>
                         </div>
                         <div class="summary-item">
-                            <span class="summary-label">剩余金额:</span>
+                            <span class="summary-label">剩余可支配金额:</span>
                             <span class="summary-value" id="summary-remaining">¥0.00</span>
                         </div>
                     </div>
@@ -1133,7 +1192,7 @@
                             <span class="summary-value" id="summary-operation-amount">¥0.00</span>
                         </div>
                         <div class="summary-item">
-                            <span class="summary-label">更新后数量:</span>
+                            <span class="summary-label">更新后的股数:</span>
                             <span class="summary-value" id="summary-new-quantity">0</span>
                         </div>
                     </div>
@@ -1164,7 +1223,7 @@
                 </div>
                 <div class="form-group">
                     <label class="form-label">购买股数</label>
-                    <input type="number" class="form-input" id="stockQuantity" placeholder="请输入购买股数" required>
+                    <input type="number" class="form-input" id="stockQuantity" placeholder="请输入股数" required>
                 </div>
                 <div class="form-group">
                     <label class="form-label">购买价格 (市场价)</label>
@@ -1324,7 +1383,7 @@
                             <span>资产数量: ${totalAssets}</span>
                         </div>
                         <div class="portfolio-actions">
-                            <button class="portfolio-action-btn edit-portfolio" onclick="editPortfolio(${portfolio.id}, '${portfolio.name}')">修改组合</button>
+                            <button class="portfolio-action-btn edit-portfolio" onclick="editPortfolio(${portfolio.id}, '${portfolio.name}')">修改组合名称</button>
                             <button class="portfolio-action-btn delete-portfolio" onclick="deletePortfolio(${portfolio.id}, '${portfolio.name}')">删除组合</button>
                         </div>
                     `;
@@ -1604,8 +1663,13 @@
                 
                 if (existingBankAsset) {
                     // 如果银行已存在，更新现有分配金额
-                    const newAllocatedAmount = existingBankAsset.cash_amount + cashAmount;
-                    
+                    // const newAllocatedAmount = existingBankAsset.cash_amount + cashAmount;
+                    const oldAmount = parseFloat(Number(existingBankAsset.cash_amount).toFixed(2));
+                    const addAmount = parseFloat(Number(cashAmount).toFixed(2));
+                    // 相加后再保留两位小数
+                    const newAllocatedAmount = parseFloat((oldAmount + addAmount).toFixed(2));  
+
+
                     const updateResponse = await fetch(`${API_BASE}/portfolio-assets/update-cash`, {
                         method: 'PUT',
                         headers: {
@@ -2129,33 +2193,78 @@
                     return;
                 }
                 
-                // 使用现有的股票资产ID，而不是创建新的
-                if (!selectedStockDetails || !selectedStockDetails.id) {
-                    alert('无法获取股票资产信息');
-                    return;
-                }
+                // 检查当前投资组合中是否已经有该股票的资产
+                const existingStockAssets = allPortfolios.find(p => p.id === currentPortfolioId)?.assets.stock || [];
+                const existingStockAsset = existingStockAssets.find(asset => asset.ticker === selectedStock.ticker);
                 
-                // 将股票资产添加到当前投资组合
-                const portfolioResponse = await fetch(`${API_BASE}/portfolio-assets`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        portfolio_id: currentPortfolioId,
-                        asset_type: 'stock',
-                        asset_id: selectedStockDetails.id,
-                        quantity: quantity
-                    })
-                });
-                
-                if (portfolioResponse.ok) {
-                    closeModal('addStockModal');
-                    alert('股票资产添加成功！');
-                    // 只重新加载当前投资组合的数据，而不是整个页面
-                    loadAllPortfoliosAssets();
+                if (existingStockAsset) {
+                    // 如果股票已存在，更新现有分配数量
+                    // 确保所有数量都是数值类型，避免字符串拼接问题
+                    const oldQuantity = parseFloat(Number(existingStockAsset.quantity).toFixed(2));
+                    const addQuantity = parseFloat(Number(quantity).toFixed(2));
+                    const newQuantity = parseFloat((oldQuantity + addQuantity).toFixed(2));
+
+                    console.log('股票加仓计算:', {
+                        oldQuantity: oldQuantity,
+                        addQuantity: addQuantity,
+                        newQuantity: newQuantity,
+                        existingStockAsset: existingStockAsset
+                    });
+
+                    const updateResponse = await fetch(`${API_BASE}/portfolio-assets/update-stock`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            portfolio_id: currentPortfolioId,
+                            asset_id: existingStockAsset.id, // 使用stock_assets表的ID
+                            new_quantity: newQuantity
+                        })
+                    });
+                    
+                    if (updateResponse.ok) {
+                        const responseData = await updateResponse.json();
+                        console.log('更新成功，响应数据:', responseData);
+                        closeModal('addStockModal');
+                        alert('股票资产更新成功！');
+                        
+                        // 强制重新加载数据
+                        console.log('开始重新加载投资组合数据...');
+                        await loadAllPortfoliosAssets();
+                        console.log('投资组合数据重新加载完成');
+                    } else {
+                        const errorData = await updateResponse.json();
+                        alert(`更新失败: ${errorData.error || '未知错误'}`);
+                    }
                 } else {
-                    alert('添加到投资组合失败');
+                    // 如果股票不存在，创建新的股票资产
+                    if (!selectedStockDetails || !selectedStockDetails.id) {
+                        alert('无法获取股票资产信息');
+                        return;
+                    }
+                    
+                    // 将股票资产添加到当前投资组合
+                    const portfolioResponse = await fetch(`${API_BASE}/portfolio-assets`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            portfolio_id: currentPortfolioId,
+                            asset_type: 'stock',
+                            asset_id: selectedStockDetails.id,
+                            quantity: quantity
+                        })
+                    });
+                    
+                    if (portfolioResponse.ok) {
+                        closeModal('addStockModal');
+                        alert('股票资产添加成功！');
+                        loadAllPortfoliosAssets();
+                    } else {
+                        alert('添加到投资组合失败');
+                    }
                 }
             } catch (error) {
                 console.error('添加股票资产失败:', error);
@@ -2274,15 +2383,24 @@
         // 编辑股票资产
         async function editStockAsset(assetId) {
             try {
-                const response = await fetch(`${API_BASE}/stock-assets/${assetId}`);
+                // 获取当前投资组合中的股票资产信息
+                const response = await fetch(`${API_BASE}/portfolio-assets/${currentPortfolioId}/stock/${assetId}`);
                 if (!response.ok) {
-                    throw new Error('获取股票资产详情失败');
+                    throw new Error('获取投资组合股票资产详情失败');
                 }
                 
-                const stockAsset = await response.json();
+                const portfolioStockAsset = await response.json();
+                
+                // 获取股票基本信息
+                const stockResponse = await fetch(`${API_BASE}/stock-assets/${assetId}`);
+                if (!stockResponse.ok) {
+                    throw new Error('获取股票基本信息失败');
+                }
+                
+                const stockAsset = await stockResponse.json();
                 
                 // 填充编辑表单
-                document.getElementById('edit-stock-id').value = stockAsset.id;
+                document.getElementById('edit-stock-id').value = portfolioStockAsset.id; // 使用portfolio_assets.id
                 document.getElementById('edit-stock-ticker').value = stockAsset.ticker;
                 document.getElementById('edit-stock-name').value = stockAsset.name;
                 document.getElementById('edit-stock-quantity').value = '';
@@ -2290,7 +2408,10 @@
                 document.getElementById('edit-stock-operation').value = '';
                 
                 // 保存当前股票信息供摘要使用
-                window.currentEditingStock = stockAsset;
+                window.currentEditingStock = {
+                    ...stockAsset,
+                    quantity: portfolioStockAsset.quantity // 使用投资组合中的数量
+                };
                 
                 // 获取股票可支配信息
                 try {
@@ -2300,7 +2421,7 @@
                         
                         // 显示股票可支配信息
                         // 当前组合持有：当前编辑的股票记录在投资组合中的数量
-                        document.getElementById('current-holding').textContent = `${stockAsset.quantity.toLocaleString()}股`;
+                        document.getElementById('current-holding').textContent = `${portfolioStockAsset.quantity.toLocaleString()}股`;
                         // 全局已分配：该股票在所有投资组合中的分配总量
                         document.getElementById('allocated-quantity').textContent = `${stockDetails.allocated_quantity.toLocaleString()}股`;
                         // 全局可支配：该股票的剩余可支配数量
@@ -2321,7 +2442,7 @@
                 document.getElementById('summary-operation-quantity').textContent = '0';
                 document.getElementById('summary-operation-price').textContent = '¥0.00';
                 document.getElementById('summary-operation-amount').textContent = '¥0.00';
-                document.getElementById('summary-new-quantity').textContent = stockAsset.quantity.toLocaleString();
+                document.getElementById('summary-new-quantity').textContent = portfolioStockAsset.quantity.toLocaleString();
                 
                 showModal('editStockModal');
             } catch (error) {
@@ -2439,42 +2560,55 @@
         document.getElementById('editStockForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            const assetId = document.getElementById('edit-stock-id').value;
+            const portfolioAssetId = document.getElementById('edit-stock-id').value; // 这是portfolio_assets.id
             const operation = document.getElementById('edit-stock-operation').value;
-            const quantity = parseFloat(document.getElementById('edit-stock-quantity').value);
+            const addQuantity = parseFloat(document.getElementById('edit-stock-quantity').value);
             const price = parseFloat(document.getElementById('edit-stock-price').value);
             
-            if (!operation || !quantity || !price || quantity <= 0 || price <= 0) {
+            if (!operation || !addQuantity || !price || addQuantity <= 0 || price <= 0) {
                 alert('请填写完整的操作信息');
                 return;
             }
             
             try {
-                // 先获取当前股票资产信息
-                const getResponse = await fetch(`${API_BASE}/stock-assets/${assetId}`);
-                if (!getResponse.ok) {
-                    throw new Error('获取股票资产信息失败');
+                // 获取当前股票信息
+                const currentStock = window.currentEditingStock;
+                if (!currentStock) {
+                    throw new Error('获取当前股票信息失败');
                 }
                 
-                const currentStock = await getResponse.json();
-                let newQuantity = currentStock.quantity;
+                // 确保数值精度，防止字符串拼接
+                const currentQuantity = parseFloat(Number(currentStock.quantity).toFixed(2));
+                const addQuantityFixed = parseFloat(Number(addQuantity).toFixed(2));
+                
+                let newQuantity;
                 
                 // 根据操作类型计算新数量
                 if (operation === 'buy') {
-                    newQuantity += quantity;
+                    // 加仓：当前数量 + 新增数量
+                    newQuantity = parseFloat((currentQuantity + addQuantityFixed).toFixed(2));
                 } else if (operation === 'sell') {
-                    newQuantity -= quantity;
+                    // 减仓：当前数量 - 减少数量
+                    newQuantity = parseFloat((currentQuantity - addQuantityFixed).toFixed(2));
                     if (newQuantity < 0) {
                         alert('减仓数量不能超过当前持有数量');
                         return;
                     }
                 } else if (operation === 'update') {
-                    newQuantity = quantity;
+                    // 直接更新：使用输入的数量
+                    newQuantity = parseFloat(Number(addQuantityFixed).toFixed(2));
                 }
+                
+                console.log('编辑股票计算:', {
+                    currentQuantity: currentQuantity,
+                    addQuantity: addQuantityFixed,
+                    operation: operation,
+                    newQuantity: newQuantity
+                });
                 
                 // 如果数量为0，删除该资产
                 if (newQuantity === 0) {
-                    const deleteResponse = await fetch(`${API_BASE}/stock-assets/${assetId}`, {
+                    const deleteResponse = await fetch(`${API_BASE}/portfolio-assets/delete-stock/${portfolioAssetId}`, {
                         method: 'DELETE'
                     });
                     
@@ -2488,23 +2622,22 @@
                     }
                 }
                 
-                // 更新股票资产
-                const updateResponse = await fetch(`${API_BASE}/stock-assets/${assetId}`, {
+                // 使用portfolio-assets API更新投资组合中的股票分配
+                const updateResponse = await fetch(`${API_BASE}/portfolio-assets/update-stock`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        ticker: currentStock.ticker,
-                        name: currentStock.name,
-                        quantity: newQuantity,
-                        purchase_price: price,
-                        current_price: price,
-                        purchase_date: new Date().toISOString().split('T')[0]
+                        portfolio_id: currentPortfolioId,
+                        asset_id: currentStock.id, // 这是stock_assets.id
+                        new_quantity: newQuantity
                     })
                 });
                 
                 if (updateResponse.ok) {
+                    const result = await updateResponse.json();
+                    console.log('编辑股票成功:', result);
                     closeModal('editStockModal');
                     alert('股票资产操作成功！');
                     loadAllPortfoliosAssets();
@@ -2641,28 +2774,37 @@
 
         function updateStockEditSummary() {
             const operation = document.getElementById('edit-stock-operation').value;
-            const quantity = parseFloat(document.getElementById('edit-stock-quantity').value) || 0;
+            const addQuantity = parseFloat(document.getElementById('edit-stock-quantity').value) || 0;
             const price = parseFloat(document.getElementById('edit-stock-price').value) || 0;
-            const amount = quantity * price;
+            const amount = addQuantity * price;
             
             // 获取当前股票信息（这里需要从之前的API调用中保存）
             const currentStock = window.currentEditingStock;
             if (!currentStock) return;
             
-            let newQuantity = currentStock.quantity;
+            // 确保数值精度，防止字符串拼接
+            const currentQuantity = parseFloat(Number(currentStock.quantity).toFixed(2));
+            const addQuantityFixed = parseFloat(Number(addQuantity).toFixed(2));
+            
+            let newQuantity;
             if (operation === 'buy') {
-                newQuantity += quantity;
+                // 加仓：当前数量 + 新增数量
+                newQuantity = parseFloat((currentQuantity + addQuantityFixed).toFixed(2));
             } else if (operation === 'sell') {
-                newQuantity -= quantity;
+                // 减仓：当前数量 - 减少数量
+                newQuantity = parseFloat((currentQuantity - addQuantityFixed).toFixed(2));
             } else if (operation === 'update') {
-                newQuantity = quantity;
+                // 直接更新：使用输入的数量
+                newQuantity = parseFloat(Number(addQuantityFixed).toFixed(2));
+            } else {
+                newQuantity = currentQuantity;
             }
             
             document.getElementById('summary-operation-type').textContent = 
                 operation === 'buy' ? '加仓' : 
                 operation === 'sell' ? '减仓' :
                 operation === 'update' ? '更新信息' : '-';
-            document.getElementById('summary-operation-quantity').textContent = quantity.toLocaleString();
+            document.getElementById('summary-operation-quantity').textContent = addQuantityFixed.toLocaleString();
             document.getElementById('summary-operation-price').textContent = `¥${price.toLocaleString()}`;
             document.getElementById('summary-operation-amount').textContent = `¥${amount.toLocaleString()}`;
             document.getElementById('summary-new-quantity').textContent = newQuantity.toLocaleString();

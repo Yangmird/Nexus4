@@ -21,6 +21,12 @@ router.delete('/portfolio-assets/delete-stock/:assetId', portfolioAssetControlle
 // 更新投资组合中的现金分配（必须在通用路由之前）
 router.put('/portfolio-assets/update-cash', portfolioAssetController.updateCashAllocation);
 
+// 获取投资组合中特定股票的分配记录ID
+router.get('/portfolio-assets/:portfolioId/stock/:stockId', portfolioAssetController.getPortfolioStockAsset);
+
+// 更新投资组合中的股票分配（必须在通用路由之前）
+router.put('/portfolio-assets/update-stock', portfolioAssetController.updateStockAllocation);
+
 // 通用的投资组合资产更新路由（必须在特定路由之后）
 router.put('/portfolio-assets/:id', portfolioAssetController.updatePortfolioAsset);
 
