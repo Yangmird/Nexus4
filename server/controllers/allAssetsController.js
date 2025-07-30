@@ -82,13 +82,20 @@ export function getAllAssets(req, res) {
 
 // 获取所有股票信息（支持分页）
 export function getAllStocks(req, res) {
+    // 设置响应头，防止缓存
+    res.set({
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+    });
+
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const search = req.query.search || '';
     const offset = (page - 1) * limit;
 
-    let query = 'SELECT * FROM stock_assets';
-    let countQuery = 'SELECT COUNT(*) as total FROM stock_assets';
+    let query = 'SELECT * FROM all_stocks';
+    let countQuery = 'SELECT COUNT(*) as total FROM all_stocks';
     let params = [];
     let countParams = [];
 
@@ -433,6 +440,88 @@ export function getStockDetails(req, res) {
                     available_quantity: availableQuantity,
                     portfolio_allocations: portfolioAllocations
                 });
+            });
+        });
+    });
+}
+
+// 获取特定股票的历史价格数据
+export function getStockHistory(req, res) {
+    // 设置响应头，防止缓存
+    res.set({
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+    });
+
+    const { ticker } = req.params;
+    
+    // 从all_stocks获取股票基本信息
+    const stockQuery = `
+        SELECT id, ticker, name, market_price
+        FROM all_stocks 
+        WHERE ticker = ?
+        ORDER BY record_date DESC
+        LIMIT 1
+    `;
+    
+    connection.query(stockQuery, [ticker], (err, stockResults) => {
+        if (err) {
+            console.error('Error fetching stock info:', err);
+            return res.status(500).json({ error: '获取股票信息失败' });
+        }
+        
+        if (stockResults.length === 0) {
+            return res.status(404).json({ error: '未找到该股票' });
+        }
+        
+        const stockInfo = stockResults[0];
+        const stockId = stockInfo.id;
+        
+        // 直接从stocks_history获取历史数据，使用all_stocks的id，并去重
+        const historyQuery = `
+            SELECT DISTINCT record_date, current_price
+            FROM stocks_history 
+            WHERE stock_id = ?
+            ORDER BY record_date ASC
+        `;
+        
+        connection.query(historyQuery, [stockId], (err, historyResults) => {
+            if (err) {
+                console.error('Error fetching stock history:', err);
+                return res.status(500).json({ error: '获取股票历史数据失败' });
+            }
+            
+            if (historyResults.length === 0) {
+                return res.status(404).json({ error: '未找到该股票的历史数据' });
+            }
+            
+            // 计算价格变化百分比
+            const history = historyResults.map((record, index) => {
+                let priceChange = 0;
+                let priceChangePercent = 0;
+                
+                if (index > 0) {
+                    const previousPrice = historyResults[index - 1].current_price;
+                    priceChange = record.current_price - previousPrice;
+                    priceChangePercent = (priceChange / previousPrice) * 100;
+                }
+                
+                return {
+                    date: record.record_date,
+                    price: record.current_price,
+                    priceChange: priceChange,
+                    priceChangePercent: priceChangePercent,
+                    stockName: stockInfo.name,
+                    ticker: stockInfo.ticker
+                };
+            });
+            
+            res.json({
+                ticker: ticker,
+                stockName: stockInfo.name,
+                currentPrice: stockInfo.market_price,
+                history: history
             });
         });
     });
