@@ -3,16 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>投资组合管理</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>个人资产组合管理</title>
     <style>
-        /* 页面整体样式 */
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
+            color: #333;
         }
 
         .container {
@@ -25,14 +28,15 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            background: rgba(255, 255, 255, 0.2);
             color: white;
-            padding: 10px 20px;
-            border-radius: 25px;
             text-decoration: none;
+            font-size: 16px;
             margin-bottom: 20px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
             transition: all 0.3s ease;
-            cursor: pointer;
         }
 
         .back-btn:hover {
@@ -42,57 +46,60 @@
 
         .page-title {
             color: white;
-            text-align: center;
+            font-size: 32px;
+            font-weight: 600;
             margin-bottom: 30px;
-            font-size: 2.5em;
-            font-weight: 300;
+            text-align: center;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
-        /* 主内容区域 */
         .main-content {
-            display: flex;
+            display: grid;
+            grid-template-columns: 350px 1fr;
             gap: 30px;
             background: white;
             border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
             overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
         }
 
         /* 左侧投资组合列表 */
         .portfolio-sidebar {
-            width: 300px;
             background: #f8f9fa;
             padding: 30px;
             border-right: 1px solid #e9ecef;
         }
 
         .sidebar-title {
-            color: #333;
-            margin-bottom: 20px;
-            font-size: 1.3em;
+            font-size: 20px;
             font-weight: 600;
+            color: #495057;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e9ecef;
         }
 
         .portfolio-list {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 15px;
+            max-height: 600px;
+            overflow-y: auto;
         }
 
         .portfolio-item {
             background: white;
-            border: 2px solid #e9ecef;
-            border-radius: 10px;
-            padding: 15px;
+            border-radius: 12px;
+            padding: 20px;
             cursor: pointer;
             transition: all 0.3s ease;
-            text-align: center;
+            border: 2px solid transparent;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
         .portfolio-item:hover {
-            border-color: #667eea;
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
         }
 
         .portfolio-item.active {
@@ -102,19 +109,53 @@
         }
 
         .portfolio-name {
+            font-size: 18px;
             font-weight: 600;
-            font-size: 1.1em;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
         }
 
         .portfolio-info {
-            font-size: 0.9em;
+            font-size: 14px;
             opacity: 0.8;
+            line-height: 1.4;
         }
 
-        /* 右侧资产显示区域 */
+        /* 新增资产组合按钮样式 */
+        .add-portfolio-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .add-portfolio-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .add-portfolio-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-icon {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        /* 右侧资产区域 */
         .assets-main {
-            flex: 1;
             padding: 30px;
         }
 
@@ -126,53 +167,49 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: #667eea;
-            color: white;
-            padding: 15px 20px;
-            border-radius: 10px 10px 0 0;
-            margin-bottom: 0;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e9ecef;
         }
 
         .asset-title {
+            font-size: 22px;
             font-weight: 600;
-            font-size: 1.2em;
+            color: #495057;
         }
 
         .add-btn {
-            background: rgba(255, 255, 255, 0.2);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            padding: 8px 16px;
-            border-radius: 20px;
+            padding: 10px 20px;
+            border-radius: 8px;
             cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
             transition: all 0.3s ease;
-            font-size: 0.9em;
         }
 
         .add-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: scale(1.05);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
         }
 
-        /* 表格样式 */
         .asset-table {
-            border: 1px solid #e9ecef;
-            border-radius: 0 0 10px 10px;
+            background: white;
+            border-radius: 12px;
             overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
 
         .table-header {
             display: grid;
             grid-template-columns: 2fr 1fr 1fr 1fr;
             background: #f8f9fa;
-            border-bottom: 1px solid #e9ecef;
-        }
-
-        .header-cell {
-            padding: 15px;
+            padding: 15px 20px;
             font-weight: 600;
-            color: #333;
-            text-align: center;
+            color: #495057;
+            border-bottom: 1px solid #e9ecef;
         }
 
         .table-body {
@@ -183,7 +220,8 @@
         .table-row {
             display: grid;
             grid-template-columns: 2fr 1fr 1fr 1fr;
-            border-bottom: 1px solid #f0f0f0;
+            padding: 15px 20px;
+            border-bottom: 1px solid #f1f3f4;
             transition: background-color 0.3s ease;
         }
 
@@ -196,25 +234,22 @@
         }
 
         .table-cell {
-            padding: 15px;
-            text-align: center;
             display: flex;
             align-items: center;
-            justify-content: center;
         }
 
         .action-buttons {
             display: flex;
             gap: 8px;
-            justify-content: center;
         }
 
         .action-btn {
             padding: 6px 12px;
             border: none;
-            border-radius: 15px;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 0.8em;
+            font-size: 12px;
+            font-weight: 500;
             transition: all 0.3s ease;
         }
 
@@ -225,225 +260,37 @@
 
         .action-btn.edit {
             background: #ffc107;
-            color: #333;
+            color: #212529;
         }
 
-        .action-btn:hover {
-            transform: scale(1.05);
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: #6c757d;
-        }
-
-        .empty-state div {
-            font-size: 3em;
-            margin-bottom: 10px;
-        }
-
-        .empty-state p {
-            font-size: 1.1em;
-            margin: 0;
-        }
-
-        /* 操作区域 */
-        .operations-section {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-bottom: 30px;
-        }
-
-        .operation-card {
-            background: white;
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-
-        .operation-title {
-            font-size: 1.4em;
-            color: #333;
-            margin-bottom: 20px;
-            text-align: center;
-            font-weight: 600;
-        }
-
-        .btn-group {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .btn {
-            padding: 12px 25px;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            font-size: 0.9em;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-success {
-            background: linear-gradient(135deg, #28a745, #20c997);
-            color: white;
-        }
-
-        .btn-success:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
-        }
-
-        .btn-warning {
-            background: linear-gradient(135deg, #ffc107, #fd7e14);
-            color: white;
-        }
-
-        .btn-warning:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(255, 193, 7, 0.4);
-        }
-
-        .btn-danger {
-            background: linear-gradient(135deg, #dc3545, #e83e8c);
-            color: white;
-        }
-
-        .btn-danger:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
-        }
-
-        /* 资产展示区域 */
-        .assets-section {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-
-        .assets-tabs {
-            display: flex;
-            margin-bottom: 25px;
-            border-bottom: 2px solid #f0f0f0;
-        }
-
-        .tab-btn {
-            padding: 15px 30px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-weight: 600;
-            color: #666;
-            border-bottom: 3px solid transparent;
-            transition: all 0.3s ease;
-        }
-
-        .tab-btn.active {
-            color: #667eea;
-            border-bottom-color: #667eea;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .asset-list {
-            display: grid;
-            gap: 15px;
-        }
-
-        .asset-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 10px;
-            border-left: 4px solid #667eea;
-        }
-
-        .asset-info {
-            flex: 1;
-        }
-
-        .asset-name {
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 5px;
-        }
-
-        .asset-details {
-            font-size: 0.9em;
-            color: #666;
-        }
-
-        .asset-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        .action-btn {
-            padding: 8px 15px;
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.8em;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .action-btn-view {
-            background: #17a2b8;
-            color: white;
-        }
-
-        .action-btn-edit {
-            background: #ffc107;
-            color: white;
-        }
-
-        .action-btn-delete {
+        .action-btn.delete {
             background: #dc3545;
             color: white;
         }
 
-        /* 新增资产按钮样式 */
-        .add-asset-section {
+        .action-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            color: #6c757d;
             text-align: center;
-            padding: 20px 0;
-            border-top: 1px solid #f0f0f0;
-            margin-top: 20px;
         }
 
-        .add-asset-section .btn {
-            padding: 15px 30px;
-            font-size: 1em;
-            border-radius: 30px;
-            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        .empty-state div {
+            font-size: 48px;
+            margin-bottom: 10px;
         }
 
-        .add-asset-section .btn span {
-            margin-right: 8px;
-            font-size: 1.2em;
+        .empty-state p {
+            font-size: 16px;
+            margin: 0;
         }
 
         /* 模态框样式 */
@@ -456,60 +303,80 @@
             width: 100%;
             height: 100%;
             background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
         }
 
         .modal-content {
             background-color: white;
-            margin: 5% auto;
-            padding: 30px;
+            margin: 3% auto;
+            padding: 0;
             border-radius: 15px;
             width: 90%;
-            max-width: 500px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            max-width: 700px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px 40px;
+            border-radius: 15px 15px 0 0;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
         }
 
         .modal-title {
-            font-size: 1.5em;
+            font-size: 20px;
             font-weight: 600;
-            color: #333;
+            margin: 0;
         }
 
         .close {
-            color: #aaa;
+            color: white;
             font-size: 28px;
             font-weight: bold;
             cursor: pointer;
+            transition: opacity 0.3s ease;
         }
 
         .close:hover {
-            color: #000;
+            opacity: 0.7;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin: 25px 40px;
         }
 
         .form-label {
             display: block;
             margin-bottom: 8px;
-            font-weight: 600;
-            color: #333;
+            font-weight: 500;
+            color: #495057;
         }
 
         .form-input {
             width: 100%;
-            padding: 12px;
+            padding: 15px 20px;
             border: 2px solid #e9ecef;
             border-radius: 8px;
-            font-size: 1em;
+            font-size: 16px;
             transition: border-color 0.3s ease;
+            min-height: 50px;
         }
 
         .form-input:focus {
@@ -517,9 +384,42 @@
             border-color: #667eea;
         }
 
+        .btn-group {
+            display: flex;
+            gap: 20px;
+            margin: 40px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-height: 55px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        /* 搜索结果显示 */
         .search-container {
             position: relative;
-            margin-bottom: 20px;
         }
 
         .search-results {
@@ -528,76 +428,299 @@
             left: 0;
             right: 0;
             background: white;
-            border: 1px solid #ddd;
+            border: 1px solid #e9ecef;
             border-radius: 8px;
-            max-height: 200px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            max-height: 250px;
             overflow-y: auto;
-            z-index: 1001;
+            z-index: 100;
             display: none;
+            margin-top: 5px;
         }
 
         .search-result-item {
-            padding: 10px 15px;
+            padding: 15px 20px;
             cursor: pointer;
-            border-bottom: 1px solid #f0f0f0;
+            border-bottom: 1px solid #f1f3f4;
+            transition: background-color 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            min-height: 60px;
         }
 
         .search-result-item:hover {
-            background: #f8f9fa;
+            background-color: #f8f9fa;
         }
 
         .search-result-item:last-child {
             border-bottom: none;
         }
 
-        /* 投资信息摘要样式 */
-        .investment-summary {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 20px;
-            margin: 20px 0;
-            border-left: 4px solid #667eea;
+        .search-result-item.selected {
+            background-color: #667eea;
+            color: white;
         }
 
-        .investment-summary h4 {
-            color: #333;
+        .stock-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .stock-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .stock-ticker {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .stock-price {
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        /* 投资信息摘要 */
+        .investment-summary {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .summary-title {
+            font-weight: 600;
+            color: #495057;
             margin-bottom: 15px;
-            font-size: 1.1em;
+            font-size: 16px;
+        }
+
+        .summary-grid {
+            display: grid;
+            gap: 15px;
+            font-size: 14px;
+        }
+
+        .summary-grid.cash-summary {
+            grid-template-columns: 1fr 1fr;
+            gap: 20px 30px;
+        }
+
+        .summary-grid.stock-summary {
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px 30px;
         }
 
         .summary-item {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 10px;
+            align-items: center;
+        }
+
+        .summary-label {
+            color: #6c757d;
+            min-width: 80px;
+            text-align: left;
+        }
+
+        .summary-value {
+            font-weight: 500;
+            color: #495057;
+            text-align: left;
+            flex: 1;
+        }
+
+        /* 资产详情样式 */
+        .asset-details {
+            padding: 20px 30px;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f3f4;
+        }
+
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #495057;
+            min-width: 100px;
+        }
+
+        .detail-value {
+            font-weight: 500;
+            color: #333;
+            text-align: right;
+            flex: 1;
+        }
+
+        .detail-value.profit {
+            color: #28a745;
+        }
+
+        .detail-value.loss {
+            color: #dc3545;
+        }
+
+        /* 文本域样式 */
+        textarea.form-input {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        /* 只读输入框样式 */
+        .form-input.readonly {
+            background-color: #f8f9fa;
+            color: #6c757d;
+            cursor: not-allowed;
+            border-color: #e9ecef;
+        }
+
+        .form-input.readonly:focus {
+            border-color: #e9ecef;
+            box-shadow: none;
+        }
+
+        /* 银行输入容器样式 */
+        .bank-input-container {
+            position: relative;
+        }
+
+        .bank-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 100;
+            display: none;
+            margin-top: 5px;
+        }
+
+        .bank-suggestion-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid #f1f3f4;
+            transition: background-color 0.3s ease;
+        }
+
+        .bank-suggestion-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .bank-suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        .bank-name {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 4px;
+        }
+
+        .bank-amount {
+            font-size: 12px;
+            color: #6c757d;
+        }
+
+        /* 银行资产分布信息样式 */
+        .bank-distribution-info {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .bank-distribution-content {
+            margin-top: 10px;
+        }
+
+        .bank-allocation-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             padding: 8px 0;
             border-bottom: 1px solid #e9ecef;
         }
 
-        .summary-item:last-child {
+        .bank-allocation-item:last-child {
             border-bottom: none;
         }
 
-        .summary-item.total {
+        .allocation-portfolio {
+            font-weight: 500;
+            color: #495057;
+        }
+
+        .allocation-amount {
             font-weight: 600;
             color: #667eea;
-            font-size: 1.1em;
-            border-top: 2px solid #667eea;
-            padding-top: 15px;
+        }
+
+        /* 股票资产分布信息样式 */
+        .stock-distribution-info {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
             margin-top: 15px;
+        }
+
+        .stock-distribution-content {
+            margin-top: 10px;
         }
 
         /* 响应式设计 */
         @media (max-width: 768px) {
-            .operations-section {
-                grid-template-columns: 1fr;
-            }
-            
-            .portfolios-grid {
-                grid-template-columns: 1fr;
-            }
-            
             .main-content {
-                padding: 20px;
+                grid-template-columns: 1fr;
+            }
+            
+            .portfolio-sidebar {
+                order: 2;
+            }
+            
+            .assets-main {
+                order: 1;
+            }
+
+            .summary-grid.cash-summary,
+            .summary-grid.stock-summary {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .summary-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+
+            .summary-label {
+                min-width: auto;
+            }
+
+            .search-result-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .stock-price {
+                align-self: flex-end;
             }
         }
     </style>
@@ -616,6 +739,14 @@
                 <h3 class="sidebar-title">已有资产组合:</h3>
                 <div class="portfolio-list" id="portfolio-list">
                     <!-- 投资组合列表将通过JavaScript动态生成 -->
+                </div>
+                
+                <!-- 新增资产组合按钮 -->
+                <div class="add-portfolio-section">
+                    <button class="add-portfolio-btn" onclick="showAddPortfolioModal()">
+                        <span class="btn-icon">+</span>
+                        新增资产组合
+                    </button>
                 </div>
             </div>
             
@@ -662,26 +793,6 @@
         </div>
     </div>
 
-    <!-- 新增组合模态框 -->
-    <div id="addPortfolioModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">新增投资组合</h3>
-                <span class="close" onclick="closeModal('addPortfolioModal')">&times;</span>
-            </div>
-            <form id="addPortfolioForm">
-                <div class="form-group">
-                    <label class="form-label">组合名称</label>
-                    <input type="text" class="form-input" id="portfolioName" required>
-                </div>
-                <div class="btn-group">
-                    <button type="submit" class="btn btn-primary">创建组合</button>
-                    <button type="button" class="btn btn-warning" onclick="closeModal('addPortfolioModal')">取消</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
     <!-- 新增现金模态框 -->
     <div id="addCashModal" class="modal">
         <div class="modal-content">
@@ -692,26 +803,275 @@
             <form id="addCashForm">
                 <div class="form-group">
                     <label class="form-label">投入银行</label>
-                    <input type="text" class="form-input" id="bankName" placeholder="请输入银行名称" required>
+                    <div class="bank-input-container">
+                        <input type="text" class="form-input" id="bankName" placeholder="请输入银行名称" required>
+                        <div class="bank-suggestions" id="bankSuggestions"></div>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label class="form-label">投入金额</label>
                     <input type="number" class="form-input" id="cashAmount" step="0.01" placeholder="请输入投入金额" required>
                 </div>
+                
+                <!-- 银行资产分布信息 -->
+                <div class="bank-distribution-info" id="bankDistributionInfo" style="display: none;">
+                    <div class="summary-title">银行资产分布</div>
+                    <div class="bank-distribution-content" id="bankDistributionContent"></div>
+                </div>
+                
+                <!-- 投资信息摘要 -->
                 <div class="investment-summary">
-                    <h4>投资信息</h4>
-                    <div class="summary-item">
-                        <span>投入银行:</span>
-                        <span id="summary-bank">-</span>
-                    </div>
-                    <div class="summary-item">
-                        <span>投入金额:</span>
-                        <span id="summary-amount">¥0.00</span>
+                    <div class="summary-title">投资信息摘要</div>
+                    <div class="summary-grid cash-summary">
+                        <div class="summary-item">
+                            <span class="summary-label">投入银行:</span>
+                            <span class="summary-value" id="summary-bank">-</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">投入金额:</span>
+                            <span class="summary-value" id="summary-amount">¥0.00</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">剩余金额:</span>
+                            <span class="summary-value" id="summary-remaining">¥0.00</span>
+                        </div>
                     </div>
                 </div>
+                
                 <div class="btn-group">
-                    <button type="submit" class="btn btn-primary">确认投入</button>
+                    <button type="submit" class="btn btn-primary">确认添加</button>
                     <button type="button" class="btn btn-warning" onclick="closeModal('addCashModal')">取消</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 新增资产组合模态框 -->
+    <div id="addPortfolioModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">新增资产组合</h3>
+                <span class="close" onclick="closeModal('addPortfolioModal')">&times;</span>
+            </div>
+            <form id="addPortfolioForm">
+                <div class="form-group">
+                    <label class="form-label">组合名称</label>
+                    <input type="text" class="form-input" id="portfolioName" placeholder="请输入资产组合名称" required>
+                </div>
+                
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-primary">确认创建</button>
+                    <button type="button" class="btn btn-warning" onclick="closeModal('addPortfolioModal')">取消</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 查看现金资产模态框 -->
+    <div id="viewCashModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">现金资产详情</h3>
+                <span class="close" onclick="closeModal('viewCashModal')">&times;</span>
+            </div>
+            <div class="asset-details">
+                <div class="detail-item">
+                    <span class="detail-label">银行名称:</span>
+                    <span class="detail-value" id="view-cash-bank">-</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">现金金额:</span>
+                    <span class="detail-value" id="view-cash-amount">-</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">货币代码:</span>
+                    <span class="detail-value" id="view-cash-currency">-</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">备注:</span>
+                    <span class="detail-value" id="view-cash-notes">-</span>
+                </div>
+            </div>
+            <div class="btn-group">
+                <button type="button" class="btn btn-warning" onclick="closeModal('viewCashModal')">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 编辑现金资产模态框 -->
+    <div id="editCashModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">编辑现金资产</h3>
+                <span class="close" onclick="closeModal('editCashModal')">&times;</span>
+            </div>
+            <form id="editCashForm">
+                <input type="hidden" id="edit-cash-id">
+                <div class="form-group">
+                    <label class="form-label">银行名称</label>
+                    <input type="text" class="form-input readonly" id="edit-cash-bank" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">当前现金金额</label>
+                    <input type="number" class="form-input readonly" id="edit-cash-current-amount" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">操作类型</label>
+                    <select class="form-input" id="edit-cash-operation" required>
+                        <option value="">请选择操作类型</option>
+                        <option value="deposit">存入</option>
+                        <option value="withdraw">取出</option>
+                        <option value="update">直接修改</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">操作金额</label>
+                    <input type="number" class="form-input" id="edit-cash-operation-amount" step="0.01" placeholder="请输入操作金额" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">备注</label>
+                    <textarea class="form-input" id="edit-cash-notes" placeholder="请输入备注信息" rows="3"></textarea>
+                </div>
+                
+                <!-- 操作信息摘要 -->
+                <div class="investment-summary">
+                    <div class="summary-title">操作信息摘要</div>
+                    <div class="summary-grid cash-summary">
+                        <div class="summary-item">
+                            <span class="summary-label">操作类型:</span>
+                            <span class="summary-value" id="summary-cash-operation-type">-</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">操作金额:</span>
+                            <span class="summary-value" id="summary-cash-operation-amount">¥0.00</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">更新后金额:</span>
+                            <span class="summary-value" id="summary-cash-new-amount">¥0.00</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-primary">确认修改</button>
+                    <button type="button" class="btn btn-warning" onclick="closeModal('editCashModal')">取消</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 查看股票资产模态框 -->
+    <div id="viewStockModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">股票资产详情</h3>
+                <span class="close" onclick="closeModal('viewStockModal')">&times;</span>
+            </div>
+            <div class="asset-details">
+                <div class="detail-item">
+                    <span class="detail-label">股票代码:</span>
+                    <span class="detail-value" id="view-stock-ticker">-</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">股票名称:</span>
+                    <span class="detail-value" id="view-stock-name">-</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">持有数量:</span>
+                    <span class="detail-value" id="view-stock-quantity">-</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">购买价格:</span>
+                    <span class="detail-value" id="view-stock-purchase-price">-</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">当前价格:</span>
+                    <span class="detail-value" id="view-stock-current-price">-</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">购买日期:</span>
+                    <span class="detail-value" id="view-stock-purchase-date">-</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">总价值:</span>
+                    <span class="detail-value" id="view-stock-total-value">-</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">盈亏情况:</span>
+                    <span class="detail-value" id="view-stock-profit-loss">-</span>
+                </div>
+            </div>
+            <div class="btn-group">
+                <button type="button" class="btn btn-warning" onclick="closeModal('viewStockModal')">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 编辑股票资产模态框 -->
+    <div id="editStockModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">编辑股票资产</h3>
+                <span class="close" onclick="closeModal('editStockModal')">&times;</span>
+            </div>
+            <form id="editStockForm">
+                <input type="hidden" id="edit-stock-id">
+                <div class="form-group">
+                    <label class="form-label">操作类型</label>
+                    <select class="form-input" id="edit-stock-operation" required>
+                        <option value="">请选择操作类型</option>
+                        <option value="buy">加仓</option>
+                        <option value="sell">减仓</option>
+                        <option value="update">更新信息</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">股票代码</label>
+                    <input type="text" class="form-input" id="edit-stock-ticker" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">股票名称</label>
+                    <input type="text" class="form-input" id="edit-stock-name" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">操作数量</label>
+                    <input type="number" class="form-input" id="edit-stock-quantity" step="0.01" placeholder="请输入操作数量" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">操作价格</label>
+                    <input type="number" class="form-input" id="edit-stock-price" step="0.01" placeholder="请输入操作价格" required>
+                </div>
+                
+                <!-- 操作信息摘要 -->
+                <div class="investment-summary">
+                    <div class="summary-title">操作信息摘要</div>
+                    <div class="summary-grid stock-summary">
+                        <div class="summary-item">
+                            <span class="summary-label">操作类型:</span>
+                            <span class="summary-value" id="summary-operation-type">-</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">操作数量:</span>
+                            <span class="summary-value" id="summary-operation-quantity">0</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">操作价格:</span>
+                            <span class="summary-value" id="summary-operation-price">¥0.00</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">操作金额:</span>
+                            <span class="summary-value" id="summary-operation-amount">¥0.00</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">更新后数量:</span>
+                            <span class="summary-value" id="summary-new-quantity">0</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-primary">确认操作</button>
+                    <button type="button" class="btn btn-warning" onclick="closeModal('editStockModal')">取消</button>
                 </div>
             </form>
         </div>
@@ -726,9 +1086,9 @@
             </div>
             <form id="addStockForm">
                 <div class="form-group">
-                    <label class="form-label">搜索股票</label>
+                    <label class="form-label">股票搜索</label>
                     <div class="search-container">
-                        <input type="text" class="form-input" id="stockSearch" placeholder="输入股票代码或名称搜索...">
+                        <input type="text" class="form-input" id="stockSearch" placeholder="输入股票代码或名称搜索" required>
                         <div class="search-results" id="searchResults"></div>
                     </div>
                 </div>
@@ -737,32 +1097,47 @@
                     <input type="number" class="form-input" id="stockQuantity" placeholder="请输入购买股数" required>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">市场价格</label>
-                    <input type="number" class="form-input" id="stockPrice" step="0.01" placeholder="请输入市场价格" required>
+                    <label class="form-label">购买价格 (市场价)</label>
+                    <input type="number" class="form-input" id="stockPrice" step="0.01" placeholder="请输入购买价格" required>
                 </div>
+                
+                <!-- 股票资产分布信息 -->
+                <div class="stock-distribution-info" id="stockDistributionInfo" style="display: none;">
+                    <div class="summary-title">股票资产分布</div>
+                    <div class="stock-distribution-content" id="stockDistributionContent"></div>
+                </div>
+                
+                <!-- 投资信息摘要 -->
                 <div class="investment-summary">
-                    <h4>购买信息</h4>
-                    <div class="summary-item">
-                        <span>股票名称:</span>
-                        <span id="summary-stock-name">-</span>
-                    </div>
-                    <div class="summary-item">
-                        <span>股票代码:</span>
-                        <span id="summary-stock-ticker">-</span>
-                    </div>
-                    <div class="summary-item">
-                        <span>购买股数:</span>
-                        <span id="summary-quantity">0</span>
-                    </div>
-                    <div class="summary-item">
-                        <span>市场价格:</span>
-                        <span id="summary-price">¥0.00</span>
-                    </div>
-                    <div class="summary-item total">
-                        <span>购买总金额:</span>
-                        <span id="summary-total">¥0.00</span>
+                    <div class="summary-title">投资信息摘要</div>
+                    <div class="summary-grid stock-summary">
+                        <div class="summary-item">
+                            <span class="summary-label">股票名称:</span>
+                            <span class="summary-value" id="summary-stock-name">-</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">股票代码:</span>
+                            <span class="summary-value" id="summary-stock-ticker">-</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">购买股数:</span>
+                            <span class="summary-value" id="summary-quantity">0</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">市场价格:</span>
+                            <span class="summary-value" id="summary-price">¥0.00</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">购买总金额:</span>
+                            <span class="summary-value" id="summary-total">¥0.00</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">剩余可支配:</span>
+                            <span class="summary-value" id="summary-remaining-stock">0股</span>
+                        </div>
                     </div>
                 </div>
+                
                 <div class="btn-group">
                     <button type="submit" class="btn btn-primary">确认购买</button>
                     <button type="button" class="btn btn-warning" onclick="closeModal('addStockModal')">取消</button>
@@ -772,10 +1147,10 @@
     </div>
 
     <script>
-        // API基础URL
         const API_BASE = 'http://localhost:8088/api';
         let currentPortfolioId = null;
         let selectedStock = null;
+        let allPortfolios = [];
 
         // 加载所有投资组合及其资产
         async function loadAllPortfoliosAssets() {
@@ -791,6 +1166,9 @@
                 const portfolios = await response.json();
                 console.log('获取到的投资组合数据:', portfolios);
                 
+                // 保存到全局变量
+                allPortfolios = portfolios;
+                
                 const container = document.getElementById('portfolio-list');
                 if (!container) {
                     console.error('找不到portfolio-list容器');
@@ -799,9 +1177,17 @@
                 
                 container.innerHTML = '';
                 
+                // 记住当前选中的投资组合ID
+                const previousSelectedId = currentPortfolioId;
+                
                 portfolios.forEach((portfolio, index) => {
                     const item = document.createElement('div');
-                    item.className = `portfolio-item ${index === 0 ? 'active' : ''}`;
+                    // 如果之前有选中的投资组合，保持选中状态；否则选择第一个
+                    const isActive = previousSelectedId ? 
+                        (portfolio.id === previousSelectedId) : 
+                        (index === 0);
+                    
+                    item.className = `portfolio-item ${isActive ? 'active' : ''}`;
                     item.dataset.portfolioId = portfolio.id;
                     item.onclick = () => selectPortfolio(portfolio.id);
                     
@@ -820,11 +1206,27 @@
                 
                 console.log(`成功加载了 ${portfolios.length} 个投资组合`);
                 
-                // 默认选择第一个投资组合
+                // 选择投资组合
                 if (portfolios.length > 0) {
-                    currentPortfolioId = portfolios[0].id;
-                    console.log('默认选择投资组合:', portfolios[0].name);
-                    displayPortfolioAssets(portfolios[0]);
+                    if (previousSelectedId) {
+                        // 保持之前选中的投资组合
+                        const selectedPortfolio = portfolios.find(p => p.id === previousSelectedId);
+                        if (selectedPortfolio) {
+                            currentPortfolioId = selectedPortfolio.id;
+                            console.log('保持选中投资组合:', selectedPortfolio.name);
+                            displayPortfolioAssets(selectedPortfolio);
+                        } else {
+                            // 如果之前的投资组合不存在了，选择第一个
+                            currentPortfolioId = portfolios[0].id;
+                            console.log('默认选择投资组合:', portfolios[0].name);
+                            displayPortfolioAssets(portfolios[0]);
+                        }
+                    } else {
+                        // 第一次加载，选择第一个
+                        currentPortfolioId = portfolios[0].id;
+                        console.log('默认选择投资组合:', portfolios[0].name);
+                        displayPortfolioAssets(portfolios[0]);
+                    }
                 } else {
                     console.log('没有找到投资组合数据');
                 }
@@ -852,37 +1254,17 @@
                 portfolioItem.classList.add('active');
             }
             
-            // 重新加载该投资组合的资产
-            loadPortfolioAssets(portfolioId);
+            // 显示该投资组合的资产
+            const selectedPortfolio = allPortfolios.find(p => p.id === portfolioId);
+            if (selectedPortfolio) {
+                displayPortfolioAssets(selectedPortfolio);
+            }
         }
 
         // 显示投资组合资产
         function displayPortfolioAssets(portfolio) {
             updateCashAssetsList(portfolio.assets.cash);
             updateStockAssetsList(portfolio.assets.stock);
-        }
-
-        // 加载特定投资组合的资产（用于切换时）
-        async function loadPortfolioAssets(portfolioId) {
-            try {
-                const response = await fetch(`${API_BASE}/portfolios/${portfolioId}/assets`);
-                if (!response.ok) {
-                    throw new Error('Failed to fetch portfolio assets');
-                }
-                
-                const assets = await response.json();
-                
-                // 分离现金和股票资产
-                const cashAssets = assets.filter(asset => asset.cash).map(asset => asset.cash);
-                const stockAssets = assets.filter(asset => asset.stock).map(asset => asset.stock);
-                
-                updateCashAssetsList(cashAssets);
-                updateStockAssetsList(stockAssets);
-            } catch (error) {
-                console.error('加载投资组合资产失败:', error);
-                updateCashAssetsList([]);
-                updateStockAssetsList([]);
-            }
         }
 
         // 更新现金资产列表
@@ -951,26 +1333,6 @@
             `).join('');
         }
 
-        // 切换标签页
-        function switchTab(tabName) {
-            // 更新标签按钮状态
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            
-            // 找到对应的标签按钮并设置为活跃状态
-            const tabBtn = document.querySelector(`[onclick="switchTab('${tabName}')"]`);
-            if (tabBtn) {
-                tabBtn.classList.add('active');
-            }
-            
-            // 更新内容区域
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.remove('active');
-            });
-            document.getElementById(`${tabName}-tab`).classList.add('active');
-        }
-
         // 模态框操作
         function showModal(modalId) {
             document.getElementById(modalId).style.display = 'block';
@@ -980,18 +1342,32 @@
             document.getElementById(modalId).style.display = 'none';
         }
 
-        // 新增组合
-        function showAddPortfolioModal() {
-            showModal('addPortfolioModal');
-        }
-
         // 新增现金
         function showAddCashModal() {
             if (!currentPortfolioId) {
                 alert('请先选择一个投资组合');
                 return;
             }
+            // 重置表单
+            document.getElementById('bankName').value = '';
+            document.getElementById('cashAmount').value = '';
+            
+            // 重置摘要信息
+            document.getElementById('summary-bank').textContent = '-';
+            document.getElementById('summary-amount').textContent = '¥0.00';
+            document.getElementById('summary-remaining').textContent = '¥0.00';
+            
+            // 隐藏银行分布信息
+            document.getElementById('bankDistributionInfo').style.display = 'none';
+            
             showModal('addCashModal');
+        }
+
+        // 新增资产组合
+        function showAddPortfolioModal() {
+            // 重置表单
+            document.getElementById('portfolioName').value = '';
+            showModal('addPortfolioModal');
         }
 
         // 新增股票
@@ -1000,14 +1376,32 @@
                 alert('请先选择一个投资组合');
                 return;
             }
+            // 重置表单
+            document.getElementById('stockSearch').value = '';
+            document.getElementById('stockQuantity').value = '';
+            document.getElementById('stockPrice').value = '';
+            selectedStock = null;
+            
+            // 重置摘要信息
+            document.getElementById('summary-stock-name').textContent = '-';
+            document.getElementById('summary-stock-ticker').textContent = '-';
+            document.getElementById('summary-quantity').textContent = '0';
+            document.getElementById('summary-price').textContent = '¥0.00';
+            document.getElementById('summary-total').textContent = '¥0.00';
+            
             showModal('addStockModal');
         }
 
-        // 表单提交处理
+        // 新增资产组合表单提交处理
         document.getElementById('addPortfolioForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            const name = document.getElementById('portfolioName').value;
+            const portfolioName = document.getElementById('portfolioName').value.trim();
+            
+            if (!portfolioName) {
+                alert('请输入资产组合名称');
+                return;
+            }
             
             try {
                 const response = await fetch(`${API_BASE}/portfolios`, {
@@ -1015,31 +1409,44 @@
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ name })
+                    body: JSON.stringify({ name: portfolioName })
                 });
                 
                 if (response.ok) {
                     closeModal('addPortfolioModal');
-                    document.getElementById('portfolioName').value = '';
-                    loadAllPortfoliosAssets(); // 重新加载所有投资组合
-                    alert('投资组合创建成功！');
+                    alert('资产组合创建成功！');
+                    // 重新加载投资组合数据
+                    loadAllPortfoliosAssets();
                 } else {
-                    alert('创建失败，请重试');
+                    const errorData = await response.json();
+                    alert(`创建失败: ${errorData.error || '未知错误'}`);
                 }
             } catch (error) {
-                console.error('创建投资组合失败:', error);
+                console.error('创建资产组合失败:', error);
                 alert('创建失败，请重试');
             }
         });
 
+        // 表单提交处理
         document.getElementById('addCashForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            const bankName = document.getElementById('bankName').value;
+            const bankName = document.getElementById('bankName').value.trim();
             const cashAmount = parseFloat(document.getElementById('cashAmount').value);
             
+            if (!bankName || !cashAmount || cashAmount <= 0) {
+                alert('请填写完整的现金信息');
+                return;
+            }
+            
+            // 验证投入金额是否超过剩余可支配金额
+            if (selectedBankDetails && cashAmount > selectedBankDetails.available_amount) {
+                alert(`投入金额 (¥${cashAmount.toLocaleString()}) 超过了该银行的剩余可支配金额 (¥${selectedBankDetails.available_amount.toLocaleString()})，请调整金额`);
+                return;
+            }
+
             try {
-                // 验证购买能力
+                // 验证购买
                 const validationResponse = await fetch(`${API_BASE}/portfolio-assets/validate`, {
                     method: 'POST',
                     headers: {
@@ -1058,13 +1465,17 @@
                     return;
                 }
                 
-                // 先创建现金资产
+                // 创建现金资产
                 const cashResponse = await fetch(`${API_BASE}/cash-assets`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ bank_name: bankName, cash_amount: cashAmount })
+                    body: JSON.stringify({
+                        currency_code: 'CNY',
+                        cash_amount: cashAmount,
+                        bank_name: bankName
+                    })
                 });
                 
                 if (cashResponse.ok) {
@@ -1079,18 +1490,16 @@
                         body: JSON.stringify({
                             portfolio_id: currentPortfolioId,
                             asset_type: 'cash',
-                            asset_id: cashData.id
+                            asset_id: cashData.id,
+                            quantity: cashAmount
                         })
                     });
                     
                     if (portfolioResponse.ok) {
                         closeModal('addCashModal');
-                        document.getElementById('bankName').value = '';
-                        document.getElementById('cashAmount').value = '';
-                        document.getElementById('summary-bank').textContent = '-';
-                        document.getElementById('summary-amount').textContent = '¥0.00';
-                        loadPortfolioAssets(currentPortfolioId);
                         alert('现金资产添加成功！');
+                        // 只重新加载当前投资组合的数据，而不是整个页面
+                        loadAllPortfoliosAssets();
                     } else {
                         alert('添加到投资组合失败');
                     }
@@ -1104,43 +1513,305 @@
         });
 
         // 股票搜索功能
+        let searchTimeout;
+        let selectedIndex = -1;
+        let searchResults = [];
+        let selectedStockDetails = null;
+
         document.getElementById('stockSearch').addEventListener('input', async function(e) {
-            const searchTerm = e.target.value;
+            const searchTerm = e.target.value.trim();
             const resultsContainer = document.getElementById('searchResults');
             
-            if (searchTerm.length < 2) {
+            // 清除之前的定时器
+            clearTimeout(searchTimeout);
+            
+            if (searchTerm.length < 1) {
                 resultsContainer.style.display = 'none';
+                selectedIndex = -1;
+                return;
+            }
+            
+            // 延迟搜索，避免频繁请求
+            searchTimeout = setTimeout(async () => {
+                try {
+                    const response = await fetch(`${API_BASE}/stock-distribution?search=${encodeURIComponent(searchTerm)}`);
+                    const data = await response.json();
+                    
+                    resultsContainer.innerHTML = '';
+                    searchResults = data.stocks || [];
+                    selectedIndex = -1;
+                    
+                    if (searchResults.length > 0) {
+                        searchResults.forEach((stock, index) => {
+                            const item = document.createElement('div');
+                            item.className = 'search-result-item';
+                            item.dataset.index = index;
+                            
+                            item.innerHTML = `
+                                <div class="stock-info">
+                                    <div class="stock-name">${stock.name}</div>
+                                    <div class="stock-ticker">${stock.ticker}</div>
+                                </div>
+                                <div class="stock-price">
+                                    <div>¥${stock.current_price ? stock.current_price.toLocaleString() : '0.00'}</div>
+                                    <div style="color: #28a745; font-size: 12px;">可支配: ${stock.available_quantity}股</div>
+                                </div>
+                            `;
+                            
+                            item.onclick = () => selectStock(stock);
+                            item.onmouseenter = () => {
+                                // 移除之前的选中状态
+                                document.querySelectorAll('.search-result-item').forEach(el => {
+                                    el.classList.remove('selected');
+                                });
+                                // 添加当前项的选中状态
+                                item.classList.add('selected');
+                                selectedIndex = index;
+                            };
+                            
+                            resultsContainer.appendChild(item);
+                        });
+                        resultsContainer.style.display = 'block';
+                    } else {
+                        resultsContainer.innerHTML = '<div class="search-result-item" style="text-align: center; color: #6c757d;">未找到相关股票</div>';
+                        resultsContainer.style.display = 'block';
+                    }
+                } catch (error) {
+                    console.error('搜索股票失败:', error);
+                    resultsContainer.innerHTML = '<div class="search-result-item" style="text-align: center; color: #dc3545;">搜索失败，请重试</div>';
+                    resultsContainer.style.display = 'block';
+                }
+            }, 300); // 300ms延迟
+        });
+
+        // 键盘导航功能
+        document.getElementById('stockSearch').addEventListener('keydown', function(e) {
+            const resultsContainer = document.getElementById('searchResults');
+            
+            if (resultsContainer.style.display === 'none') return;
+            
+            switch(e.key) {
+                case 'ArrowDown':
+                    e.preventDefault();
+                    selectedIndex = Math.min(selectedIndex + 1, searchResults.length - 1);
+                    updateSelectedItem();
+                    break;
+                case 'ArrowUp':
+                    e.preventDefault();
+                    selectedIndex = Math.max(selectedIndex - 1, -1);
+                    updateSelectedItem();
+                    break;
+                case 'Enter':
+                    e.preventDefault();
+                    if (selectedIndex >= 0 && searchResults[selectedIndex]) {
+                        selectStock(searchResults[selectedIndex]);
+                    }
+                    break;
+                case 'Escape':
+                    resultsContainer.style.display = 'none';
+                    selectedIndex = -1;
+                    break;
+            }
+        });
+
+        function updateSelectedItem() {
+            document.querySelectorAll('.search-result-item').forEach((item, index) => {
+                if (index === selectedIndex) {
+                    item.classList.add('selected');
+                } else {
+                    item.classList.remove('selected');
+                }
+            });
+        }
+
+        // 点击外部关闭搜索结果和银行建议
+        document.addEventListener('click', function(e) {
+            const searchContainer = document.querySelector('.search-container');
+            const resultsContainer = document.getElementById('searchResults');
+            const bankInputContainer = document.querySelector('.bank-input-container');
+            const bankSuggestions = document.getElementById('bankSuggestions');
+            
+            if (!searchContainer.contains(e.target)) {
+                resultsContainer.style.display = 'none';
+                selectedIndex = -1;
+            }
+            
+            if (!bankInputContainer.contains(e.target)) {
+                bankSuggestions.style.display = 'none';
+            }
+        });
+
+        // 银行名称输入处理
+        let bankSuggestions = [];
+        let selectedBankDetails = null;
+
+        document.getElementById('bankName').addEventListener('input', async function() {
+            const bankName = this.value.trim();
+            const suggestionsContainer = document.getElementById('bankSuggestions');
+            
+            if (bankName.length < 1) {
+                suggestionsContainer.style.display = 'none';
                 return;
             }
             
             try {
-                const response = await fetch(`${API_BASE}/stock-assets?search=${searchTerm}`);
-                const stocks = await response.json();
+                const response = await fetch(`${API_BASE}/bank-distribution`);
+                const data = await response.json();
                 
-                resultsContainer.innerHTML = '';
-                stocks.forEach(stock => {
-                    const item = document.createElement('div');
-                    item.className = 'search-result-item';
-                    item.textContent = `${stock.ticker} - ${stock.name}`;
-                    item.onclick = () => selectStock(stock);
-                    resultsContainer.appendChild(item);
-                });
+                // 过滤匹配的银行
+                const matchedBanks = data.banks.filter(bank => 
+                    bank.bank_name.toLowerCase().includes(bankName.toLowerCase())
+                );
                 
-                resultsContainer.style.display = stocks.length > 0 ? 'block' : 'none';
+                suggestionsContainer.innerHTML = '';
+                bankSuggestions = matchedBanks;
+                
+                if (matchedBanks.length > 0) {
+                    matchedBanks.forEach(bank => {
+                        const item = document.createElement('div');
+                        item.className = 'bank-suggestion-item';
+                        item.innerHTML = `
+                            <div class="bank-name">${bank.bank_name}</div>
+                            <div class="bank-amount">
+                                <span style="color: #6c757d;">总资产: ¥${bank.total_amount.toLocaleString()}</span><br>
+                                <span style="color: #28a745; font-weight: 600;">可支配: ¥${bank.available_amount.toLocaleString()}</span>
+                            </div>
+                        `;
+                        item.onclick = () => selectBank(bank);
+                        suggestionsContainer.appendChild(item);
+                    });
+                    suggestionsContainer.style.display = 'block';
+                } else {
+                    suggestionsContainer.style.display = 'none';
+                }
             } catch (error) {
-                console.error('搜索股票失败:', error);
+                console.error('获取银行建议失败:', error);
             }
         });
 
+        // 选择银行
+        async function selectBank(bank) {
+            document.getElementById('bankName').value = bank.bank_name;
+            document.getElementById('bankSuggestions').style.display = 'none';
+            
+            // 更新摘要
+            document.getElementById('summary-bank').textContent = bank.bank_name;
+            
+            // 获取银行详细信息
+            try {
+                const response = await fetch(`${API_BASE}/bank-details/${encodeURIComponent(bank.bank_name)}`);
+                const bankDetails = await response.json();
+                selectedBankDetails = bankDetails;
+                
+                // 显示银行资产分布信息
+                displayBankDistribution(bankDetails);
+                
+                // 更新剩余金额
+                updateCashSummary();
+            } catch (error) {
+                console.error('获取银行详情失败:', error);
+            }
+        }
+
+        // 显示银行资产分布
+        function displayBankDistribution(bankDetails) {
+            const container = document.getElementById('bankDistributionContent');
+            const infoContainer = document.getElementById('bankDistributionInfo');
+            
+            let html = `<div class="bank-allocation-item">
+                <span class="allocation-portfolio">银行总资产</span>
+                <span class="allocation-amount">¥${bankDetails.total_amount.toLocaleString()}</span>
+            </div>`;
+            
+            html += `<div class="bank-allocation-item">
+                <span class="allocation-portfolio">已分配金额</span>
+                <span class="allocation-amount">¥${bankDetails.allocated_amount.toLocaleString()}</span>
+            </div>`;
+            
+            html += `<div class="bank-allocation-item" style="background-color: #e8f5e8; border-radius: 4px; padding: 8px 12px; margin-top: 8px;">
+                <span class="allocation-portfolio" style="font-weight: 600; color: #28a745;">剩余可支配金额</span>
+                <span class="allocation-amount" style="font-weight: 600; color: #28a745;">¥${bankDetails.available_amount.toLocaleString()}</span>
+            </div>`;
+            
+            // 显示各组合分配详情
+            if (bankDetails.portfolio_allocations.length > 0) {
+                html += `<div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #e9ecef;">
+                    <div style="font-weight: 600; color: #495057; margin-bottom: 8px;">已分配组合详情:</div>`;
+                
+                bankDetails.portfolio_allocations.forEach(allocation => {
+                    html += `<div class="bank-allocation-item">
+                        <span class="allocation-portfolio">${allocation.portfolio_name}</span>
+                        <span class="allocation-amount">¥${allocation.amount.toLocaleString()}</span>
+                    </div>`;
+                });
+                
+                html += `</div>`;
+            }
+            
+            container.innerHTML = html;
+            infoContainer.style.display = 'block';
+        }
+
+        // 显示股票资产分布
+        function displayStockDistribution(stockDetails) {
+            const container = document.getElementById('stockDistributionContent');
+            const infoContainer = document.getElementById('stockDistributionInfo');
+            
+            let html = `<div class="bank-allocation-item">
+                <span class="allocation-portfolio">股票总股数</span>
+                <span class="allocation-amount">${stockDetails.total_quantity.toLocaleString()}股</span>
+            </div>`;
+            
+            html += `<div class="bank-allocation-item">
+                <span class="allocation-portfolio">已分配股数</span>
+                <span class="allocation-amount">${stockDetails.allocated_quantity.toLocaleString()}股</span>
+            </div>`;
+            
+            html += `<div class="bank-allocation-item" style="background-color: #e8f5e8; border-radius: 4px; padding: 8px 12px; margin-top: 8px;">
+                <span class="allocation-portfolio" style="font-weight: 600; color: #28a745;">剩余可支配股数</span>
+                <span class="allocation-amount" style="font-weight: 600; color: #28a745;">${stockDetails.available_quantity.toLocaleString()}股</span>
+            </div>`;
+            
+            // 显示各组合分配详情
+            if (stockDetails.portfolio_allocations.length > 0) {
+                html += `<div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #e9ecef;">
+                    <div style="font-weight: 600; color: #495057; margin-bottom: 8px;">已分配组合详情:</div>`;
+                
+                stockDetails.portfolio_allocations.forEach(allocation => {
+                    html += `<div class="bank-allocation-item">
+                        <span class="allocation-portfolio">${allocation.portfolio_name}</span>
+                        <span class="allocation-amount">${allocation.quantity.toLocaleString()}股</span>
+                    </div>`;
+                });
+                
+                html += `</div>`;
+            }
+            
+            container.innerHTML = html;
+            infoContainer.style.display = 'block';
+        }
+
         // 实时更新现金投资信息
-        document.getElementById('bankName').addEventListener('input', function() {
-            document.getElementById('summary-bank').textContent = this.value || '-';
+        document.getElementById('cashAmount').addEventListener('input', function() {
+            updateCashSummary();
         });
 
-        document.getElementById('cashAmount').addEventListener('input', function() {
-            const amount = parseFloat(this.value) || 0;
+        function updateCashSummary() {
+            const amount = parseFloat(document.getElementById('cashAmount').value) || 0;
             document.getElementById('summary-amount').textContent = `¥${amount.toLocaleString()}`;
-        });
+            
+            if (selectedBankDetails) {
+                const remaining = selectedBankDetails.available_amount - amount;
+                document.getElementById('summary-remaining').textContent = `¥${remaining.toLocaleString()}`;
+                
+                // 如果投入金额大于剩余可支配金额，显示警告
+                if (amount > selectedBankDetails.available_amount) {
+                    document.getElementById('summary-remaining').style.color = '#dc3545';
+                } else {
+                    document.getElementById('summary-remaining').style.color = '#495057';
+                }
+            }
+        }
 
         // 实时更新股票购买信息
         document.getElementById('stockQuantity').addEventListener('input', updateStockSummary);
@@ -1154,13 +1825,27 @@
             document.getElementById('summary-quantity').textContent = quantity.toLocaleString();
             document.getElementById('summary-price').textContent = `¥${price.toLocaleString()}`;
             document.getElementById('summary-total').textContent = `¥${total.toLocaleString()}`;
+            
+            // 更新剩余可支配股数
+            if (selectedStockDetails) {
+                const remaining = selectedStockDetails.available_quantity - quantity;
+                document.getElementById('summary-remaining-stock').textContent = `${remaining.toLocaleString()}股`;
+                
+                // 如果购买股数超过可支配股数，显示警告
+                if (quantity > selectedStockDetails.available_quantity) {
+                    document.getElementById('summary-remaining-stock').style.color = '#dc3545';
+                } else {
+                    document.getElementById('summary-remaining-stock').style.color = '#495057';
+                }
+            }
         }
 
         // 选择股票时更新摘要
-        function selectStock(stock) {
+        async function selectStock(stock) {
             selectedStock = stock;
             document.getElementById('stockSearch').value = `${stock.ticker} - ${stock.name}`;
             document.getElementById('searchResults').style.display = 'none';
+            selectedIndex = -1;
             
             // 更新股票信息摘要
             document.getElementById('summary-stock-name').textContent = stock.name;
@@ -1169,11 +1854,25 @@
             // 自动填充市场价格（如果有的话）
             if (stock.current_price) {
                 document.getElementById('stockPrice').value = stock.current_price;
+            }
+            
+            // 获取股票详细信息
+            try {
+                const response = await fetch(`${API_BASE}/stock-details/${encodeURIComponent(stock.ticker)}`);
+                const stockDetails = await response.json();
+                selectedStockDetails = stockDetails;
+                
+                // 显示股票资产分布信息
+                displayStockDistribution(stockDetails);
+                
+                // 更新剩余可支配股数
                 updateStockSummary();
+            } catch (error) {
+                console.error('获取股票详情失败:', error);
             }
         }
 
-        // 添加股票到投资组合
+        // 股票表单提交处理
         document.getElementById('addStockForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -1186,8 +1885,19 @@
             const price = parseFloat(document.getElementById('stockPrice').value);
             const totalAmount = quantity * price;
             
+            if (!quantity || !price || quantity <= 0 || price <= 0) {
+                alert('请填写完整的股票信息');
+                return;
+            }
+            
+            // 验证购买股数是否超过可支配股数
+            if (selectedStockDetails && quantity > selectedStockDetails.available_quantity) {
+                alert(`购买股数 (${quantity.toLocaleString()}股) 超过了该股票的可支配股数 (${selectedStockDetails.available_quantity.toLocaleString()}股)，请调整数量`);
+                return;
+            }
+
             try {
-                // 验证购买能力
+                // 验证购买
                 const validationResponse = await fetch(`${API_BASE}/portfolio-assets/validate`, {
                     method: 'POST',
                     headers: {
@@ -1235,24 +1945,16 @@
                         body: JSON.stringify({
                             portfolio_id: currentPortfolioId,
                             asset_type: 'stock',
-                            asset_id: stockData.id
+                            asset_id: stockData.id,
+                            quantity: quantity
                         })
                     });
                     
                     if (portfolioResponse.ok) {
                         closeModal('addStockModal');
-                        document.getElementById('stockSearch').value = '';
-                        document.getElementById('stockQuantity').value = '';
-                        document.getElementById('stockPrice').value = '';
-                        selectedStock = null;
-                        // 重置摘要信息
-                        document.getElementById('summary-stock-name').textContent = '-';
-                        document.getElementById('summary-stock-ticker').textContent = '-';
-                        document.getElementById('summary-quantity').textContent = '0';
-                        document.getElementById('summary-price').textContent = '¥0.00';
-                        document.getElementById('summary-total').textContent = '¥0.00';
-                        loadPortfolioAssets(currentPortfolioId);
                         alert('股票资产添加成功！');
+                        // 只重新加载当前投资组合的数据，而不是整个页面
+                        loadAllPortfoliosAssets();
                     } else {
                         alert('添加到投资组合失败');
                     }
@@ -1265,123 +1967,371 @@
             }
         });
 
-        // 其他功能函数（待实现）
-        function showEditPortfolioModal() {
-            if (!currentPortfolioId) {
-                alert('请先选择一个投资组合');
-                return;
-            }
-            
-            // 获取当前投资组合信息
-            const currentCard = document.querySelector('.portfolio-item.active');
-            if (!currentCard) {
-                alert('未找到选中的投资组合');
-                return;
-            }
-            
-            const portfolioName = currentCard.querySelector('.portfolio-name').textContent;
-            
-            const newName = prompt('请输入新的投资组合名称:', portfolioName);
-            if (newName && newName.trim() !== '' && newName !== portfolioName) {
-                updatePortfolioName(currentPortfolioId, newName.trim());
-            }
-        }
-
-        async function updatePortfolioName(portfolioId, newName) {
-            try {
-                const response = await fetch(`${API_BASE}/portfolios/${portfolioId}/name`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ name: newName })
-                });
-                
-                if (response.ok) {
-                    alert('投资组合名称修改成功！');
-                    loadAllPortfoliosAssets(); // 重新加载所有投资组合
-                } else {
-                    const errorData = await response.json();
-                    alert(`修改失败: ${errorData.error}`);
-                }
-            } catch (error) {
-                console.error('修改投资组合失败:', error);
-                alert('修改失败，请重试');
-            }
-        }
-
-        function deleteCurrentPortfolio() {
-            if (!currentPortfolioId) {
-                alert('请先选择一个投资组合');
-                return;
-            }
-            
-            const currentCard = document.querySelector('.portfolio-item.active');
-            if (!currentCard) {
-                alert('未找到选中的投资组合');
-                return;
-            }
-            
-            const portfolioName = currentCard.querySelector('.portfolio-name').textContent;
-            
-            if (confirm(`确定要删除投资组合"${portfolioName}"吗？\n\n⚠️ 警告：此操作将删除该投资组合及其所有资产，且不可恢复！`)) {
-                deletePortfolio(currentPortfolioId);
-            }
-        }
-
-        async function deletePortfolio(portfolioId) {
-            try {
-                const response = await fetch(`${API_BASE}/portfolios/${portfolioId}/delete`, {
-                    method: 'DELETE'
-                });
-                
-                if (response.ok) {
-                    alert('投资组合删除成功！');
-                    loadAllPortfoliosAssets(); // 重新加载所有投资组合
-                } else {
-                    const errorData = await response.json();
-                    alert(`删除失败: ${errorData.error}`);
-                }
-            } catch (error) {
-                console.error('删除投资组合失败:', error);
-                alert('删除失败，请重试');
-            }
-        }
-
         // 查看现金资产
-        function viewCashAsset(assetId) {
-            alert('查看现金资产功能开发中...');
+        async function viewCashAsset(assetId) {
+            try {
+                const response = await fetch(`${API_BASE}/cash-assets/${assetId}`);
+                if (!response.ok) {
+                    throw new Error('获取现金资产详情失败');
+                }
+                
+                const cashAsset = await response.json();
+                
+                // 填充详情信息
+                document.getElementById('view-cash-bank').textContent = cashAsset.bank_name || '-';
+                document.getElementById('view-cash-amount').textContent = `¥${cashAsset.cash_amount.toLocaleString()}`;
+                document.getElementById('view-cash-currency').textContent = cashAsset.currency_code || 'CNY';
+                document.getElementById('view-cash-notes').textContent = cashAsset.notes || '-';
+                
+                showModal('viewCashModal');
+            } catch (error) {
+                console.error('查看现金资产失败:', error);
+                alert('查看失败，请重试');
+            }
         }
 
         // 编辑现金资产
-        function editCashAsset(assetId) {
-            alert('编辑现金资产功能开发中...');
-        }
-
-        // 删除现金资产
-        function deleteCashAsset(id) {
-            if (confirm('确定要删除这个现金资产吗？')) {
-                // TODO: 实现删除现金资产功能
-                alert('删除功能开发中...');
+        async function editCashAsset(assetId) {
+            try {
+                const response = await fetch(`${API_BASE}/cash-assets/${assetId}`);
+                if (!response.ok) {
+                    throw new Error('获取现金资产详情失败');
+                }
+                
+                const cashAsset = await response.json();
+                
+                // 保存当前现金资产信息供摘要使用
+                window.currentEditingCash = cashAsset;
+                
+                // 填充编辑表单
+                document.getElementById('edit-cash-id').value = cashAsset.id;
+                document.getElementById('edit-cash-bank').value = cashAsset.bank_name || '';
+                document.getElementById('edit-cash-current-amount').value = cashAsset.cash_amount || '';
+                document.getElementById('edit-cash-operation').value = '';
+                document.getElementById('edit-cash-operation-amount').value = '';
+                document.getElementById('edit-cash-notes').value = cashAsset.notes || '';
+                
+                // 重置摘要信息
+                document.getElementById('summary-cash-operation-type').textContent = '-';
+                document.getElementById('summary-cash-operation-amount').textContent = '¥0.00';
+                document.getElementById('summary-cash-new-amount').textContent = `¥${cashAsset.cash_amount.toLocaleString()}`;
+                
+                showModal('editCashModal');
+            } catch (error) {
+                console.error('编辑现金资产失败:', error);
+                alert('编辑失败，请重试');
             }
         }
 
         // 查看股票资产
-        function viewStockAsset(assetId) {
-            alert('查看股票资产功能开发中...');
+        async function viewStockAsset(assetId) {
+            try {
+                const response = await fetch(`${API_BASE}/stock-assets/${assetId}`);
+                if (!response.ok) {
+                    throw new Error('获取股票资产详情失败');
+                }
+                
+                const stockAsset = await response.json();
+                
+                // 计算总价值和盈亏
+                const totalValue = stockAsset.quantity * stockAsset.current_price;
+                const profitLoss = (stockAsset.current_price - stockAsset.purchase_price) * stockAsset.quantity;
+                const profitLossPercent = ((stockAsset.current_price - stockAsset.purchase_price) / stockAsset.purchase_price * 100);
+                
+                // 填充详情信息
+                document.getElementById('view-stock-ticker').textContent = stockAsset.ticker;
+                document.getElementById('view-stock-name').textContent = stockAsset.name;
+                document.getElementById('view-stock-quantity').textContent = stockAsset.quantity.toLocaleString();
+                document.getElementById('view-stock-purchase-price').textContent = `¥${stockAsset.purchase_price.toLocaleString()}`;
+                document.getElementById('view-stock-current-price').textContent = `¥${stockAsset.current_price.toLocaleString()}`;
+                document.getElementById('view-stock-purchase-date').textContent = new Date(stockAsset.purchase_date).toLocaleDateString();
+                document.getElementById('view-stock-total-value').textContent = `¥${totalValue.toLocaleString()}`;
+                
+                // 设置盈亏显示
+                const profitLossElement = document.getElementById('view-stock-profit-loss');
+                profitLossElement.textContent = `${profitLoss >= 0 ? '+' : ''}¥${profitLoss.toLocaleString()} (${profitLossPercent >= 0 ? '+' : ''}${profitLossPercent.toFixed(2)}%)`;
+                profitLossElement.className = `detail-value ${profitLoss >= 0 ? 'profit' : 'loss'}`;
+                
+                showModal('viewStockModal');
+            } catch (error) {
+                console.error('查看股票资产失败:', error);
+                alert('查看失败，请重试');
+            }
         }
 
         // 编辑股票资产
-        function editStockAsset(assetId) {
-            alert('编辑股票资产功能开发中...');
+        async function editStockAsset(assetId) {
+            try {
+                const response = await fetch(`${API_BASE}/stock-assets/${assetId}`);
+                if (!response.ok) {
+                    throw new Error('获取股票资产详情失败');
+                }
+                
+                const stockAsset = await response.json();
+                
+                // 填充编辑表单
+                document.getElementById('edit-stock-id').value = stockAsset.id;
+                document.getElementById('edit-stock-ticker').value = stockAsset.ticker;
+                document.getElementById('edit-stock-name').value = stockAsset.name;
+                document.getElementById('edit-stock-quantity').value = '';
+                document.getElementById('edit-stock-price').value = '';
+                document.getElementById('edit-stock-operation').value = '';
+                
+                // 保存当前股票信息供摘要使用
+                window.currentEditingStock = stockAsset;
+                
+                // 重置摘要信息
+                document.getElementById('summary-operation-type').textContent = '-';
+                document.getElementById('summary-operation-quantity').textContent = '0';
+                document.getElementById('summary-operation-price').textContent = '¥0.00';
+                document.getElementById('summary-operation-amount').textContent = '¥0.00';
+                document.getElementById('summary-new-quantity').textContent = stockAsset.quantity.toLocaleString();
+                
+                showModal('editStockModal');
+            } catch (error) {
+                console.error('编辑股票资产失败:', error);
+                alert('编辑失败，请重试');
+            }
         }
 
-        // 删除股票资产
-        function deleteStockAsset(id) {
-            if (confirm('确定要删除这个股票资产吗？')) {
-                // TODO: 实现删除股票资产功能
-                alert('删除功能开发中...');
+        // 编辑现金资产表单提交处理
+        document.getElementById('editCashForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const assetId = document.getElementById('edit-cash-id').value;
+            const operation = document.getElementById('edit-cash-operation').value;
+            const operationAmount = parseFloat(document.getElementById('edit-cash-operation-amount').value);
+            const notes = document.getElementById('edit-cash-notes').value;
+            
+            if (!operation || !operationAmount || operationAmount <= 0) {
+                alert('请选择操作类型并填写操作金额');
+                return;
             }
+            
+            try {
+                // 获取当前现金资产信息
+                const currentCash = window.currentEditingCash;
+                if (!currentCash) {
+                    throw new Error('获取当前现金资产信息失败');
+                }
+                
+                let newAmount = currentCash.cash_amount;
+                
+                // 根据操作类型计算新金额
+                if (operation === 'deposit') {
+                    newAmount += operationAmount;
+                } else if (operation === 'withdraw') {
+                    newAmount -= operationAmount;
+                    if (newAmount < 0) {
+                        alert('取出金额不能超过当前现金余额');
+                        return;
+                    }
+                } else if (operation === 'update') {
+                    newAmount = operationAmount;
+                }
+                
+                const response = await fetch(`${API_BASE}/cash-assets/${assetId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        cash_amount: newAmount,
+                        currency_code: 'CNY',
+                        bank_name: currentCash.bank_name,
+                        notes: notes
+                    })
+                });
+                
+                if (response.ok) {
+                    closeModal('editCashModal');
+                    alert('现金资产修改成功！');
+                    loadAllPortfoliosAssets();
+                } else {
+                    const errorData = await response.json();
+                    alert(`修改失败: ${errorData.error || '未知错误'}`);
+                }
+            } catch (error) {
+                console.error('修改现金资产失败:', error);
+                alert('修改失败，请重试');
+            }
+        });
+
+        // 编辑股票资产表单提交处理
+        document.getElementById('editStockForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const assetId = document.getElementById('edit-stock-id').value;
+            const operation = document.getElementById('edit-stock-operation').value;
+            const quantity = parseFloat(document.getElementById('edit-stock-quantity').value);
+            const price = parseFloat(document.getElementById('edit-stock-price').value);
+            
+            if (!operation || !quantity || !price || quantity <= 0 || price <= 0) {
+                alert('请填写完整的操作信息');
+                return;
+            }
+            
+            try {
+                // 先获取当前股票资产信息
+                const getResponse = await fetch(`${API_BASE}/stock-assets/${assetId}`);
+                if (!getResponse.ok) {
+                    throw new Error('获取股票资产信息失败');
+                }
+                
+                const currentStock = await getResponse.json();
+                let newQuantity = currentStock.quantity;
+                
+                // 根据操作类型计算新数量
+                if (operation === 'buy') {
+                    newQuantity += quantity;
+                } else if (operation === 'sell') {
+                    newQuantity -= quantity;
+                    if (newQuantity < 0) {
+                        alert('减仓数量不能超过当前持有数量');
+                        return;
+                    }
+                } else if (operation === 'update') {
+                    newQuantity = quantity;
+                }
+                
+                // 如果数量为0，删除该资产
+                if (newQuantity === 0) {
+                    const deleteResponse = await fetch(`${API_BASE}/stock-assets/${assetId}`, {
+                        method: 'DELETE'
+                    });
+                    
+                    if (deleteResponse.ok) {
+                        closeModal('editStockModal');
+                        alert('股票资产已全部卖出！');
+                        loadAllPortfoliosAssets();
+                        return;
+                    } else {
+                        throw new Error('删除股票资产失败');
+                    }
+                }
+                
+                // 更新股票资产
+                const updateResponse = await fetch(`${API_BASE}/stock-assets/${assetId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        ticker: currentStock.ticker,
+                        name: currentStock.name,
+                        quantity: newQuantity,
+                        purchase_price: price,
+                        current_price: price,
+                        purchase_date: new Date().toISOString().split('T')[0]
+                    })
+                });
+                
+                if (updateResponse.ok) {
+                    closeModal('editStockModal');
+                    alert('股票资产操作成功！');
+                    loadAllPortfoliosAssets();
+                } else {
+                    const errorData = await updateResponse.json();
+                    alert(`操作失败: ${errorData.error || '未知错误'}`);
+                }
+            } catch (error) {
+                console.error('股票资产操作失败:', error);
+                alert('操作失败，请重试');
+            }
+        });
+
+        // 现金编辑操作类型变化处理
+        document.getElementById('edit-cash-operation').addEventListener('change', function() {
+            const operation = this.value;
+            const amountInput = document.getElementById('edit-cash-operation-amount');
+            
+            if (operation === 'deposit') {
+                amountInput.placeholder = '请输入存入金额';
+            } else if (operation === 'withdraw') {
+                amountInput.placeholder = '请输入取出金额';
+            } else if (operation === 'update') {
+                amountInput.placeholder = '请输入新的现金余额';
+            }
+            
+            updateCashEditSummary();
+        });
+
+        // 现金编辑金额变化处理
+        document.getElementById('edit-cash-operation-amount').addEventListener('input', updateCashEditSummary);
+
+        function updateCashEditSummary() {
+            const operation = document.getElementById('edit-cash-operation').value;
+            const operationAmount = parseFloat(document.getElementById('edit-cash-operation-amount').value) || 0;
+            
+            // 获取当前现金信息
+            const currentCash = window.currentEditingCash;
+            if (!currentCash) return;
+            
+            let newAmount = currentCash.cash_amount;
+            if (operation === 'deposit') {
+                newAmount += operationAmount;
+            } else if (operation === 'withdraw') {
+                newAmount -= operationAmount;
+            } else if (operation === 'update') {
+                newAmount = operationAmount;
+            }
+            
+            document.getElementById('summary-cash-operation-type').textContent = 
+                operation === 'deposit' ? '存入' : 
+                operation === 'withdraw' ? '取出' : 
+                operation === 'update' ? '直接修改' : '-';
+            document.getElementById('summary-cash-operation-amount').textContent = `¥${operationAmount.toLocaleString()}`;
+            document.getElementById('summary-cash-new-amount').textContent = `¥${newAmount.toLocaleString()}`;
+        }
+
+        // 股票编辑操作类型变化处理
+        document.getElementById('edit-stock-operation').addEventListener('change', function() {
+            const operation = this.value;
+            const quantityInput = document.getElementById('edit-stock-quantity');
+            const priceInput = document.getElementById('edit-stock-price');
+            
+            if (operation === 'update') {
+                quantityInput.placeholder = '请输入新的持有数量';
+            } else if (operation === 'buy') {
+                quantityInput.placeholder = '请输入加仓数量';
+            } else if (operation === 'sell') {
+                quantityInput.placeholder = '请输入减仓数量';
+            }
+            
+            updateStockEditSummary();
+        });
+
+        // 股票编辑数量变化处理
+        document.getElementById('edit-stock-quantity').addEventListener('input', updateStockEditSummary);
+        document.getElementById('edit-stock-price').addEventListener('input', updateStockEditSummary);
+
+        function updateStockEditSummary() {
+            const operation = document.getElementById('edit-stock-operation').value;
+            const quantity = parseFloat(document.getElementById('edit-stock-quantity').value) || 0;
+            const price = parseFloat(document.getElementById('edit-stock-price').value) || 0;
+            const amount = quantity * price;
+            
+            // 获取当前股票信息（这里需要从之前的API调用中保存）
+            const currentStock = window.currentEditingStock;
+            if (!currentStock) return;
+            
+            let newQuantity = currentStock.quantity;
+            if (operation === 'buy') {
+                newQuantity += quantity;
+            } else if (operation === 'sell') {
+                newQuantity -= quantity;
+            } else if (operation === 'update') {
+                newQuantity = quantity;
+            }
+            
+            document.getElementById('summary-operation-type').textContent = 
+                operation === 'buy' ? '加仓' : 
+                operation === 'sell' ? '减仓' : 
+                operation === 'update' ? '更新信息' : '-';
+            document.getElementById('summary-operation-quantity').textContent = quantity.toLocaleString();
+            document.getElementById('summary-operation-price').textContent = `¥${price.toLocaleString()}`;
+            document.getElementById('summary-operation-amount').textContent = `¥${amount.toLocaleString()}`;
+            document.getElementById('summary-new-quantity').textContent = newQuantity.toLocaleString();
         }
 
         // 页面加载时初始化

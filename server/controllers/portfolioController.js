@@ -15,7 +15,7 @@ export function getPortfolioOptions(req, res) {
 
 // 创建新的投资组合
 export function createPortfolio(req, res) {
-    const { name } = req.body;
+  const { name } = req.body;
     const query = 'INSERT INTO portfolios (name, created_at) VALUES (?, NOW())';
     connection.query(query, [name], (err, result) => {
         if (err) {
@@ -30,7 +30,7 @@ export function createPortfolio(req, res) {
 // 更新投资组合名称
 export function updatePortfolio(req, res) {
     const { id } = req.params;
-    const { name } = req.body;
+  const { name } = req.body;
     const query = 'UPDATE portfolios SET name = ? WHERE id = ?';
     connection.query(query, [name, id], (err, result) => {
         if (err) {
@@ -237,7 +237,7 @@ export function getAllPortfoliosAssets(req, res) {
     `;
     
     connection.query(query, (err, results) => {
-        if (err) {
+    if (err) {
             console.error('Error fetching all portfolios assets:', err);
             res.status(500).send('Error fetching all portfolios assets');
             return;

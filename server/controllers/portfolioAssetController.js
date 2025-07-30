@@ -155,7 +155,8 @@ export function updatePortfolioAsset(req, res) {
 }
 
 export function addPortfolioAsset(req, res) {
-  const portfolio_id = req.params.portfolioId;  // 路由参数里取
+  // 从路由参数或请求体获取portfolio_id
+  const portfolio_id = req.params.portfolioId || req.body.portfolio_id;
   const { asset_type, asset_id, quantity } = req.body;
 
   // 基础校验
