@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus-4 投资组合管理系统</title>
+    <title>Nexus-4 Portfolio Management System</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * {
@@ -360,20 +360,20 @@
     <div class="container">
         <div class="header">
             <h1>Welcome to the Nexus-4</h1>
-            <p>个人投资组合管理系统</p>
+            <p>Personal Portfolio Management System</p>
         </div>
 
         <!-- 管理按钮区域 -->
         <div class="management-section">
             <div class="management-buttons">
                 <button class="mgmt-btn" onclick="location.href='portfolio-management.html'">
-                    个人资产组合管理
+                    Asset Portfolio Management
                 </button>
                 <button class="mgmt-btn" onclick="location.href='asset-management.html'">
-                    个人资产管理
+                    Personal Asset Management
                 </button>
                 <button class="mgmt-btn" onclick="location.href='stock-details.html'">
-                    查看所有股票详情
+                    View all stock details
                 </button>
             </div>
         </div>
@@ -384,23 +384,23 @@
                 <!-- 个人资产总额 - 移到左侧面板顶部 -->
                 <div class="total-section">
                     <div class="total-header">
-                        <h3>个人资产总额</h3>
-                        <div class="subtitle">实时资产配置与收益分析</div>
+                        <h3>Total Personal Assets</h3>
+                        <div class="subtitle">Real-time asset allocation and return analysis</div>
                     </div>
                     
                     <div class="total-grid">
                         <div class="total-item">
-                            <div class="total-label">现金资产</div>
+                            <div class="total-label">Cash Assets</div>
                             <div class="total-value" id="total-cash">$0</div>
                             <div class="total-change" id="cash-change">+0.00%</div>
                         </div>
                         <div class="total-item">
-                            <div class="total-label">股票资产</div>
+                            <div class="total-label">Stock Assets</div>
                             <div class="total-value" id="total-stocks">$0</div>
                             <div class="total-change" id="stocks-change">+0.00%</div>
                         </div>
                         <div class="total-item">
-                            <div class="total-label">总资产</div>
+                            <div class="total-label">Total Assets</div>
                             <div class="total-value" id="total-assets">$0</div>
                             <div class="total-change" id="total-change">+0.00%</div>
                         </div>
@@ -409,11 +409,11 @@
                     <div class="performance-summary">
                         <div class="performance-item">
                             <div class="performance-value" id="total-return">0.00%</div>
-                            <div class="performance-label">总收益率</div>
+                            <div class="performance-label">Total Rate of Return</div>
                         </div>
                         <div class="performance-item">
                             <div class="performance-value" id="daily-return">0.00%</div>
-                            <div class="performance-label">日收益率</div>
+                            <div class="performance-label">Daily Rate of Return</div>
                         </div>
 <!--                        <div class="performance-item">-->
 <!--                            <div class="performance-value" id="risk-ratio">0.00</div>-->
@@ -422,13 +422,13 @@
                     </div>
                 </div>
 
-                <h2 class="section-title">个人资产组成</h2>
+                <h2 class="section-title">Composition of Personal Assets</h2>
                 
                 <!-- 现金资产 -->
                 <div class="asset-section">
                     <h3>Cash:</h3>
                     <div id="cash-assets">
-                        <div class="loading">加载中...</div>
+                        <div class="loading">Loading...</div>
                     </div>
                 </div>
 
@@ -436,18 +436,18 @@
                 <div class="asset-section">
                     <h3>Stocks:</h3>
                     <div id="stock-assets">
-                        <div class="loading">加载中...</div>
+                        <div class="loading">Loading...</div>
                     </div>
                 </div>
             </div>
 
             <!-- 右侧面板：个人资产组合 -->
             <div class="right-panel">
-                <h2 class="section-title">个人资产组合</h2>
+                <h2 class="section-title">Personal Asset Portfolio</h2>
                 
                 <!-- 投资组合选择 -->
                 <div class="portfolio-buttons" id="portfolio-buttons">
-                    <div class="loading">加载中...</div>
+                    <div class="loading">Loading...</div>
                 </div>
 
                 <!-- 收益变化折线图 -->
@@ -462,9 +462,9 @@
 
                 <!-- 资产分配详情 -->
                 <div class="allocation-details" id="allocation-details">
-                    <h3>资产分配详情</h3>
+                    <h3>Asset Allocation Details</h3>
                     <div class="asset-list" id="asset-list">
-                        <div class="loading">加载中...</div>
+                        <div class="loading">Loading...</div>
                     </div>
                 </div>
             </div>
@@ -511,7 +511,7 @@
                 document.getElementById('total-cash').textContent = `$${totalCash.toLocaleString()}`;
                 updateTotalAssets();
             } catch (error) {
-                console.error('加载现金资产失败:', error);
+                console.error('Failed to load cash assets:', error);
                 document.getElementById('cash-assets').innerHTML = '<div class="error">加载失败</div>';
             }
         }
@@ -533,7 +533,7 @@
                     assetElement.className = 'asset-item';
                     assetElement.innerHTML = `
                         <span class="asset-name">${asset.name}</span>
-                        <span class="asset-value">${asset.quantity.toLocaleString()}股 $${currentValue.toLocaleString()}</span>
+                        <span class="asset-value">Share Count: ${asset.quantity.toLocaleString()}.  $${currentValue.toLocaleString()}</span>
                     `;
                     stockContainer.appendChild(assetElement);
                     totalStocks += currentValue;
@@ -712,7 +712,7 @@
                 data: {
                     labels: displayDates,
                     datasets: [{
-                        label: '投资组合每日收益',
+                        label: 'Portfolio Daily Returns',
                         data: totalProfits,
                         borderColor: 'rgba(75, 192, 192, 1)',
                         fill: false,
@@ -727,10 +727,10 @@
                     scales: {
                         y: {
                             beginAtZero: true,
-                            title: { display: true, text: '收益 (元)' }
+                            title: { display: true, text: 'Revenue ($)' }
                         },
                         x: {
-                            title: { display: true, text: '日期' }
+                            title: { display: true, text: 'Date' }
                         }
                     }
                 }
@@ -749,7 +749,7 @@
             allocationChart = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['现金', '股票'],
+                    labels: ['Cash', 'Stock'],
                     datasets: [{
                         data: [allocationData.cash.value, allocationData.stock.value],
                         backgroundColor: ['#17a2b8', '#ffc107'],
@@ -762,7 +762,7 @@
                     plugins: {
                         title: {
                             display: true,
-                            text: '资产分配情况',
+                            text: 'Asset Allocation',
                             font: {
                                 size: 16
                             }
@@ -795,11 +795,11 @@
                 if (asset.stock) {
                     assetName = `${asset.stock.name} (${asset.stock.ticker})`;
                     assetValue = asset.quantity * asset.stock.current_price;
-                    assetType = '股票';
+                    assetType = 'Stock';
                 } else if (asset.cash) {
                     assetName = `${asset.cash.bank_name}`;
                     assetValue = asset.quantity;
-                    assetType = '现金';
+                    assetType = 'Cash';
                 }
                 
                 const percentage = totalValue > 0 ? (assetValue / totalValue) * 100 : 0;

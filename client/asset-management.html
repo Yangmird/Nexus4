@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>个人资产管理 - Nexus-4</title>
+    <title>Personal Asset Management - Nexus-4</title>
     <style>
         * {
             margin: 0;
@@ -310,13 +310,13 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>个人资产管理</h1>
+            <h1>Personal Asset Management</h1>
         </div>
 
         <div class="nav-bar">
-            <a href="index.html" class="nav-btn">返回主页</a>
-            <a href="portfolio-management.html" class="nav-btn">个人投资组合管理</a>
-            <a href="stock-details.html" class="nav-btn">股票详情</a>
+            <a href="index.html" class="nav-btn">Back to Home</a>
+            <a href="portfolio-management.html" class="nav-btn">Personal Portfolio Management</a>
+            <a href="stock-details.html" class="nav-btn">Stock Details</a>
         </div>
 
         <div class="main-content">
@@ -326,24 +326,24 @@
                     <h2 class="section-title" style="display: flex; justify-content: space-between; align-items: center;">
                         Cash
                         <button class="add-badge" onclick="openAddCashModal()">
-                            <span style="margin-right: 4px;">＋</span>添加
+                            <span style="margin-right: 4px;">＋</span>ADD
                         </button>
                     </h2>
                     <div class="asset-list" id="cash-assets-list">
-                        <div class="loading">加载中...</div>
+                        <div class="loading">Loading...</div>
                     </div>
                 </div>
 
                 <!-- 股票资产管理 -->
                 <div class="asset-section">
                     <h2 class="section-title" style="display: flex; justify-content: space-between; align-items: center;">
-                        stocks
+                        Stocks
                         <button class="add-badge" onclick="openAddStockModal()">
-                            <span style="margin-right: 4px;">＋</span>添加
+                            <span style="margin-right: 4px;">＋</span>ADD
                         </button>
                     </h2>
                     <div class="asset-list" id="stock-assets-list">
-                        <div class="loading">加载中...</div>
+                        <div class="loading">Loading...</div>
                     </div>
                 </div>
             </div>
@@ -353,43 +353,43 @@
     <!-- 添加现金模态框 -->
     <div id="add-cash-modal" class="modal">
         <div class="modal-content">
-            <h3 class="modal-title">添加现金资产</h3>
+            <h3 class="modal-title">Add Cash Assets</h3>
 
             <div class="form-group">
-                <label>银行名称:</label>
-                <input type="text" id="add-bank-name" placeholder="银行名称">
+                <label>Bank Name:</label>
+                <input type="text" id="add-bank-name" placeholder="Bank Name">
             </div>
 
             <div class="form-group">
-                <label>货币代码:</label>
+                <label>Currency Code:</label>
                 <select id="add-currency-code">
-                    <option value="CNY">CNY - 人民币</option>
-                    <option value="USD">USD - 美元</option>
-                    <option value="EUR">EUR - 欧元</option>
-                    <option value="JPY">JPY - 日元</option>
-                    <option value="GBP">GBP - 英镑</option>
-                    <option value="AUD">AUD - 澳元</option>
-                    <option value="CAD">CAD - 加元</option>
-                    <option value="CHF">CHF - 瑞士法郎</option>
-                    <option value="HKD">HKD - 港币</option>
-                    <option value="SGD">SGD - 新加坡元</option>
-                    <option value="KRW">KRW - 韩元</option>
+                    <option value="CNY">CNY</option>
+                    <option value="USD">USD</option>
+                    <option value="EUR">EUR</option>
+                    <option value="JPY">JPY</option>
+                    <option value="GBP">GBP</option>
+                    <option value="AUD">AUD</option>
+                    <option value="CAD">CAD</option>
+                    <option value="CHF">CHF</option>
+                    <option value="HKD">HKD</option>
+                    <option value="SGD">SGD</option>
+                    <option value="KRW">KRW</option>
                 </select>
             </div>
 
             <div class="form-group">
-                <label>金额:</label>
-                <input type="number" id="add-amount" step="0.01" placeholder="请输入金额">
+                <label>Amount:</label>
+                <input type="number" id="add-amount" step="0.01" placeholder="Please enter the amount">
             </div>
 
             <div class="form-group">
-                <label>备注:</label>
-                <input type="text" id="add-notes" placeholder="备注（选填）">
+                <label>Remark:</label>
+                <input type="text" id="add-notes" placeholder="Remark(Optional)">
             </div>
 
             <div class="modal-buttons">
-                <button class="confirm-btn" onclick="confirmAddCash()">确认添加</button>
-                <button class="cancel-btn" onclick="closeModal('add-cash-modal')">取消</button>
+                <button class="confirm-btn" onclick="confirmAddCash()">Confirm</button>
+                <button class="cancel-btn" onclick="closeModal('add-cash-modal')">Cancel</button>
             </div>
         </div>
     </div>
@@ -397,53 +397,53 @@
     <!-- 编辑现金模态框（已更新） -->
     <div id="edit-cash-modal" class="modal">
         <div class="modal-content">
-            <h3 class="modal-title">编辑现金资产</h3>
+            <h3 class="modal-title">Edit Cash Assets</h3>
 
             <div class="form-group">
-                <label>银行名称:</label>
-                <input type="text" id="edit-bank-name" placeholder="银行名称">
+                <label>Bank Name:</label>
+                <input type="text" id="edit-bank-name" placeholder="Bank Name">
             </div>
 
             <div class="form-group">
-                <label>货币代码:</label>
+                <label>Currency Code:</label>
                 <select id="edit-currency-code">
-                    <option value="CNY">CNY - 人民币</option>
-                    <option value="USD">USD - 美元</option>
-                    <option value="EUR">EUR - 欧元</option>
-                    <option value="JPY">JPY - 日元</option>
-                    <option value="GBP">GBP - 英镑</option>
-                    <option value="AUD">AUD - 澳元</option>
-                    <option value="CAD">CAD - 加元</option>
-                    <option value="CHF">CHF - 瑞士法郎</option>
-                    <option value="HKD">HKD - 港币</option>
-                    <option value="SGD">SGD - 新加坡元</option>
-                    <option value="KRW">KRW - 韩元</option>
+                    <option value="CNY">CNY</option>
+                    <option value="USD">USD</option>
+                    <option value="EUR">EUR</option>
+                    <option value="JPY">JPY</option>
+                    <option value="GBP">GBP</option>
+                    <option value="AUD">AUD</option>
+                    <option value="CAD">CAD</option>
+                    <option value="CHF">CHF</option>
+                    <option value="HKD">HKD</option>
+                    <option value="SGD">SGD</option>
+                    <option value="KRW">KRW</option>
                 </select>
             </div>
 
             <div class="form-group">
-                <label>持有金额:</label>
+                <label>Amount held:</label>
                 <input type="number" id="edit-original-amount" step="0.01" readonly>
             </div>
 
             <div class="form-group">
-                <label>被组合占用金额:</label>
+                <label>Amount occupied by the combination:</label>
                 <input type="number" id="edit-locked-amount" step="0.01" readonly>
             </div>
 
             <div class="form-group">
-                <label>更新金额:</label>
-                <input type="number" id="edit-amount" step="0.01" placeholder="请输入新的金额">
+                <label>Update Amount:</label>
+                <input type="number" id="edit-amount" step="0.01" placeholder="Please enter the new amount">
             </div>
 
             <div class="form-group">
-                <label>备注:</label>
-                <input type="text" id="edit-notes" placeholder="备注（选填）">
+                <label>Remark:</label>
+                <input type="text" id="edit-notes" placeholder="Remarks(optional)">
             </div>
 
             <div class="modal-buttons">
-                <button class="confirm-btn" onclick="confirmCashEdit()">确认编辑</button>
-                <button class="cancel-btn" onclick="closeModal('edit-cash-modal')">取消编辑</button>
+                <button class="confirm-btn" onclick="confirmCashEdit()">Confirm</button>
+                <button class="cancel-btn" onclick="closeModal('edit-cash-modal')">Cancel</button>
             </div>
         </div>
     </div>
@@ -451,48 +451,48 @@
     <!-- 添加股票模态框（已更新） -->
     <div id="add-stock-modal" class="modal">
         <div class="modal-content">
-            <h3 class="modal-title">添加股票资产</h3>
+            <h3 class="modal-title">Adding Stock Assets</h3>
 
             <!-- 新增搜索区域 -->
             <div class="form-group">
-                <label>搜索股票:</label>
-                <input type="text" id="stock-search" placeholder="输入股票代码或名称搜索" autocomplete="off">
+                <label>Search Stocks:</label>
+                <input type="text" id="stock-search" placeholder="Enter stock code or name to search" autocomplete="off">
                 <div id="search-results" style="display: none; max-height: 200px; overflow-y: auto; border: 1px solid #ddd; border-radius: 4px; margin-top: 5px;"></div>
             </div>
 
             <div class="form-group">
-                <label>股票代码:</label>
-                <input type="text" id="add-stock-code" placeholder="如 NVDA" readonly>
+                <label>Stock Code:</label>
+                <input type="text" id="add-stock-code" placeholder="Such as NVDA" readonly>
             </div>
 
             <div class="form-group">
-                <label>股票名称:</label>
-                <input type="text" id="add-stock-name" placeholder="如 NVIDIA" readonly>
+                <label>Stock Name:</label>
+                <input type="text" id="add-stock-name" placeholder="Such as NVIDIA" readonly>
             </div>
 
             <div class="form-group">
-                <label>买入数量:</label>
-                <input type="number" id="add-quantity" min="0" step="0.01" placeholder="股数">
+                <label>Buy quantity:</label>
+                <input type="number" id="add-quantity" min="0" step="0.01" placeholder="shares">
             </div>
 
             <div class="form-group">
-                <label>买入价格:</label>
-                <input type="number" id="add-price" min="0" step="0.01" placeholder="请选择日期自动获取价格" readonly>
+                <label>Buy Price:</label>
+                <input type="number" id="add-price" min="0" step="0.01" placeholder="Please select a date to automatically get the price" readonly>
             </div>
 
             <div class="form-group">
-                <label>买入日期:</label>
+                <label>Purchase Date:</label>
                 <input type="date" id="add-date">
             </div>
 
             <div class="form-group">
-                <label>总价值:</label>
-                <input type="number" id="add-total-price" readonly placeholder="自动计算">
+                <label>Total Value:</label>
+                <input type="number" id="add-total-price" readonly placeholder="Automatic calculation">
             </div>
 
             <div class="modal-buttons">
-                <button class="confirm-btn" onclick="confirmAddStock()">确认添加</button>
-                <button class="cancel-btn" onclick="closeModal('add-stock-modal')">取消</button>
+                <button class="confirm-btn" onclick="confirmAddStock()">Confirm</button>
+                <button class="cancel-btn" onclick="closeModal('add-stock-modal')">Cancel</button>
             </div>
         </div>
     </div>
@@ -500,56 +500,56 @@
     <!-- 抛售股票模态框 -->
     <div id="sell-stock-modal" class="modal">
         <div class="modal-content">
-            <h3 class="modal-title">抛售股票</h3>
+            <h3 class="modal-title">Selling stocks</h3>
 
             <div class="form-group">
-                <label>股票代码:</label>
+                <label>Stock Code:</label>
                 <input type="text" id="sell-stock-code" readonly>
             </div>
 
             <div class="form-group">
-                <label>股票名称:</label>
+                <label>Stock Name:</label>
                 <input type="text" id="sell-stock-name" readonly>
             </div>
 
             <div class="form-group">
-                <label>购入价格:</label>
+                <label>Purchase price:</label>
                 <input type="number" id="sell-purchase-price" readonly>
             </div>
 
             <div class="form-group">
-                <label>今日成交价:</label>
+                <label>Today's transaction price:</label>
                 <input type="number" id="sell-price" readonly>
             </div>
 
             <div class="form-group">
-                <label>总持有股数:</label>
+                <label>Total number of shares held:</label>
                 <input type="number" id="sell-original-shares" readonly>
             </div>
 
             <div class="form-group">
-                <label>可支配股数:</label>
+                <label>Available shares:</label>
                 <input type="number" id="sell-available-shares" readonly>
             </div>
 
             <div class="form-group">
-                <label>抛售股数:</label>
-                <input type="number" id="sell-shares" min="0" step="1" placeholder="股数">
+                <label>Number of shares sold:</label>
+                <input type="number" id="sell-shares" min="0" step="1" placeholder="shares">
             </div>
 
             <div class="form-group">
-                <label>抛售金额:</label>
+                <label>Selling amount:</label>
                 <input type="number" id="sell-total-gain" readonly>
             </div>
 
             <div class="form-group">
-                <label>交易银行:</label>
+                <label>Transaction Banking:</label>
                 <select id="sell-bank-select"></select>
             </div>
 
             <div class="modal-buttons">
-                <button class="confirm-btn" onclick="confirmSellStock()">确认抛售</button>
-                <button class="cancel-btn" onclick="closeModal('sell-stock-modal')">取消</button>
+                <button class="confirm-btn" onclick="confirmSellStock()">Confirm</button>
+                <button class="cancel-btn" onclick="closeModal('sell-stock-modal')">Cancel</button>
             </div>
         </div>
     </div>
@@ -557,46 +557,46 @@
     <!-- 购买股票模态框 -->
     <div id="buy-stock-modal" class="modal">
         <div class="modal-content">
-            <h3 class="modal-title">购买股票</h3>
+            <h3 class="modal-title">Buying Stocks</h3>
 
             <div class="form-group">
-                <label>股票代码:</label>
+                <label>Stock Code:</label>
                 <input type="text" id="buy-stock-code" readonly>
             </div>
 
             <div class="form-group">
-                <label>股票名称:</label>
+                <label>Stock Name:</label>
                 <input type="text" id="buy-stock-name" readonly>
             </div>
 
             <div class="form-group">
-                <label>购入价格:</label>
+                <label>Purchase price:</label>
                 <input type="number" id="buy-purchase-price" readonly>
             </div>
 
             <div class="form-group">
-                <label>今日成交价:</label>
+                <label>Today's transaction price:</label>
                 <input type="number" id="buy-price" readonly>
             </div>
 
             <div class="form-group">
-                <label>购买股数:</label>
-                <input type="number" id="buy-shares" min="0" step="1" placeholder="股数">
+                <label>Number of shares purchased:</label>
+                <input type="number" id="buy-shares" min="0" step="1" placeholder="shares">
             </div>
 
             <div class="form-group">
-                <label>购入金额:</label>
+                <label>Purchase amount:</label>
                 <input type="number" id="buy-total-cost" readonly>
             </div>
 
             <div class="form-group">
-                <label>交易银行:</label>
+                <label>Transaction Banking:</label>
                 <select id="buy-bank-select"></select>
             </div>
 
             <div class="modal-buttons">
-                <button class="confirm-btn" onclick="confirmBuyStock()">确认购买</button>
-                <button class="cancel-btn" onclick="closeModal('buy-stock-modal')">取消</button>
+                <button class="confirm-btn" onclick="confirmBuyStock()">Confirm</button>
+                <button class="cancel-btn" onclick="closeModal('buy-stock-modal')">Cancel</button>
             </div>
         </div>
     </div>
@@ -622,7 +622,7 @@
                 container.innerHTML = '';
 
                 if (cashAssets.length === 0) {
-                    container.innerHTML = '<div class="empty-state">暂无现金资产</div>';
+                    container.innerHTML = '<div class="empty-state">No cash assets</div>';
                     return;
                 }
 
@@ -633,7 +633,7 @@
         <div class="asset-info" style="flex: 1 1 auto; display: flex; justify-content: space-between; align-items: center;">
             <div>
                 <div class="asset-name">${asset.bank_name}</div>
-                <div class="asset-details">金额: $${asset.cash_amount.toLocaleString()} ${asset.currency_code}</div>
+                <div class="asset-details">Amount: $${asset.cash_amount.toLocaleString()} ${asset.currency_code}</div>
             </div>
 
             ${asset.notes ? `
@@ -644,15 +644,15 @@
         </div>
 
         <div class="asset-actions" style="margin-left: 16px;">
-            <button class="action-btn edit-btn" onclick="editCashAsset(${asset.id})">编辑</button>
-            <button class="action-btn delete-btn" onclick="deleteCashAsset(${asset.id})">删除</button>
+            <button class="action-btn edit-btn" onclick="editCashAsset(${asset.id})">Edit</button>
+            <button class="action-btn delete-btn" onclick="deleteCashAsset(${asset.id})">Delete</button>
         </div>
     `;
                     container.appendChild(assetElement);
                 });
             } catch (error) {
-                console.error('加载现金资产失败:', error);
-                document.getElementById('cash-assets-list').innerHTML = '<div class="loading">加载失败</div>';
+                console.error('Failed to load cash assets:', error);
+                document.getElementById('cash-assets-list').innerHTML = '<div class="loading">Loading failed</div>';
             }
         }
 
@@ -677,7 +677,7 @@
                     assetElement.innerHTML = `
                         <div class="asset-info">
                             <div class="asset-name">${asset.name} (${asset.ticker})</div>
-                            <div class="asset-details">持股: ${asset.quantity.toLocaleString()}股 | 购入价: $${asset.purchase_price.toLocaleString()} | 持仓总值: $${currentValue.toLocaleString()}</div>
+                            <div class="asset-details">Holdings: ${asset.quantity.toLocaleString()} | Purchase price: $${asset.purchase_price.toLocaleString()} | Total holdings: $${currentValue.toLocaleString()}</div>
                         </div>
                         <div class="asset-actions">
                             <button class="action-btn buy-btn" onclick="buyStock(${asset.id})">购入</button>

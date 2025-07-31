@@ -814,21 +814,21 @@
     <div class="container">
         <!-- 删除左上角返回首页按钮 -->
         
-        <h1 class="page-title">个人资产组合管理</h1>
+        <h1 class="page-title">Personal Portfolio Management</h1>
         
         <!-- 导航按钮区域 -->
         <div class="navigation-section">
             <div class="navigation-buttons">
-                <a href="index.html" class="nav-btn">返回首页</a>
-                <a href="asset-management.html" class="nav-btn">个人资产管理</a>
-                <a href="stock-details.html" class="nav-btn">查看所有股票详情</a>
+                <a href="index.html" class="nav-btn">Home Page</a>
+                <a href="asset-management.html" class="nav-btn">Personal Assets</a>
+                <a href="stock-details.html" class="nav-btn">View all Stocks Details</a>
             </div>
         </div>
         
         <div class="main-content">
             <!-- 左侧投资组合列表 -->
             <div class="portfolio-sidebar">
-                <h3 class="sidebar-title">已有资产组合:</h3>
+                <h3 class="sidebar-title">Existing Asset Portfolio:</h3>
                 <div class="portfolio-list" id="portfolio-list">
                     <!-- 投资组合列表将通过JavaScript动态生成 -->
                 </div>
@@ -837,7 +837,7 @@
                 <div class="add-portfolio-section">
                     <button class="add-portfolio-btn" onclick="showAddPortfolioModal()">
                         <span class="btn-icon">+</span>
-                        新增资产组合
+                        Add New Asset Portfolio
                     </button>
                 </div>
             </div>
@@ -847,15 +847,15 @@
                 <!-- 现金资产区域 -->
                 <div class="asset-section">
                     <div class="asset-header">
-                        <span class="asset-title">Cash:</span>
-                        <button class="add-btn" onclick="showAddCashModal()">新增现金</button>
+                        <span class="asset-title">Cash</span>
+                        <button class="add-btn" onclick="showAddCashModal()">Add Cash</button>
                     </div>
                     <div class="asset-table">
                         <div class="table-header">
-                            <div class="header-cell">名称</div>
-                            <div class="header-cell">金额</div>
-                            <div class="header-cell">银行</div>
-                            <div class="header-cell">操作</div>
+                            <div class="header-cell">Cash Name</div>
+                            <div class="header-cell">Money</div>
+                            <div class="header-cell">Bank</div>
+                            <div class="header-cell">Operation</div>
                         </div>
                         <div class="table-body" id="cash-assets-table">
                             <!-- 现金资产数据将通过JavaScript动态生成 -->
@@ -867,14 +867,14 @@
                 <div class="asset-section">
                     <div class="asset-header">
                         <span class="asset-title">Stocks:</span>
-                        <button class="add-btn" onclick="showAddStockModal()">新增股票</button>
+                        <button class="add-btn" onclick="showAddStockModal()">Add a Stock</button>
                     </div>
                     <div class="asset-table">
                         <div class="table-header">
-                            <div class="header-cell">名称</div>
-                            <div class="header-cell">数量</div>
-                            <div class="header-cell">当前价格</div>
-                            <div class="header-cell">操作</div>
+                            <div class="header-cell">Stock Name</div>
+                            <div class="header-cell">Number</div>
+                            <div class="header-cell">Current Price</div>
+                            <div class="header-cell">Operation</div>
                         </div>
                         <div class="table-body" id="stocks-assets-table">
                             <!-- 股票资产数据将通过JavaScript动态生成 -->
@@ -889,50 +889,50 @@
     <div id="addCashModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title">新增现金资产</h3>
+                <h3 class="modal-title">Add Cash Asset</h3>
                 <span class="close" onclick="closeModal('addCashModal')">&times;</span>
             </div>
             <form id="addCashForm">
                 <div class="form-group">
-                    <label class="form-label">投入银行</label>
+                    <label class="form-label">Invest in What Bank</label>
                     <div class="bank-input-container">
-                        <input type="text" class="form-input" id="bankName" placeholder="请输入银行名称" required>
+                        <input type="text" class="form-input" id="bankName" placeholder="Please enter the Bank name" required>
                         <div class="bank-suggestions" id="bankSuggestions"></div>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">投入金额</label>
-                    <input type="number" class="form-input" id="cashAmount" step="0.01" placeholder="请输入投入金额" required>
+                    <label class="form-label">Investment Amount</label>
+                    <input type="number" class="form-input" id="cashAmount" step="0.01" placeholder="Please enter the investment amount" required>
                 </div>
                 
                 <!-- 银行资产分布信息 -->
                 <div class="bank-distribution-info" id="bankDistributionInfo" style="display: none;">
-                    <div class="summary-title">银行资产分布</div>
+                    <div class="summary-title">Bank Asset Distribution</div>
                     <div class="bank-distribution-content" id="bankDistributionContent"></div>
                 </div>
                 
                 <!-- 投资信息摘要 -->
                 <div class="investment-summary">
-                    <div class="summary-title">投资信息摘要</div>
+                    <div class="summary-title">Investment Information Summary</div>
                     <div class="summary-grid cash-summary">
                         <div class="summary-item">
-                            <span class="summary-label">投入银行:</span>
+                            <span class="summary-label">Invest in What Bank:</span>
                             <span class="summary-value" id="summary-bank">-</span>
                         </div>
                         <div class="summary-item">
-                            <span class="summary-label">投入金额:</span>
+                            <span class="summary-label">Amount of investment:</span>
                             <span class="summary-value" id="summary-amount">$0.00</span>
                         </div>
                         <div class="summary-item">
-                            <span class="summary-label">剩余可支配金额:</span>
+                            <span class="summary-label">Remaining disposable amount:</span>
                             <span class="summary-value" id="summary-remaining">$0.00</span>
                         </div>
                     </div>
                 </div>
                 
                 <div class="btn-group">
-                    <button type="submit" class="btn btn-primary">确认添加</button>
-                    <button type="button" class="btn btn-warning" onclick="closeModal('addCashModal')">取消</button>
+                    <button type="submit" class="btn btn-primary">Confirm Add</button>
+                    <button type="button" class="btn btn-warning" onclick="closeModal('addCashModal')">Cancel</button>
                 </div>
             </form>
         </div>
@@ -942,18 +942,18 @@
     <div id="addPortfolioModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title">新增资产组合</h3>
+                <h3 class="modal-title">Add New Asset Portfolio</h3>
                 <span class="close" onclick="closeModal('addPortfolioModal')">&times;</span>
             </div>
             <form id="addPortfolioForm">
                 <div class="form-group">
-                    <label class="form-label">组合名称</label>
-                    <input type="text" class="form-input" id="portfolioName" placeholder="请输入资产组合名称" required>
+                    <label class="form-label">Portfolio Name</label>
+                    <input type="text" class="form-input" id="portfolioName" placeholder="Please enter the Portfolio Name" required>
                 </div>
                 
                 <div class="btn-group">
-                    <button type="submit" class="btn btn-primary">确认创建</button>
-                    <button type="button" class="btn btn-warning" onclick="closeModal('addPortfolioModal')">取消</button>
+                    <button type="submit" class="btn btn-primary">Confirm Creation</button>
+                    <button type="button" class="btn btn-warning" onclick="closeModal('addPortfolioModal')">Cancel</button>
                 </div>
             </form>
         </div>
@@ -963,24 +963,24 @@
     <div id="viewCashModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title">现金资产详情</h3>
+                <h3 class="modal-title">Cash Asset Details</h3>
                 <span class="close" onclick="closeModal('viewCashModal')">&times;</span>
             </div>
             <div class="asset-details">
                 <div class="detail-item">
-                    <span class="detail-label">银行名称:</span>
+                    <span class="detail-label">Bank Name:</span>
                     <span class="detail-value" id="view-cash-bank">-</span>
                 </div>
                 <div class="detail-item">
-                    <span class="detail-label">现金金额:</span>
+                    <span class="detail-label">Cash Amount:</span>
                     <span class="detail-value" id="view-cash-amount">-</span>
                 </div>
                 <div class="detail-item">
-                    <span class="detail-label">货币代码:</span>
+                    <span class="detail-label">Currency Code:</span>
                     <span class="detail-value" id="view-cash-currency">-</span>
                 </div>
                 <div class="detail-item">
-                    <span class="detail-label">备注:</span>
+                    <span class="detail-label">Remark:</span>
                     <span class="detail-value" id="view-cash-notes">-</span>
                 </div>
             </div>
@@ -994,50 +994,50 @@
     <div id="editCashModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title">编辑现金资产</h3>
+                <h3 class="modal-title">Edit Cash Assets</h3>
                 <span class="close" onclick="closeModal('editCashModal')">&times;</span>
             </div>
             <form id="editCashForm">
                 <input type="hidden" id="edit-cash-id">
                 <div class="form-group">
-                    <label class="form-label">银行名称</label>
+                    <label class="form-label">Bank Name</label>
                     <input type="text" class="form-input readonly" id="edit-cash-bank" readonly>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">当前现金金额</label>
+                    <label class="form-label">Current Cash Amount</label>
                     <input type="number" class="form-input readonly" id="edit-cash-current-amount" readonly>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">操作类型</label>
+                    <label class="form-label">Operation Type</label>
                     <select class="form-input" id="edit-cash-operation" required>
-                        <option value="">请选择操作类型</option>
-                        <option value="deposit">存入</option>
-                        <option value="withdraw">取出</option>
+                        <option value="">Select Operation Type</option>
+                        <option value="deposit">Deposit</option>
+                        <option value="withdraw">Take out</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">操作金额</label>
-                    <input type="number" class="form-input" id="edit-cash-operation-amount" step="0.01" placeholder="请输入操作金额" required>
+                    <label class="form-label">Operation Amount</label>
+                    <input type="number" class="form-input" id="edit-cash-operation-amount" step="0.01" placeholder="Please enter the operation amount" required>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">备注</label>
-                    <textarea class="form-input" id="edit-cash-notes" placeholder="请输入备注信息" rows="3"></textarea>
+                    <label class="form-label">Remark</label>
+                    <textarea class="form-input" id="edit-cash-notes" placeholder="Please enter the remark" rows="3"></textarea>
                 </div>
                 
                 <!-- 银行可支配金额信息 -->
                 <div class="bank-available-info" id="bankAvailableInfo" style="display: none;">
-                    <div class="summary-title">银行可支配金额</div>
+                    <div class="summary-title">Bank Disposable Amount</div>
                     <div class="summary-grid">
                         <div class="summary-item">
-                            <span class="summary-label">银行总资产:</span>
+                            <span class="summary-label">Total Bank Assets:</span>
                             <span class="summary-value" id="edit-bank-total">$0.00</span>
                         </div>
                         <div class="summary-item">
-                            <span class="summary-label">已分配金额:</span>
+                            <span class="summary-label">Allocated Amount:</span>
                             <span class="summary-value" id="edit-bank-allocated">$0.00</span>
                         </div>
                         <div class="summary-item">
-                            <span class="summary-label">可支配金额:</span>
+                            <span class="summary-label">Disposable Amount:</span>
                             <span class="summary-value" id="edit-bank-available">$0.00</span>
                         </div>
                     </div>
@@ -1045,26 +1045,26 @@
                 
                 <!-- 操作信息摘要 -->
                 <div class="investment-summary">
-                    <div class="summary-title">操作信息摘要</div>
+                    <div class="summary-title">Operation Summary</div>
                     <div class="summary-grid cash-summary">
                         <div class="summary-item">
-                            <span class="summary-label">操作类型:</span>
+                            <span class="summary-label">Operation Type:</span>
                             <span class="summary-value" id="summary-cash-operation-type">-</span>
                         </div>
                         <div class="summary-item">
-                            <span class="summary-label">操作金额:</span>
+                            <span class="summary-label">Operation Amount:</span>
                             <span class="summary-value" id="summary-cash-operation-amount">$0.00</span>
                         </div>
                         <div class="summary-item">
-                            <span class="summary-label">更新后金额:</span>
+                            <span class="summary-label">Updated Cash Amount:</span>
                             <span class="summary-value" id="summary-cash-new-amount">$0.00</span>
                         </div>
                     </div>
                 </div>
                 
                 <div class="btn-group">
-                    <button type="submit" class="btn btn-primary">确认修改</button>
-                    <button type="button" class="btn btn-warning" onclick="closeModal('editCashModal')">取消</button>
+                    <button type="submit" class="btn btn-primary">Confirm Modify</button>
+                    <button type="button" class="btn btn-warning" onclick="closeModal('editCashModal')">Cancel</button>
                 </div>
             </form>
         </div>
@@ -1074,45 +1074,45 @@
     <div id="viewStockModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title">股票资产详情</h3>
+                <h3 class="modal-title">Stock Asset Details</h3>
                 <span class="close" onclick="closeModal('viewStockModal')">&times;</span>
             </div>
             <div class="asset-details">
                 <div class="detail-item">
-                    <span class="detail-label">股票代码:</span>
+                    <span class="detail-label">Stock Code:</span>
                     <span class="detail-value" id="view-stock-ticker">-</span>
                 </div>
                 <div class="detail-item">
-                    <span class="detail-label">股票名称:</span>
+                    <span class="detail-label">Stock Name:</span>
                     <span class="detail-value" id="view-stock-name">-</span>
                 </div>
                 <div class="detail-item">
-                    <span class="detail-label">持有数量:</span>
+                    <span class="detail-label">Number of holdings:</span>
                     <span class="detail-value" id="view-stock-quantity">-</span>
                 </div>
                 <div class="detail-item">
-                    <span class="detail-label">购买价格:</span>
+                    <span class="detail-label">Purchase Price:</span>
                     <span class="detail-value" id="view-stock-purchase-price">-</span>
                 </div>
                 <div class="detail-item">
-                    <span class="detail-label">当前价格:</span>
+                    <span class="detail-label">Current Price:</span>
                     <span class="detail-value" id="view-stock-current-price">-</span>
                 </div>
                 <div class="detail-item">
-                    <span class="detail-label">购买日期:</span>
+                    <span class="detail-label">Purchase Date:</span>
                     <span class="detail-value" id="view-stock-purchase-date">-</span>
                 </div>
                 <div class="detail-item">
-                    <span class="detail-label">总价值:</span>
+                    <span class="detail-label">Total Value:</span>
                     <span class="detail-value" id="view-stock-total-value">-</span>
                 </div>
                 <div class="detail-item">
-                    <span class="detail-label">盈亏情况:</span>
+                    <span class="detail-label">Profit and loss situation:</span>
                     <span class="detail-value" id="view-stock-profit-loss">-</span>
                 </div>
             </div>
             <div class="btn-group">
-                <button type="button" class="btn btn-warning" onclick="closeModal('viewStockModal')">关闭</button>
+                <button type="button" class="btn btn-warning" onclick="closeModal('viewStockModal')">Close</button>
             </div>
         </div>
     </div>
@@ -1121,86 +1121,86 @@
     <div id="editStockModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title">编辑股票资产</h3>
+                <h3 class="modal-title">Edit Stock Assets</h3>
                 <span class="close" onclick="closeModal('editStockModal')">&times;</span>
             </div>
             <form id="editStockForm">
                 <input type="hidden" id="edit-stock-id">
                 <div class="form-group">
-                    <label class="form-label">操作类型</label>
+                    <label class="form-label">Operation Type:</label>
                     <select class="form-input" id="edit-stock-operation" required>
-                        <option value="">请选择操作类型</option>
-                        <option value="buy">加仓</option>
-                        <option value="sell">减仓</option>
+                        <option value="">Select Operation Type</option>
+                        <option value="buy">Increase positions</option>
+                        <option value="sell">Reduce holdings</option>
                         <!-- <option value="update">更新信息</option> -->
                     </select>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">股票代码</label>
+                    <label class="form-label">Stock Code</label>
                     <input type="text" class="form-input" id="edit-stock-ticker" readonly>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">股票名称</label>
+                    <label class="form-label">Stock Name</label>
                     <input type="text" class="form-input" id="edit-stock-name" readonly>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">操作数量</label>
-                    <input type="number" class="form-input" id="edit-stock-quantity" step="0.01" placeholder="请输入操作数量" required>
+                    <label class="form-label">Number of operations</label>
+                    <input type="number" class="form-input" id="edit-stock-quantity" step="0.01" placeholder="Please enter the number of operations" required>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">操作单价</label>
-                    <input type="number" class="form-input" id="edit-stock-price" step="0.01" placeholder="根据市场价自动计算" required>
+                    <label class="form-label">Operation unit price</label>
+                    <input type="number" class="form-input" id="edit-stock-price" step="0.01" placeholder="Automatically calculated based on market price" required>
                 </div>
                 
                 <!-- 股票可支配信息 -->
                 <div class="stock-available-info" id="stockAvailableInfo" style="display: none;">
-                    <div class="summary-title">股票可支配信息</div>
+                    <div class="summary-title">Stock available information</div>
                     <div class="summary-grid stock-summary">
                         <div class="summary-item">
-                            <span class="summary-label">当前组合持有:</span>
-                            <span class="summary-value" id="current-holding">0股</span>
+                            <span class="summary-label">Current portfolio holdings:</span>
+                            <span class="summary-value" id="current-holding">0</span>
                         </div>
                         <div class="summary-item">
-                            <span class="summary-label">全局已分配:</span>
-                            <span class="summary-value" id="allocated-quantity">0股</span>
+                            <span class="summary-label">Globally allocated:</span>
+                            <span class="summary-value" id="allocated-quantity">0</span>
                         </div>
                         <div class="summary-item" style="background-color: #e8f5e8; border-radius: 4px; padding: 8px 12px;">
-                            <span class="summary-label" style="font-weight: 600; color: #28a745;">全局可支配:</span>
-                            <span class="summary-value" id="available-quantity" style="font-weight: 600; color: #28a745;">0股</span>
+                            <span class="summary-label" style="font-weight: 600; color: #28a745;">Globally available:</span>
+                            <span class="summary-value" id="available-quantity" style="font-weight: 600; color: #28a745;">0</span>
                         </div>
                     </div>
                 </div>
                 
                 <!-- 操作信息摘要 -->
                 <div class="investment-summary">
-                    <div class="summary-title">操作信息摘要</div>
+                    <div class="summary-title">Operational Information Summary</div>
                     <div class="summary-grid stock-summary">
                         <div class="summary-item">
-                            <span class="summary-label">操作类型:</span>
+                            <span class="summary-label">Operation Type:</span>
                             <span class="summary-value" id="summary-operation-type">-</span>
                         </div>
                         <div class="summary-item">
-                            <span class="summary-label">操作数量:</span>
+                            <span class="summary-label">Operation Quantity:</span>
                             <span class="summary-value" id="summary-operation-quantity">0</span>
                         </div>
                         <div class="summary-item">
-                            <span class="summary-label">操作价格:</span>
+                            <span class="summary-label">Operation Price:</span>
                             <span class="summary-value" id="summary-operation-price">$0.00</span>
                         </div>
                         <div class="summary-item">
-                            <span class="summary-label">操作金额:</span>
+                            <span class="summary-label">Operation Amount:</span>
                             <span class="summary-value" id="summary-operation-amount">$0.00</span>
                         </div>
                         <div class="summary-item">
-                            <span class="summary-label">更新后的股数:</span>
+                            <span class="summary-label">Updated number of shares:</span>
                             <span class="summary-value" id="summary-new-quantity">0</span>
                         </div>
                     </div>
                 </div>
                 
                 <div class="btn-group">
-                    <button type="submit" class="btn btn-primary">确认操作</button>
-                    <button type="button" class="btn btn-warning" onclick="closeModal('editStockModal')">取消</button>
+                    <button type="submit" class="btn btn-primary">Confirm</button>
+                    <button type="button" class="btn btn-warning" onclick="closeModal('editStockModal')">Cancel</button>
                 </div>
             </form>
         </div>
@@ -1210,66 +1210,66 @@
     <div id="addStockModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title">新增股票资产</h3>
+                <h3 class="modal-title">Add Stock Asset</h3>
                 <span class="close" onclick="closeModal('addStockModal')">&times;</span>
             </div>
             <form id="addStockForm">
                 <div class="form-group">
-                    <label class="form-label">股票搜索</label>
+                    <label class="form-label">Stock Search</label>
                     <div class="search-container">
-                        <input type="text" class="form-input" id="stockSearch" placeholder="输入股票代码或名称搜索" required>
+                        <input type="text" class="form-input" id="stockSearch" placeholder="Enter stock code or name to search" required>
                         <div class="search-results" id="searchResults"></div>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">购买股数</label>
-                    <input type="number" class="form-input" id="stockQuantity" placeholder="请输入股数" required>
+                    <label class="form-label">Number of shares purchased</label>
+                    <input type="number" class="form-input" id="stockQuantity" placeholder="Please enter the number of shares" required>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">购买价格 (市场价)</label>
-                    <input type="number" class="form-input" id="stockPrice" step="0.01" placeholder="请输入购买价格" required>
+                    <label class="form-label">Purchase price (market price)</label>
+                    <input type="number" class="form-input" id="stockPrice" step="0.01" placeholder="Please enter the purchase price" required>
                 </div>
                 
                 <!-- 股票资产分布信息 -->
                 <div class="stock-distribution-info" id="stockDistributionInfo" style="display: none;">
-                    <div class="summary-title">股票资产分布</div>
+                    <div class="summary-title">Stock Asset Distribution</div>
                     <div class="stock-distribution-content" id="stockDistributionContent"></div>
                 </div>
                 
                 <!-- 投资信息摘要 -->
                 <div class="investment-summary">
-                    <div class="summary-title">投资信息摘要</div>
+                    <div class="summary-title">Investment Information Summary</div>
                     <div class="summary-grid stock-summary">
                         <div class="summary-item">
-                            <span class="summary-label">股票名称:</span>
+                            <span class="summary-label">Stock Name:</span>
                             <span class="summary-value" id="summary-stock-name">-</span>
                         </div>
                         <div class="summary-item">
-                            <span class="summary-label">股票代码:</span>
+                            <span class="summary-label">Stock Code:</span>
                             <span class="summary-value" id="summary-stock-ticker">-</span>
                         </div>
                         <div class="summary-item">
-                            <span class="summary-label">购买股数:</span>
+                            <span class="summary-label">Number of shares purchased:</span>
                             <span class="summary-value" id="summary-quantity">0</span>
                         </div>
                         <div class="summary-item">
-                            <span class="summary-label">市场价格:</span>
+                            <span class="summary-label">Market Price:</span>
                             <span class="summary-value" id="summary-price">$0.00</span>
                         </div>
                         <div class="summary-item">
-                            <span class="summary-label">购买总金额:</span>
+                            <span class="summary-label">Total Purchase Amount:</span>
                             <span class="summary-value" id="summary-total">$0.00</span>
                         </div>
                         <div class="summary-item">
-                            <span class="summary-label">剩余可支配:</span>
-                            <span class="summary-value" id="summary-remaining-stock">0股</span>
+                            <span class="summary-label">Remaining Disposable:</span>
+                            <span class="summary-value" id="summary-remaining-stock">0</span>
                         </div>
                     </div>
                 </div>
                 
                 <div class="btn-group">
-                    <button type="submit" class="btn btn-primary">确认购买</button>
-                    <button type="button" class="btn btn-warning" onclick="closeModal('addStockModal')">取消</button>
+                    <button type="submit" class="btn btn-primary">Confirm Add</button>
+                    <button type="button" class="btn btn-warning" onclick="closeModal('addStockModal')">Cancel</button>
                 </div>
             </form>
         </div>
@@ -1279,19 +1279,19 @@
     <div id="editPortfolioModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title">修改资产组合名称</h3>
+                <h3 class="modal-title">Modify Name</h3>
                 <span class="close" onclick="closeModal('editPortfolioModal')">&times;</span>
             </div>
             <form id="editPortfolioForm">
                 <input type="hidden" id="edit-portfolio-id">
                 <div class="form-group">
-                    <label class="form-label">资产组合名称</label>
-                    <input type="text" class="form-input" id="editPortfolioName" placeholder="请输入新的资产组合名称" required>
+                    <label class="form-label">Portfolio Name</label>
+                    <input type="text" class="form-input" id="editPortfolioName" placeholder="Please enter a new portfolio name" required>
                 </div>
                 
                 <div class="btn-group">
-                    <button type="submit" class="btn btn-primary">确认修改</button>
-                    <button type="button" class="btn btn-warning" onclick="closeModal('editPortfolioModal')">取消</button>
+                    <button type="submit" class="btn btn-primary">Confirm</button>
+                    <button type="button" class="btn btn-warning" onclick="closeModal('editPortfolioModal')">Cancel</button>
                 </div>
             </form>
         </div>
@@ -1301,30 +1301,30 @@
     <div id="deletePortfolioModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title">删除资产组合</h3>
+                <h3 class="modal-title">Deleting a Portfolio</h3>
                 <span class="close" onclick="closeModal('deletePortfolioModal')">&times;</span>
             </div>
             <div class="asset-details">
                 <div class="detail-item">
-                    <span class="detail-label">组合名称:</span>
+                    <span class="detail-label">Portfiolio Name:</span>
                     <span class="detail-value" id="delete-portfolio-name">-</span>
                 </div>
                 <div class="detail-item">
-                    <span class="detail-label">现金资产:</span>
+                    <span class="detail-label">Cash Assets:</span>
                     <span class="detail-value" id="delete-portfolio-cash-count">-</span>
                 </div>
                 <div class="detail-item">
-                    <span class="detail-label">股票资产:</span>
+                    <span class="detail-label">Stock Assets:</span>
                     <span class="detail-value" id="delete-portfolio-stock-count">-</span>
                 </div>
                 <div class="detail-item">
-                    <span class="detail-label">操作说明:</span>
-                    <span class="detail-value" style="color: #dc3545; font-weight: 600;">删除后，所有资产将返回到对应的"池子"中</span>
+                    <span class="detail-label">Operating Instructions:</span>
+                    <span class="detail-value" style="color: #dc3545; font-weight: 600;">After deletion, all assets will be returned to the corresponding "pool"</span>
                 </div>
             </div>
             <div class="btn-group">
-                <button type="button" class="btn btn-primary" onclick="confirmDeletePortfolio()">确认删除</button>
-                <button type="button" class="btn btn-warning" onclick="closeModal('deletePortfolioModal')">取消</button>
+                <button type="button" class="btn btn-primary" onclick="confirmDeletePortfolio()">Confirm</button>
+                <button type="button" class="btn btn-warning" onclick="closeModal('deletePortfolioModal')">Cancel</button>
             </div>
         </div>
     </div>
@@ -1379,12 +1379,12 @@
                     item.innerHTML = `
                         <div class="portfolio-name">${portfolio.name}</div>
                         <div class="portfolio-info">
-                            <span>创建时间: ${new Date(portfolio.created_at).toLocaleDateString()}</span><br>
-                            <span>资产数量: ${totalAssets}</span>
+                            <span>Create Time: ${new Date(portfolio.created_at).toLocaleDateString()}</span><br>
+                            <span>Number of assets: ${totalAssets}</span>
                         </div>
                         <div class="portfolio-actions">
-                            <button class="portfolio-action-btn edit-portfolio" onclick="editPortfolio(${portfolio.id}, '${portfolio.name}')">修改组合名称</button>
-                            <button class="portfolio-action-btn delete-portfolio" onclick="deletePortfolio(${portfolio.id}, '${portfolio.name}')">删除组合</button>
+                            <button class="portfolio-action-btn edit-portfolio" onclick="editPortfolio(${portfolio.id}, '${portfolio.name}')">Modify Name</button>
+                            <button class="portfolio-action-btn delete-portfolio" onclick="deletePortfolio(${portfolio.id}, '${portfolio.name}')">Delete Portfolio</button>
                         </div>
                     `;
                     
@@ -1482,9 +1482,9 @@
                     <div class="table-cell">${asset.bank_name}</div>
                     <div class="table-cell">
                         <div class="action-buttons">
-                            <button class="action-btn view" onclick="viewCashAsset(${asset.id}, ${asset.cash_amount})">查看</button>
-                            <button class="action-btn edit" onclick="editCashAsset(${asset.id}, ${asset.cash_amount})">编辑</button>
-                            <button class="action-btn delete" onclick="deleteCashAsset(${asset.id})">删除</button>
+                            <button class="action-btn view" onclick="viewCashAsset(${asset.id}, ${asset.cash_amount})">Check</button>
+                            <button class="action-btn edit" onclick="editCashAsset(${asset.id}, ${asset.cash_amount})">Edit</button>
+                            <button class="action-btn delete" onclick="deleteCashAsset(${asset.id})">Delete</button>
                         </div>
                     </div>
                 </div>
@@ -1516,9 +1516,9 @@
                     <div class="table-cell">$${asset.current_price.toLocaleString()}</div>
                     <div class="table-cell">
                         <div class="action-buttons">
-                            <button class="action-btn view" onclick="viewStockAsset(${asset.id}, ${asset.quantity})">查看</button>
-                            <button class="action-btn edit" onclick="editStockAsset(${asset.id})">编辑</button>
-                            <button class="action-btn delete" onclick="deleteStockAsset(${asset.id})">删除</button>
+                            <button class="action-btn view" onclick="viewStockAsset(${asset.id}, ${asset.quantity})">Check</button>
+                            <button class="action-btn edit" onclick="editStockAsset(${asset.id})">Edit</button>
+                            <button class="action-btn delete" onclick="deleteStockAsset(${asset.id})">Delete</button>
                         </div>
                     </div>
                 </div>
@@ -1786,7 +1786,7 @@
                                 </div>
                                 <div class="stock-price">
                                     <div>$${stock.current_price ? stock.current_price.toLocaleString() : '0.00'}</div>
-                                    <div style="color: #28a745; font-size: 12px;">可支配: ${stock.available_quantity}股</div>
+                                    <div style="color: #28a745; font-size: 12px;">Disposable: ${stock.available_quantity}</div>
                                 </div>
                             `;
                             
@@ -1905,8 +1905,8 @@
                         item.innerHTML = `
                             <div class="bank-name">${bank.bank_name}</div>
                             <div class="bank-amount">
-                                <span style="color: #6c757d;">总资产: $${bank.total_amount.toLocaleString()}</span><br>
-                                <span style="color: #28a745; font-weight: 600;">可支配: $${bank.available_amount.toLocaleString()}</span>
+                                <span style="color: #6c757d;">Total assets: $${bank.total_amount.toLocaleString()}</span><br>
+                                <span style="color: #28a745; font-weight: 600;">Disposable: $${bank.available_amount.toLocaleString()}</span>
                             </div>
                         `;
                         item.onclick = () => selectBank(bank);
@@ -1917,7 +1917,7 @@
                     suggestionsContainer.style.display = 'none';
                 }
             } catch (error) {
-                console.error('获取银行建议失败:', error);
+                console.error('Failure to obtain banking advice:', error);
             }
         });
 
@@ -1953,7 +1953,7 @@
                     }
                 }
             } catch (error) {
-                console.error('获取银行详情失败:', error);
+                console.error('Failed to retrieve bank details:', error);
             }
         }
 
@@ -1963,24 +1963,24 @@
             const infoContainer = document.getElementById('bankDistributionInfo');
             
             let html = `<div class="bank-allocation-item">
-                <span class="allocation-portfolio">银行总资产</span>
+                <span class="allocation-portfolio">Total Bank Assets</span>
                 <span class="allocation-amount">$${bankDetails.total_amount.toLocaleString()}</span>
             </div>`;
             
             html += `<div class="bank-allocation-item">
-                <span class="allocation-portfolio">已分配金额</span>
+                <span class="allocation-portfolio">Allocated Amount</span>
                 <span class="allocation-amount">$${bankDetails.allocated_amount.toLocaleString()}</span>
             </div>`;
             
             html += `<div class="bank-allocation-item" style="background-color: #e8f5e8; border-radius: 4px; padding: 8px 12px; margin-top: 8px;">
-                <span class="allocation-portfolio" style="font-weight: 600; color: #28a745;">剩余可支配金额</span>
+                <span class="allocation-portfolio" style="font-weight: 600; color: #28a745;">Remaining disposable amount</span>
                 <span class="allocation-amount" style="font-weight: 600; color: #28a745;">$${bankDetails.available_amount.toLocaleString()}</span>
             </div>`;
             
             // 显示各组合分配详情
             if (bankDetails.portfolio_allocations.length > 0) {
                 html += `<div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #e9ecef;">
-                    <div style="font-weight: 600; color: #495057; margin-bottom: 8px;">已分配组合详情:</div>`;
+                    <div style="font-weight: 600; color: #495057; margin-bottom: 8px;">Allocated Portfolio Details:</div>`;
                 
                 bankDetails.portfolio_allocations.forEach(allocation => {
                     html += `<div class="bank-allocation-item">
@@ -2002,29 +2002,29 @@
             const infoContainer = document.getElementById('stockDistributionInfo');
             
             let html = `<div class="bank-allocation-item">
-                <span class="allocation-portfolio">股票总股数</span>
-                <span class="allocation-amount">${stockDetails.total_quantity.toLocaleString()}股</span>
+                <span class="allocation-portfolio">Total number of shares</span>
+                <span class="allocation-amount">${stockDetails.total_quantity.toLocaleString()}</span>
             </div>`;
             
             html += `<div class="bank-allocation-item">
-                <span class="allocation-portfolio">已分配股数</span>
-                <span class="allocation-amount">${stockDetails.allocated_quantity.toLocaleString()}股</span>
+                <span class="allocation-portfolio">Number of allocated shares</span>
+                <span class="allocation-amount">${stockDetails.allocated_quantity.toLocaleString()}</span>
             </div>`;
             
             html += `<div class="bank-allocation-item" style="background-color: #e8f5e8; border-radius: 4px; padding: 8px 12px; margin-top: 8px;">
-                <span class="allocation-portfolio" style="font-weight: 600; color: #28a745;">剩余可支配股数</span>
-                <span class="allocation-amount" style="font-weight: 600; color: #28a745;">${stockDetails.available_quantity.toLocaleString()}股</span>
+                <span class="allocation-portfolio" style="font-weight: 600; color: #28a745;">Remaining available shares</span>
+                <span class="allocation-amount" style="font-weight: 600; color: #28a745;">${stockDetails.available_quantity.toLocaleString()}</span>
             </div>`;
             
             // 显示各组合分配详情
             if (stockDetails.portfolio_allocations.length > 0) {
                 html += `<div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #e9ecef;">
-                    <div style="font-weight: 600; color: #495057; margin-bottom: 8px;">已分配组合详情:</div>`;
+                    <div style="font-weight: 600; color: #495057; margin-bottom: 8px;">Allocated portfolio details:</div>`;
                 
                 stockDetails.portfolio_allocations.forEach(allocation => {
                     html += `<div class="bank-allocation-item">
                         <span class="allocation-portfolio">${allocation.portfolio_name}</span>
-                        <span class="allocation-amount">${allocation.quantity.toLocaleString()}股</span>
+                        <span class="allocation-amount">${allocation.quantity.toLocaleString()}</span>
                     </div>`;
                 });
                 
@@ -2082,10 +2082,10 @@
                 
                 // 如果剩余股数为负数，显示为0并标红
                 if (remaining < 0) {
-                    document.getElementById('summary-remaining-stock').textContent = '0股';
+                    document.getElementById('summary-remaining-stock').textContent = '0';
                     document.getElementById('summary-remaining-stock').style.color = '#dc3545';
                 } else {
-                    document.getElementById('summary-remaining-stock').textContent = `${remaining.toLocaleString()}股`;
+                    document.getElementById('summary-remaining-stock').textContent = `${remaining.toLocaleString()}`;
                     document.getElementById('summary-remaining-stock').style.color = '#495057';
                 }
                 
@@ -2135,10 +2135,10 @@
                 if (stockDetails) {
                     const remaining = stockDetails.available_quantity - quantity;
                     if (remaining < 0) {
-                        document.getElementById('summary-remaining-stock').textContent = '0股';
+                        document.getElementById('summary-remaining-stock').textContent = '0';
                         document.getElementById('summary-remaining-stock').style.color = '#dc3545';
                     } else {
-                        document.getElementById('summary-remaining-stock').textContent = `${remaining.toLocaleString()}股`;
+                        document.getElementById('summary-remaining-stock').textContent = `${remaining.toLocaleString()}`;
                         document.getElementById('summary-remaining-stock').style.color = '#495057';
                     }
                 }
@@ -2167,7 +2167,7 @@
             
             // 验证购买股数是否超过可支配股数
             if (selectedStockDetails && quantity > selectedStockDetails.available_quantity) {
-                alert(`购买股数 (${quantity.toLocaleString()}股) 超过了该股票的可支配股数 (${selectedStockDetails.available_quantity.toLocaleString()}股)，请调整数量`);
+                alert(`购买股数 (${quantity.toLocaleString()}股) 超过了该股票的可支配股数 (${selectedStockDetails.available_quantity.toLocaleString()})，请调整数量`);
                 return;
             }
 
@@ -2421,11 +2421,11 @@
                         
                         // 显示股票可支配信息
                         // 当前组合持有：当前编辑的股票记录在投资组合中的数量
-                        document.getElementById('current-holding').textContent = `${portfolioStockAsset.quantity.toLocaleString()}股`;
+                        document.getElementById('current-holding').textContent = `${portfolioStockAsset.quantity.toLocaleString()}`;
                         // 全局已分配：该股票在所有投资组合中的分配总量
-                        document.getElementById('allocated-quantity').textContent = `${stockDetails.allocated_quantity.toLocaleString()}股`;
+                        document.getElementById('allocated-quantity').textContent = `${stockDetails.allocated_quantity.toLocaleString()}`;
                         // 全局可支配：该股票的剩余可支配数量
-                        document.getElementById('available-quantity').textContent = `${stockDetails.available_quantity.toLocaleString()}股`;
+                        document.getElementById('available-quantity').textContent = `${stockDetails.available_quantity.toLocaleString()}`;
                         document.getElementById('stockAvailableInfo').style.display = 'block';
                         
                         // 保存股票详情信息
@@ -2703,22 +2703,22 @@
             const currentStockDetails = window.currentStockDetails;
             
             if (operation === 'update') {
-                quantityInput.placeholder = '请输入新的持有数量';
+                quantityInput.placeholder = 'Please enter the new holding quantity';
                 priceInput.readOnly = false;
-                priceInput.placeholder = '请输入操作价格';
+                priceInput.placeholder = 'Please enter the operation price';
                 priceInput.value = '';
             } else if (operation === 'buy') {
-                quantityInput.placeholder = '请输入加仓数量';
+                quantityInput.placeholder = 'Please enter the quantity to increase your position';
                 priceInput.readOnly = false;
-                priceInput.placeholder = '根据市场价自动计算';
+                priceInput.placeholder = 'Automatically calculated based on market price';
                 // 自动设置加仓价格为当前市场价
                 if (currentStock && currentStock.current_price) {
                     priceInput.value = currentStock.current_price;
                 }
             } else if (operation === 'sell') {
-                quantityInput.placeholder = '请输入减仓数量';
+                quantityInput.placeholder = 'Please enter the amount of reduction';
                 priceInput.readOnly = true;
-                priceInput.placeholder = '根据市场价自动计算';
+                priceInput.placeholder = 'Automatically calculated based on market price';
                 // 自动设置减仓价格为当前市场价
                 if (currentStock && currentStock.current_price) {
                     priceInput.value = currentStock.current_price;
@@ -2727,7 +2727,7 @@
             
             // 重置可支配股数显示为原始状态
             if (currentStockDetails) {
-                document.getElementById('available-quantity').textContent = `${currentStockDetails.available_quantity.toLocaleString()}股`;
+                document.getElementById('available-quantity').textContent = `${currentStockDetails.available_quantity.toLocaleString()}`;
                 document.getElementById('available-quantity').style.color = '#28a745';
             }
             
@@ -2758,7 +2758,7 @@
                     newAvailableQuantity = currentStockDetails.available_quantity + quantity;
                 }
                 
-                document.getElementById('available-quantity').textContent = `${newAvailableQuantity.toLocaleString()}股`;
+                document.getElementById('available-quantity').textContent = `${newAvailableQuantity.toLocaleString()}`;
                 
                 // 如果可支配股数为负数，标红显示
                 if (newAvailableQuantity < 0) {
@@ -2801,9 +2801,9 @@
             }
             
             document.getElementById('summary-operation-type').textContent = 
-                operation === 'buy' ? '加仓' : 
-                operation === 'sell' ? '减仓' :
-                operation === 'update' ? '更新信息' : '-';
+                operation === 'buy' ? 'Increase positions' :
+                operation === 'sell' ? 'Reduce holdings' :
+                operation === 'update' ? 'Update information' : '-';
             document.getElementById('summary-operation-quantity').textContent = addQuantityFixed.toLocaleString();
             document.getElementById('summary-operation-price').textContent = `$${price.toLocaleString()}`;
             document.getElementById('summary-operation-amount').textContent = `$${amount.toLocaleString()}`;
@@ -2812,7 +2812,7 @@
 
         // 删除现金资产
         async function deleteCashAsset(assetId) {
-            if (!confirm('确定要删除这个现金资产吗？删除后该资产将返回到现金池中。')) {
+            if (!confirm('Are you sure you want to delete this cash asset? After deletion, the asset will be returned to the cash pool.')) {
                 return;
             }
             
@@ -2822,7 +2822,7 @@
                 });
                 
                 if (response.ok) {
-                    alert('现金资产删除成功！已返回到现金池中。');
+                    alert('Cash assets deleted successfully! They have been returned to the cash pool.');
                     loadAllPortfoliosAssets();
                 } else {
                     const errorData = await response.json();
@@ -2836,7 +2836,7 @@
 
         // 删除股票资产
         async function deleteStockAsset(assetId) {
-            if (!confirm('确定要删除这个股票资产吗？删除后该股票的股数将返回到股票池中。')) {
+            if (!confirm('Are you sure you want to delete this stock asset? After deletion, the shares of this stock will be returned to the stock pool.')) {
                 return;
             }
             
@@ -2846,7 +2846,7 @@
                 });
                 
                 if (response.ok) {
-                    alert('股票资产删除成功！股数已返回到股票池中。');
+                    alert('The stock asset has been deleted successfully! The shares have been returned to the stock pool.');
                     loadAllPortfoliosAssets();
                 } else {
                     const errorData = await response.json();
