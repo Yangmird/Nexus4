@@ -1031,12 +1031,15 @@
 
             if (same) {
                 // 合并：只更新数量、均价不变，日期不变
+                console.log(currentEditingAsset.name,currentEditingAsset.ticker)
                 const newQty = parseFloat(same.quantity) + shares;
                 await fetch(`${API_BASE}/stock-assets/${same.id}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         quantity: newQty,
+                        name: currentEditingAsset.name,
+                        ticker: currentEditingAsset.ticker,
                         purchase_price: same.purchase_price, // 均价不变
                         purchase_date: same.purchase_date,   // 日期不变
                         current_price: price
