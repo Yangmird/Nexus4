@@ -315,7 +315,7 @@
 
         <div class="nav-bar">
             <a href="index.html" class="nav-btn">返回主页</a>
-            <a href="portfolio-management.html" class="nav-btn">投资组合管理</a>
+            <a href="portfolio-management.html" class="nav-btn">个人投资组合管理</a>
             <a href="stock-details.html" class="nav-btn">股票详情</a>
         </div>
 
@@ -633,7 +633,7 @@
         <div class="asset-info" style="flex: 1 1 auto; display: flex; justify-content: space-between; align-items: center;">
             <div>
                 <div class="asset-name">${asset.bank_name}</div>
-                <div class="asset-details">金额: ¥${asset.cash_amount.toLocaleString()} ${asset.currency_code}</div>
+                <div class="asset-details">金额: $${asset.cash_amount.toLocaleString()} ${asset.currency_code}</div>
             </div>
 
             ${asset.notes ? `
@@ -677,7 +677,7 @@
                     assetElement.innerHTML = `
                         <div class="asset-info">
                             <div class="asset-name">${asset.name} (${asset.ticker})</div>
-                            <div class="asset-details">持股: ${asset.quantity.toLocaleString()}股 | 购入价: ¥${asset.purchase_price.toLocaleString()} | 持仓总值: ¥${currentValue.toLocaleString()}</div>
+                            <div class="asset-details">持股: ${asset.quantity.toLocaleString()}股 | 购入价: $${asset.purchase_price.toLocaleString()} | 持仓总值: $${currentValue.toLocaleString()}</div>
                         </div>
                         <div class="asset-actions">
                             <button class="action-btn buy-btn" onclick="buyStock(${asset.id})">购入</button>
@@ -969,7 +969,7 @@
                 return;
             }
             if (newAmt < window.lockedAmount) {
-                alert(`修改后的金额不能小于被组合占用的金额 ¥${window.lockedAmount.toFixed(2)}`);
+                alert(`修改后的金额不能小于被组合占用的金额 $${window.lockedAmount.toFixed(2)}`);
                 return;
             }
 

@@ -921,11 +921,11 @@
                         </div>
                         <div class="summary-item">
                             <span class="summary-label">投入金额:</span>
-                            <span class="summary-value" id="summary-amount">¥0.00</span>
+                            <span class="summary-value" id="summary-amount">$0.00</span>
                         </div>
                         <div class="summary-item">
                             <span class="summary-label">剩余可支配金额:</span>
-                            <span class="summary-value" id="summary-remaining">¥0.00</span>
+                            <span class="summary-value" id="summary-remaining">$0.00</span>
                         </div>
                     </div>
                 </div>
@@ -1030,15 +1030,15 @@
                     <div class="summary-grid">
                         <div class="summary-item">
                             <span class="summary-label">银行总资产:</span>
-                            <span class="summary-value" id="edit-bank-total">¥0.00</span>
+                            <span class="summary-value" id="edit-bank-total">$0.00</span>
                         </div>
                         <div class="summary-item">
                             <span class="summary-label">已分配金额:</span>
-                            <span class="summary-value" id="edit-bank-allocated">¥0.00</span>
+                            <span class="summary-value" id="edit-bank-allocated">$0.00</span>
                         </div>
                         <div class="summary-item">
                             <span class="summary-label">可支配金额:</span>
-                            <span class="summary-value" id="edit-bank-available">¥0.00</span>
+                            <span class="summary-value" id="edit-bank-available">$0.00</span>
                         </div>
                     </div>
                 </div>
@@ -1053,11 +1053,11 @@
                         </div>
                         <div class="summary-item">
                             <span class="summary-label">操作金额:</span>
-                            <span class="summary-value" id="summary-cash-operation-amount">¥0.00</span>
+                            <span class="summary-value" id="summary-cash-operation-amount">$0.00</span>
                         </div>
                         <div class="summary-item">
                             <span class="summary-label">更新后金额:</span>
-                            <span class="summary-value" id="summary-cash-new-amount">¥0.00</span>
+                            <span class="summary-value" id="summary-cash-new-amount">$0.00</span>
                         </div>
                     </div>
                 </div>
@@ -1185,11 +1185,11 @@
                         </div>
                         <div class="summary-item">
                             <span class="summary-label">操作价格:</span>
-                            <span class="summary-value" id="summary-operation-price">¥0.00</span>
+                            <span class="summary-value" id="summary-operation-price">$0.00</span>
                         </div>
                         <div class="summary-item">
                             <span class="summary-label">操作金额:</span>
-                            <span class="summary-value" id="summary-operation-amount">¥0.00</span>
+                            <span class="summary-value" id="summary-operation-amount">$0.00</span>
                         </div>
                         <div class="summary-item">
                             <span class="summary-label">更新后的股数:</span>
@@ -1254,11 +1254,11 @@
                         </div>
                         <div class="summary-item">
                             <span class="summary-label">市场价格:</span>
-                            <span class="summary-value" id="summary-price">¥0.00</span>
+                            <span class="summary-value" id="summary-price">$0.00</span>
                         </div>
                         <div class="summary-item">
                             <span class="summary-label">购买总金额:</span>
-                            <span class="summary-value" id="summary-total">¥0.00</span>
+                            <span class="summary-value" id="summary-total">$0.00</span>
                         </div>
                         <div class="summary-item">
                             <span class="summary-label">剩余可支配:</span>
@@ -1478,7 +1478,7 @@
             container.innerHTML = cashAssets.map(asset => `
                 <div class="table-row">
                     <div class="table-cell">${asset.bank_name}</div>
-                    <div class="table-cell">¥${asset.cash_amount.toLocaleString()}</div>
+                    <div class="table-cell">$${asset.cash_amount.toLocaleString()}</div>
                     <div class="table-cell">${asset.bank_name}</div>
                     <div class="table-cell">
                         <div class="action-buttons">
@@ -1513,7 +1513,7 @@
                 <div class="table-row">
                     <div class="table-cell">${asset.ticker} - ${asset.name}</div>
                     <div class="table-cell">${asset.quantity.toLocaleString()}</div>
-                    <div class="table-cell">¥${asset.current_price.toLocaleString()}</div>
+                    <div class="table-cell">$${asset.current_price.toLocaleString()}</div>
                     <div class="table-cell">
                         <div class="action-buttons">
                             <button class="action-btn view" onclick="viewStockAsset(${asset.id}, ${asset.quantity})">查看</button>
@@ -1546,8 +1546,8 @@
             
             // 重置摘要信息
             document.getElementById('summary-bank').textContent = '-';
-            document.getElementById('summary-amount').textContent = '¥0.00';
-            document.getElementById('summary-remaining').textContent = '¥0.00';
+            document.getElementById('summary-amount').textContent = '$0.00';
+            document.getElementById('summary-remaining').textContent = '$0.00';
             
             // 隐藏银行分布信息
             document.getElementById('bankDistributionInfo').style.display = 'none';
@@ -1578,8 +1578,8 @@
             document.getElementById('summary-stock-name').textContent = '-';
             document.getElementById('summary-stock-ticker').textContent = '-';
             document.getElementById('summary-quantity').textContent = '0';
-            document.getElementById('summary-price').textContent = '¥0.00';
-            document.getElementById('summary-total').textContent = '¥0.00';
+            document.getElementById('summary-price').textContent = '$0.00';
+            document.getElementById('summary-total').textContent = '$0.00';
             
             showModal('addStockModal');
         }
@@ -1633,7 +1633,7 @@
             
             // 验证投入金额是否超过剩余可支配金额
             if (selectedBankDetails && cashAmount > selectedBankDetails.available_amount) {
-                alert(`投入金额 (¥${cashAmount.toLocaleString()}) 超过了该银行的剩余可支配金额 (¥${selectedBankDetails.available_amount.toLocaleString()})，请调整金额`);
+                alert(`投入金额 ($${cashAmount.toLocaleString()}) 超过了该银行的剩余可支配金额 ($${selectedBankDetails.available_amount.toLocaleString()})，请调整金额`);
                 return;
             }
 
@@ -1785,7 +1785,7 @@
                                     <div class="stock-ticker">${stock.ticker}</div>
                                 </div>
                                 <div class="stock-price">
-                                    <div>¥${stock.current_price ? stock.current_price.toLocaleString() : '0.00'}</div>
+                                    <div>$${stock.current_price ? stock.current_price.toLocaleString() : '0.00'}</div>
                                     <div style="color: #28a745; font-size: 12px;">可支配: ${stock.available_quantity}股</div>
                                 </div>
                             `;
@@ -1905,8 +1905,8 @@
                         item.innerHTML = `
                             <div class="bank-name">${bank.bank_name}</div>
                             <div class="bank-amount">
-                                <span style="color: #6c757d;">总资产: ¥${bank.total_amount.toLocaleString()}</span><br>
-                                <span style="color: #28a745; font-weight: 600;">可支配: ¥${bank.available_amount.toLocaleString()}</span>
+                                <span style="color: #6c757d;">总资产: $${bank.total_amount.toLocaleString()}</span><br>
+                                <span style="color: #28a745; font-weight: 600;">可支配: $${bank.available_amount.toLocaleString()}</span>
                             </div>
                         `;
                         item.onclick = () => selectBank(bank);
@@ -1940,15 +1940,15 @@
                 
                 // 更新剩余金额 - 初始状态显示可支配金额
                 const amount = parseFloat(document.getElementById('cashAmount').value) || 0;
-                document.getElementById('summary-amount').textContent = `¥${amount.toLocaleString()}`;
+                document.getElementById('summary-amount').textContent = `$${amount.toLocaleString()}`;
                 
                 if (bankDetails) {
                     const remaining = bankDetails.available_amount - amount;
                     if (remaining < 0) {
-                        document.getElementById('summary-remaining').textContent = '¥0.00';
+                        document.getElementById('summary-remaining').textContent = '$0.00';
                         document.getElementById('summary-remaining').style.color = '#dc3545';
                     } else {
-                        document.getElementById('summary-remaining').textContent = `¥${remaining.toLocaleString()}`;
+                        document.getElementById('summary-remaining').textContent = `$${remaining.toLocaleString()}`;
                         document.getElementById('summary-remaining').style.color = '#495057';
                     }
                 }
@@ -1964,17 +1964,17 @@
             
             let html = `<div class="bank-allocation-item">
                 <span class="allocation-portfolio">银行总资产</span>
-                <span class="allocation-amount">¥${bankDetails.total_amount.toLocaleString()}</span>
+                <span class="allocation-amount">$${bankDetails.total_amount.toLocaleString()}</span>
             </div>`;
             
             html += `<div class="bank-allocation-item">
                 <span class="allocation-portfolio">已分配金额</span>
-                <span class="allocation-amount">¥${bankDetails.allocated_amount.toLocaleString()}</span>
+                <span class="allocation-amount">$${bankDetails.allocated_amount.toLocaleString()}</span>
             </div>`;
             
             html += `<div class="bank-allocation-item" style="background-color: #e8f5e8; border-radius: 4px; padding: 8px 12px; margin-top: 8px;">
                 <span class="allocation-portfolio" style="font-weight: 600; color: #28a745;">剩余可支配金额</span>
-                <span class="allocation-amount" style="font-weight: 600; color: #28a745;">¥${bankDetails.available_amount.toLocaleString()}</span>
+                <span class="allocation-amount" style="font-weight: 600; color: #28a745;">$${bankDetails.available_amount.toLocaleString()}</span>
             </div>`;
             
             // 显示各组合分配详情
@@ -1985,7 +1985,7 @@
                 bankDetails.portfolio_allocations.forEach(allocation => {
                     html += `<div class="bank-allocation-item">
                         <span class="allocation-portfolio">${allocation.portfolio_name}</span>
-                        <span class="allocation-amount">¥${allocation.amount.toLocaleString()}</span>
+                        <span class="allocation-amount">$${allocation.amount.toLocaleString()}</span>
                     </div>`;
                 });
                 
@@ -2042,17 +2042,17 @@
 
         function updateCashSummary() {
             const amount = parseFloat(document.getElementById('cashAmount').value) || 0;
-            document.getElementById('summary-amount').textContent = `¥${amount.toLocaleString()}`;
+            document.getElementById('summary-amount').textContent = `$${amount.toLocaleString()}`;
             
             if (selectedBankDetails) {
                 const remaining = selectedBankDetails.available_amount - amount;
                 
                 // 如果剩余金额为负数，显示为0并标红
                 if (remaining < 0) {
-                    document.getElementById('summary-remaining').textContent = '¥0.00';
+                    document.getElementById('summary-remaining').textContent = '$0.00';
                     document.getElementById('summary-remaining').style.color = '#dc3545';
                 } else {
-                    document.getElementById('summary-remaining').textContent = `¥${remaining.toLocaleString()}`;
+                    document.getElementById('summary-remaining').textContent = `$${remaining.toLocaleString()}`;
                     document.getElementById('summary-remaining').style.color = '#495057';
                 }
                 
@@ -2073,8 +2073,8 @@
             const total = quantity * price;
             
             document.getElementById('summary-quantity').textContent = quantity.toLocaleString();
-            document.getElementById('summary-price').textContent = `¥${price.toLocaleString()}`;
-            document.getElementById('summary-total').textContent = `¥${total.toLocaleString()}`;
+            document.getElementById('summary-price').textContent = `$${price.toLocaleString()}`;
+            document.getElementById('summary-total').textContent = `$${total.toLocaleString()}`;
             
             // 更新剩余可支配股数
             if (selectedStockDetails) {
@@ -2126,11 +2126,11 @@
                 document.getElementById('summary-quantity').textContent = quantity.toLocaleString();
                 
                 if (stock.current_price) {
-                    document.getElementById('summary-price').textContent = `¥${stock.current_price.toLocaleString()}`;
+                    document.getElementById('summary-price').textContent = `$${stock.current_price.toLocaleString()}`;
                 }
                 
                 const total = quantity * (stock.current_price || 0);
-                document.getElementById('summary-total').textContent = `¥${total.toLocaleString()}`;
+                document.getElementById('summary-total').textContent = `$${total.toLocaleString()}`;
                 
                 if (stockDetails) {
                     const remaining = stockDetails.available_quantity - quantity;
@@ -2284,7 +2284,7 @@
                 
                 // 填充详情信息 - 显示分配到这个投资组合的金额，而不是银行总金额
                 document.getElementById('view-cash-bank').textContent = cashAsset.bank_name || '-';
-                document.getElementById('view-cash-amount').textContent = `¥${allocatedAmount.toLocaleString()}`;
+                document.getElementById('view-cash-amount').textContent = `$${allocatedAmount.toLocaleString()}`;
                 document.getElementById('view-cash-currency').textContent = cashAsset.currency_code || 'CNY';
                 document.getElementById('view-cash-notes').textContent = cashAsset.notes || '-';
                 
@@ -2323,9 +2323,9 @@
                         const bankDetails = await bankResponse.json();
                         
                         // 显示银行可支配金额信息
-                        document.getElementById('edit-bank-total').textContent = `¥${bankDetails.total_amount.toLocaleString()}`;
-                        document.getElementById('edit-bank-allocated').textContent = `¥${bankDetails.allocated_amount.toLocaleString()}`;
-                        document.getElementById('edit-bank-available').textContent = `¥${bankDetails.available_amount.toLocaleString()}`;
+                        document.getElementById('edit-bank-total').textContent = `$${bankDetails.total_amount.toLocaleString()}`;
+                        document.getElementById('edit-bank-allocated').textContent = `$${bankDetails.allocated_amount.toLocaleString()}`;
+                        document.getElementById('edit-bank-available').textContent = `$${bankDetails.available_amount.toLocaleString()}`;
                         document.getElementById('bankAvailableInfo').style.display = 'block';
                     }
                 } catch (bankError) {
@@ -2334,8 +2334,8 @@
                 
                 // 重置摘要信息
                 document.getElementById('summary-cash-operation-type').textContent = '-';
-                document.getElementById('summary-cash-operation-amount').textContent = '¥0.00';
-                document.getElementById('summary-cash-new-amount').textContent = `¥${allocatedAmount.toLocaleString()}`;
+                document.getElementById('summary-cash-operation-amount').textContent = '$0.00';
+                document.getElementById('summary-cash-new-amount').textContent = `$${allocatedAmount.toLocaleString()}`;
                 
                 showModal('editCashModal');
             } catch (error) {
@@ -2363,14 +2363,14 @@
                 document.getElementById('view-stock-ticker').textContent = stockAsset.ticker;
                 document.getElementById('view-stock-name').textContent = stockAsset.name;
                 document.getElementById('view-stock-quantity').textContent = allocatedQuantity.toLocaleString();
-                document.getElementById('view-stock-purchase-price').textContent = `¥${stockAsset.purchase_price.toLocaleString()}`;
-                document.getElementById('view-stock-current-price').textContent = `¥${stockAsset.current_price.toLocaleString()}`;
+                document.getElementById('view-stock-purchase-price').textContent = `$${stockAsset.purchase_price.toLocaleString()}`;
+                document.getElementById('view-stock-current-price').textContent = `$${stockAsset.current_price.toLocaleString()}`;
                 document.getElementById('view-stock-purchase-date').textContent = new Date(stockAsset.purchase_date).toLocaleDateString();
-                document.getElementById('view-stock-total-value').textContent = `¥${totalValue.toLocaleString()}`;
+                document.getElementById('view-stock-total-value').textContent = `$${totalValue.toLocaleString()}`;
                 
                 // 设置盈亏显示
                 const profitLossElement = document.getElementById('view-stock-profit-loss');
-                profitLossElement.textContent = `${profitLoss >= 0 ? '+' : ''}¥${profitLoss.toLocaleString()} (${profitLossPercent >= 0 ? '+' : ''}${profitLossPercent.toFixed(2)}%)`;
+                profitLossElement.textContent = `${profitLoss >= 0 ? '+' : ''}$${profitLoss.toLocaleString()} (${profitLossPercent >= 0 ? '+' : ''}${profitLossPercent.toFixed(2)}%)`;
                 profitLossElement.className = `detail-value ${profitLoss >= 0 ? 'profit' : 'loss'}`;
                 
                 showModal('viewStockModal');
@@ -2440,8 +2440,8 @@
                 // 重置摘要信息
                 document.getElementById('summary-operation-type').textContent = '-';
                 document.getElementById('summary-operation-quantity').textContent = '0';
-                document.getElementById('summary-operation-price').textContent = '¥0.00';
-                document.getElementById('summary-operation-amount').textContent = '¥0.00';
+                document.getElementById('summary-operation-price').textContent = '$0.00';
+                document.getElementById('summary-operation-amount').textContent = '$0.00';
                 document.getElementById('summary-new-quantity').textContent = portfolioStockAsset.quantity.toLocaleString();
                 
                 showModal('editStockModal');
@@ -2504,7 +2504,7 @@
                     
                     // 验证存入金额是否超过可支配金额
                     if (operationAmount > bankDetails.available_amount) {
-                        alert(`存入金额 (¥${operationAmount.toLocaleString()}) 超过了该银行的剩余可支配金额 (¥${bankDetails.available_amount.toLocaleString()})，请调整金额`);
+                        alert(`存入金额 ($${operationAmount.toLocaleString()}) 超过了该银行的剩余可支配金额 ($${bankDetails.available_amount.toLocaleString()})，请调整金额`);
                         return;
                     }
                 }
@@ -2690,8 +2690,8 @@
                 operation === 'deposit' ? '存入' : 
                 operation === 'withdraw' ? '取出' : 
                 operation === 'update' ? '直接修改' : '-';
-            document.getElementById('summary-cash-operation-amount').textContent = `¥${operationAmount.toLocaleString()}`;
-            document.getElementById('summary-cash-new-amount').textContent = `¥${newAllocatedAmount.toLocaleString()}`;
+            document.getElementById('summary-cash-operation-amount').textContent = `$${operationAmount.toLocaleString()}`;
+            document.getElementById('summary-cash-new-amount').textContent = `$${newAllocatedAmount.toLocaleString()}`;
         }
 
         // 股票编辑操作类型变化处理
@@ -2805,8 +2805,8 @@
                 operation === 'sell' ? '减仓' :
                 operation === 'update' ? '更新信息' : '-';
             document.getElementById('summary-operation-quantity').textContent = addQuantityFixed.toLocaleString();
-            document.getElementById('summary-operation-price').textContent = `¥${price.toLocaleString()}`;
-            document.getElementById('summary-operation-amount').textContent = `¥${amount.toLocaleString()}`;
+            document.getElementById('summary-operation-price').textContent = `$${price.toLocaleString()}`;
+            document.getElementById('summary-operation-amount').textContent = `$${amount.toLocaleString()}`;
             document.getElementById('summary-new-quantity').textContent = newQuantity.toLocaleString();
         }
 

@@ -639,7 +639,7 @@
         <div class="stock-code">${stock.ticker}</div>
     </div>
     <div class="stock-price-section">
-        <div class="stock-price">¥${parseFloat(stock.market_price).toLocaleString()}</div>
+        <div class="stock-price">$${parseFloat(stock.market_price).toLocaleString()}</div>
         <div class="stock-change neutral">计算中...</div>
     </div>
 </div>
@@ -656,7 +656,7 @@
 
                 // 更新价格显示
                 const priceElement = card.querySelector('.stock-price');
-                priceElement.textContent = `¥${parseFloat(stockData.latestPrice).toLocaleString()}`;
+                priceElement.textContent = `$${parseFloat(stockData.latestPrice).toLocaleString()}`;
 
                 // 更新价格变化
                 const changeElement = card.querySelector('.stock-change');
@@ -744,7 +744,7 @@
             data: {
                 labels: labels,
                 datasets: [{
-                    label: '价格 (¥)',
+                    label: '价格 ($)',
                     data: prices,
                     borderColor: '#667eea',
                     backgroundColor: 'rgba(102, 126, 234, 0.1)',
@@ -767,7 +767,7 @@
                         beginAtZero: false,
                         title: {
                             display: true,
-                            text: '价格 (¥)'
+                            text: '价格 ($)'
                         }
                     },
                     x: {
@@ -803,7 +803,7 @@
         statsGrid.innerHTML = `
                 <div class="stat-item">
                     <div class="stat-label">当前价格</div>
-                    <div class="stat-value">¥${currentPrice.toFixed(2)}</div>
+                    <div class="stat-value">$${currentPrice.toFixed(2)}</div>
                 </div>
                 <div class="stat-item">
                     <div class="stat-label">日涨跌幅</div>
@@ -813,15 +813,15 @@
                 </div>
                 <div class="stat-item">
                     <div class="stat-label">最高价</div>
-                    <div class="stat-value">¥${maxPrice.toFixed(2)}</div>
+                    <div class="stat-value">$${maxPrice.toFixed(2)}</div>
                 </div>
                 <div class="stat-item">
                     <div class="stat-label">最低价</div>
-                    <div class="stat-value">¥${minPrice.toFixed(2)}</div>
+                    <div class="stat-value">$${minPrice.toFixed(2)}</div>
                 </div>
                 <div class="stat-item">
                     <div class="stat-label">平均价</div>
-                    <div class="stat-value">¥${avgPrice.toFixed(2)}</div>
+                    <div class="stat-value">$${avgPrice.toFixed(2)}</div>
                 </div>
                 <div class="stat-item">
                     <div class="stat-label">波动率</div>

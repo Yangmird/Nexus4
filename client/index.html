@@ -391,17 +391,17 @@
                     <div class="total-grid">
                         <div class="total-item">
                             <div class="total-label">现金资产</div>
-                            <div class="total-value" id="total-cash">¥0</div>
+                            <div class="total-value" id="total-cash">$0</div>
                             <div class="total-change" id="cash-change">+0.00%</div>
                         </div>
                         <div class="total-item">
                             <div class="total-label">股票资产</div>
-                            <div class="total-value" id="total-stocks">¥0</div>
+                            <div class="total-value" id="total-stocks">$0</div>
                             <div class="total-change" id="stocks-change">+0.00%</div>
                         </div>
                         <div class="total-item">
                             <div class="total-label">总资产</div>
-                            <div class="total-value" id="total-assets">¥0</div>
+                            <div class="total-value" id="total-assets">$0</div>
                             <div class="total-change" id="total-change">+0.00%</div>
                         </div>
                     </div>
@@ -415,10 +415,10 @@
                             <div class="performance-value" id="daily-return">0.00%</div>
                             <div class="performance-label">日收益率</div>
                         </div>
-                        <div class="performance-item">
-                            <div class="performance-value" id="risk-ratio">0.00</div>
-                            <div class="performance-label">风险比率</div>
-                        </div>
+<!--                        <div class="performance-item">-->
+<!--                            <div class="performance-value" id="risk-ratio">0.00</div>-->
+<!--                            <div class="performance-label">风险比率</div>-->
+<!--                        </div>-->
                     </div>
                 </div>
 
@@ -502,13 +502,13 @@
                     assetElement.className = 'asset-item';
                     assetElement.innerHTML = `
                         <span class="asset-name">${asset.bank_name}</span>
-                        <span class="asset-value">¥${asset.cash_amount.toLocaleString()}</span>
+                        <span class="asset-value">$${asset.cash_amount.toLocaleString()}</span>
                     `;
                     cashContainer.appendChild(assetElement);
                     totalCash += parseFloat(asset.cash_amount);
                 });
                 
-                document.getElementById('total-cash').textContent = `¥${totalCash.toLocaleString()}`;
+                document.getElementById('total-cash').textContent = `$${totalCash.toLocaleString()}`;
                 updateTotalAssets();
             } catch (error) {
                 console.error('加载现金资产失败:', error);
@@ -533,13 +533,13 @@
                     assetElement.className = 'asset-item';
                     assetElement.innerHTML = `
                         <span class="asset-name">${asset.name}</span>
-                        <span class="asset-value">${asset.quantity.toLocaleString()}股 ¥${currentValue.toLocaleString()}</span>
+                        <span class="asset-value">${asset.quantity.toLocaleString()}股 $${currentValue.toLocaleString()}</span>
                     `;
                     stockContainer.appendChild(assetElement);
                     totalStocks += currentValue;
                 });
                 
-                document.getElementById('total-stocks').textContent = `¥${totalStocks.toLocaleString()}`;
+                document.getElementById('total-stocks').textContent = `$${totalStocks.toLocaleString()}`;
                 updateTotalAssets();
             } catch (error) {
                 console.error('加载股票资产失败:', error);
@@ -812,7 +812,7 @@
                         <div class="asset-type">${assetType}</div>
                     </div>
                     <div class="asset-stats">
-                        <div class="asset-value">¥${assetValue.toLocaleString()}</div>
+                        <div class="asset-value">$${assetValue.toLocaleString()}</div>
                         <div class="asset-percentage">${percentage.toFixed(1)}%</div>
                     </div>
                 `;
@@ -858,10 +858,10 @@
 
         // 更新总资产
         function updateTotalAssets() {
-            const totalCash = parseFloat(document.getElementById('total-cash').textContent.replace('¥', '').replace(',', '')) || 0;
-            const totalStocks = parseFloat(document.getElementById('total-stocks').textContent.replace('¥', '').replace(',', '')) || 0;
+            const totalCash = parseFloat(document.getElementById('total-cash').textContent.replace('$', '').replace(',', '')) || 0;
+            const totalStocks = parseFloat(document.getElementById('total-stocks').textContent.replace('$', '').replace(',', '')) || 0;
             const total = totalCash + totalStocks;
-            document.getElementById('total-assets').textContent = `¥${total.toLocaleString()}`;
+            document.getElementById('total-assets').textContent = `$${total.toLocaleString()}`;
         }
     </script>
 </body>
