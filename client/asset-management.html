@@ -666,7 +666,7 @@
                 container.innerHTML = '';
                 
                 if (stockAssets.length === 0) {
-                    container.innerHTML = '<div class="empty-state">暂无股票资产</div>';
+                    container.innerHTML = '<div class="empty-state">No stock assets</div>';
                     return;
                 }
                 
@@ -680,16 +680,16 @@
                             <div class="asset-details">Holdings: ${asset.quantity.toLocaleString()} | Purchase price: $${asset.purchase_price.toLocaleString()} | Total holdings: $${currentValue.toLocaleString()}</div>
                         </div>
                         <div class="asset-actions">
-                            <button class="action-btn buy-btn" onclick="buyStock(${asset.id})">购入</button>
-                            <button class="action-btn sell-btn" onclick="sellStock(${asset.id})">抛售</button>
-                            <button class="action-btn delete-btn" onclick="deleteStockAsset(${asset.id})">删除</button>
+                            <button class="action-btn buy-btn" onclick="buyStock(${asset.id})">Purchase</button>
+                            <button class="action-btn sell-btn" onclick="sellStock(${asset.id})">Sell-Off</button>
+                            <button class="action-btn delete-btn" onclick="deleteStockAsset(${asset.id})">Delete</button>
                         </div>
                     `;
                     container.appendChild(assetElement);
                 });
             } catch (error) {
-                console.error('加载股票资产失败:', error);
-                document.getElementById('stock-assets-list').innerHTML = '<div class="loading">加载失败</div>';
+                console.error('Failed to load stock assets:', error);
+                document.getElementById('stock-assets-list').innerHTML = '<div class="loading">Loading failed</div>';
             }
         }
 
@@ -724,12 +724,12 @@
             const notes    = document.getElementById('add-notes').value.trim();
 
             if (!bankName || isNaN(amount)) {
-                alert('请填写银行名称和有效金额');
+                alert('Please fill in the bank name and valid amount');
                 return;
             }
 
             if (amount < 0) {
-                alert('金额不能为负数');
+                alert('The amount cannot be negative');
                 return;
             }
 
@@ -746,22 +746,22 @@
                 });
 
                 if (res.ok) {
-                    alert('现金资产已添加');
+                    alert('Cash assets added');
                     closeModal('add-cash-modal');
                     await loadCashAssets();           // 重新加载列表
                 } else {
                     const msg = await res.text();
-                    alert('添加失败：' + msg);
+                    alert('Add failed：' + msg);
                 }
             } catch (err) {
                 console.error(err);
-                alert('网络错误，请稍后重试');
+                alert('Network error, please try again later');
             }
         }
 
         // 删除现金资产
         async function deleteCashAsset(id) {
-            if (!confirm('确定要删除该现金资产吗？')) return;
+            if (!confirm('Are you sure you want to delete this cash asset?？')) return;
 
             try {
                 const res = await fetch(`${API_BASE}/cash-assets/${id}`, { method: 'DELETE' });
@@ -769,19 +769,19 @@
                 // ✅ 统一处理 409
                 if (res.status === 409) {
                     const data = await res.json();
-                    alert(`无法删除！\n被以下组合占用：\n${data.portfolios.join('\n')}`);
+                    alert(`Unable to delete！\nOccupied by the following combination:\n${data.portfolios.join('\n')}`);
                     return;
                 }
 
                 if (res.ok) {
-                    alert('已删除cash');
+                    alert('Deleted cash');
                     await loadCashAssets();
                 } else {
-                    alert('删除失败：' + await res.text());
+                    alert('Deletion failed：' + await res.text());
                 }
             } catch (e) {
                 console.error(e);
-                alert('网络错误');
+                alert('Network Error');
             }
         }
 
@@ -808,7 +808,7 @@
                 document.getElementById('edit-cash-modal').style.display = 'block';
             } catch (e) {
                 console.error(e);
-                alert('加载资产信息失败');
+                alert('Failed to load asset information');
             }
         }
 
@@ -838,7 +838,7 @@
             const date     = document.getElementById('add-date').value;
 
             if (!ticker || !name || isNaN(quantity) || quantity <= 0 || isNaN(price) || price <= 0 || !date) {
-                alert('请完整填写且数量和价格须为正数');
+                alert('Please fill in the form completely and the quantity and price must be positive numbers.');
                 return;
             }
 
@@ -857,22 +857,22 @@
                 });
 
                 if (res.ok) {
-                    alert('股票已添加');
+                    alert('Stocks added');
                     closeModal('add-stock-modal');
                     await loadStockAssets();
                 } else {
                     const msg = await res.text();
-                    alert('添加失败：' + msg);
+                    alert('Add failed：' + msg);
                 }
             } catch (err) {
                 console.error(err);
-                alert('网络错误，请稍后重试');
+                alert('Network error, please try again later');
             }
         }
 
         // 删除股票
         async function deleteStockAsset(id) {
-            if (!confirm('确定要删除该股票资产吗？')) return;
+            if (!confirm('Are you sure you want to delete this stock asset?？')) return;
 
             try {
                 const res = await fetch(`${API_BASE}/stock-assets/${id}`, { method: 'DELETE' });
@@ -880,19 +880,19 @@
                 // ✅ 统一处理 409
                 if (res.status === 409) {
                     const data = await res.json();
-                    alert(`无法删除！\n被以下组合占用：\n${data.portfolios.join('\n')}`);
+                    alert(`Unable to delete！\nOccupied by the following combination:\n${data.portfolios.join('\n')}`);
                     return;
                 }
 
                 if (res.ok) {
-                    alert('已删除stock及其历史记录');
+                    alert('The stock and its history have been deleted');
                     await loadStockAssets();
                 } else {
-                    alert('删除失败：' + await res.text());
+                    alert('Deletion failed:' + await res.text());
                 }
             } catch (e) {
                 console.error(e);
-                alert('网络错误');
+                alert('Network Error');
             }
         }
 
@@ -925,8 +925,8 @@
 
                 document.getElementById('buy-stock-modal').style.display = 'block';
             } catch (error) {
-                console.error('获取股票资产详情失败:', error);
-                alert('获取资产详情失败');
+                console.error('Failed to obtain stock asset details:', error);
+                alert('Failed to obtain stock asset details');
             }
         }
 
@@ -952,8 +952,8 @@
 
                 document.getElementById('sell-stock-modal').style.display = 'block';
             } catch (error) {
-                console.error('获取股票资产详情失败:', error);
-                alert('获取资产详情失败');
+                console.error('Failed to obtain stock asset details:', error);
+                alert('Failed to obtain asset details');
             }
         }
 
@@ -965,11 +965,11 @@
             const notes    = document.getElementById('edit-notes').value.trim();
 
             if (!bankName || isNaN(newAmt)) {
-                alert('请填写银行名称和有效金额');
+                alert('Please fill in the bank name and valid amount');
                 return;
             }
             if (newAmt < window.lockedAmount) {
-                alert(`修改后的金额不能小于被组合占用的金额 $${window.lockedAmount.toFixed(2)}`);
+                alert(`The modified amount cannot be less than the amount occupied by the combination $${window.lockedAmount.toFixed(2)}`);
                 return;
             }
 
@@ -986,14 +986,14 @@
                     })
                 });
                 if (res.ok) {
-                    alert('现金资产已更新');
+                    alert('Cash assets updated');
                     closeModal('edit-cash-modal');
                     await loadCashAssets();
                 } else {
-                    alert('更新失败：' + await res.text());
+                    alert('Update failed' + await res.text());
                 }
             } catch (e) {
-                alert('网络错误');
+                alert('Network error');
             }
         }
 
@@ -1003,14 +1003,14 @@
             const bankId   = document.getElementById('buy-bank-select').value;
             const price    = parseFloat(document.getElementById('buy-price').value);
 
-            if (!shares || shares <= 0) { alert('请输入正股数'); return; }
+            if (!shares || shares <= 0) { alert('Please enter the number of shares'); return; }
 
             const bankRes  = await fetch(`${API_BASE}/cash-assets/${bankId}`);
             const bank     = await bankRes.json();
             const totalCost = shares * price;
 
             if (totalCost > bank.cash_amount) {
-                alert(`余额不足！需要 ${totalCost} ${bank.currency_code}`);
+                alert(`Insufficient balance! Need ${totalCost} ${bank.currency_code}`);
                 return;
             }
 
@@ -1058,7 +1058,7 @@
                 });
             }
 
-            alert('购买成功');
+            alert('Purchase successful');
             closeModal('buy-stock-modal');
             await loadStockAssets();
             await loadCashAssets();
@@ -1070,10 +1070,10 @@
             const bankId   = document.getElementById('sell-bank-select').value;
             const price    = parseFloat(document.getElementById('sell-price').value);
 
-            if (!shares || shares <= 0) { alert('请输入正股数'); return; }
+            if (!shares || shares <= 0) { alert('Please enter the number of shares'); return; }
             const availableShares = parseInt(document.getElementById('sell-available-shares').value);
             if (shares > availableShares) {
-                alert(`超出可抛售股数，最多可卖 ${availableShares} 股`);
+                alert(`Exceed the number of shares that can be sold, the maximum number of shares that can be sold ${availableShares} `);
                 return;
             }
 
@@ -1116,7 +1116,7 @@
                 });
             }
 
-            alert('抛售成功');
+            alert('Successful Sell-off');
             closeModal('sell-stock-modal');
             await loadStockAssets();
             await loadCashAssets();
@@ -1161,7 +1161,7 @@
                 resultsDiv.innerHTML = '';
 
                 if (stocks.length === 0) {
-                    resultsDiv.innerHTML = '<div style="padding: 10px; color: #666;">未找到匹配的股票</div>';
+                    resultsDiv.innerHTML = '<div style="padding: 10px; color: #666;">No matching stocks found</div>';
                     resultsDiv.style.display = 'block';
                     return;
                 }
@@ -1183,7 +1183,7 @@
 
                 resultsDiv.style.display = 'block';
             } catch (error) {
-                console.error('搜索股票失败:', error);
+                console.error('Search for stocks failed:', error);
             }
         }
 
@@ -1211,12 +1211,12 @@
                 if (data.price) {
                     document.getElementById('add-price').value = data.price;
                 } else {
-                    alert(`在 ${date} 没有找到 ${ticker} 的价格数据`);
+                    alert(`No price data found for ${ticker} on ${date}`);
                     document.getElementById('add-price').value = '';
                 }
             } catch (error) {
-                console.error('获取历史价格失败:', error);
-                alert('获取历史价格失败，请手动输入价格');
+                console.error('Failed to obtain historical prices:', error);
+                alert('Failed to obtain historical prices, please enter the price manually');
             }
         }
 
