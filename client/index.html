@@ -653,7 +653,7 @@
                     data: {
                         labels: displayDates,
                         datasets: [{
-                            label: '仅持有现金',
+                            label: 'Cash Only',
                             data: zeroProfits,
                             borderColor: 'rgba(192, 192, 192, 1)',
                             borderDash: [5, 5],
@@ -837,12 +837,12 @@
                 // 更新显示
                 document.getElementById('total-return').textContent = `${totalReturn.toFixed(2)}%`;
                 document.getElementById('daily-return').textContent = `${dailyReturn.toFixed(2)}%`;
-                document.getElementById('risk-ratio').textContent = '0.3';
 
                 // 更新变化率
                 const cashChange = 0;
                 const stocksChange = dailyReturn;
                 const totalChange = stocksChange;
+                console.log(stocksChange, totalChange);
 
                 
                 document.getElementById('stocks-change').textContent = `${stocksChange > 0 ? '+' : ''}${stocksChange.toFixed(2)}%`;
