@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>查看股票详情 - Nexus-4</title>
+    <title>View stock details - Nexus-4</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * {
@@ -442,31 +442,31 @@
     </div>
 
     <div class="nav-bar">
-        <a href="index.html" class="nav-btn">返回主页</a>
-        <a href="portfolio-management.html" class="nav-btn">投资组合管理</a>
-        <a href="asset-management.html" class="nav-btn">个人资产管理</a>
+        <a href="index.html" class="nav-btn">Homepage</a>
+        <a href="portfolio-management.html" class="nav-btn">Portfolio Management</a>
+        <a href="asset-management.html" class="nav-btn">Asset Management</a>
     </div>
 
     <div class="main-content">
         <!-- 搜索区域 -->
         <div class="search-section">
-            <span class="search-label">搜索股票信息:</span>
-            <input type="text" class="search-input" id="search-input" placeholder="输入股票代码或名称进行搜索...">
-            <button class="search-btn" onclick="searchStocks()">搜索</button>
-            <button class="search-btn" onclick="refreshData()" style="background: #28a745;">刷新数据</button>
+            <span class="search-label">Search stock information:</span>
+            <input type="text" class="search-input" id="search-input" placeholder="Enter stock code or name to search...">
+            <button class="search-btn" onclick="searchStocks()">Search</button>
+            <button class="search-btn" onclick="refreshData()" style="background: #28a745;">Update Data</button>
         </div>
 
         <!-- 股票网格 -->
         <div class="stock-grid" id="stock-grid">
-            <div class="loading">加载中...</div>
+            <div class="loading">Loading...</div>
         </div>
 
         <!-- 图表容器 -->
         <div class="chart-container" id="chart-container">
             <div class="chart-header">
                 <div>
-                    <div class="chart-title" id="chart-title">股票价格历史</div>
-                    <div class="chart-subtitle" id="chart-subtitle">最近5天价格走势</div>
+                    <div class="chart-title" id="chart-title">Stock Price History</div>
+                    <div class="chart-subtitle" id="chart-subtitle">Recent price trend</div>
                 </div>
             </div>
             <div class="chart-canvas">
@@ -482,41 +482,41 @@
 <!-- 购买单只股票模态框 -->
 <div id="buy-stock-modal" class="modal">
     <div class="modal-content">
-        <h3 class="modal-title">购买股票</h3>
+        <h3 class="modal-title">Buy Stocks</h3>
 
         <div class="form-group">
-            <label>股票代码:</label>
+            <label>Stock Code:</label>
             <input type="text" id="buy-stock-code" readonly>
         </div>
 
         <div class="form-group">
-            <label>股票名称:</label>
+            <label>Stock Name:</label>
             <input type="text" id="buy-stock-name" readonly>
         </div>
 
         <div class="form-group">
-            <label>今日成交价:</label>
+            <label>Today's Closing Price:</label>
             <input type="number" id="buy-stock-price" readonly>
         </div>
 
         <div class="form-group">
-            <label>购买股数:</label>
-            <input type="number" id="buy-stock-shares" min="1" step="1" placeholder="输入股数">
+            <label>Shares to Buy:</label>
+            <input type="number" id="buy-stock-shares" min="1" step="1" placeholder="Enter number of shares">
         </div>
 
         <div class="form-group">
-            <label>购入金额:</label>
+            <label>Total Amount:</label>
             <input type="number" id="buy-stock-total" readonly>
         </div>
 
         <div class="form-group">
-            <label>交易银行:</label>
+            <label>Trading Bank:</label>
             <select id="buy-stock-bank"></select>
         </div>
 
         <div class="modal-buttons">
-            <button class="confirm-btn" onclick="confirmBuyStock()">确认购买</button>
-            <button class="cancel-btn" onclick="closeModal('buy-stock-modal')">取消</button>
+            <button class="confirm-btn" onclick="confirmBuyStock()">Confirm Purchase</button>
+            <button class="cancel-btn" onclick="closeModal('buy-stock-modal')">Cancel</button>
         </div>
     </div>
 </div>
@@ -702,7 +702,7 @@
             chartContainer.classList.add('active');
 
             // 更新图表标题
-            document.getElementById('chart-title').textContent = `${stock.name} (${stock.ticker}) 价格历史`;
+            document.getElementById('chart-title').textContent = `${stock.name} (${stock.ticker}) Price History`;
 
             // 绘制价格图表
             renderPriceChart(historyData);
@@ -715,7 +715,7 @@
             // 显示错误信息，不使用模拟数据
             const chartContainer = document.getElementById('chart-container');
             chartContainer.classList.add('active');
-            document.getElementById('chart-title').textContent = `${stock.name} (${stock.ticker}) 价格历史`;
+            document.getElementById('chart-title').textContent = `${stock.name} (${stock.ticker}) Price History`;
             document.getElementById('priceChart').innerHTML = '<div class="error">无法获取历史数据，请检查网络连接</div>';
             // 移除错误信息，保持统计表格为空
             document.getElementById('stats-grid').innerHTML = '';
@@ -744,7 +744,7 @@
             data: {
                 labels: labels,
                 datasets: [{
-                    label: '价格 ($)',
+                    label: 'Price ($)',
                     data: prices,
                     borderColor: '#667eea',
                     backgroundColor: 'rgba(102, 126, 234, 0.1)',
@@ -767,13 +767,13 @@
                         beginAtZero: false,
                         title: {
                             display: true,
-                            text: '价格 ($)'
+                            text: 'Price ($)'
                         }
                     },
                     x: {
                         title: {
                             display: true,
-                            text: '日期'
+                            text: 'Date'
                         }
                     }
                 }
