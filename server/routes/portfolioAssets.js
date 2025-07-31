@@ -32,3 +32,5 @@ router.put('/portfolio-assets/:id', portfolioAssetController.updatePortfolioAsse
 
 router.get('/available-shares/:ticker', portfolioAssetController.getAvailableShares);
 
+router.get('/cash-usage/:cashId', portfolioAssetController.getCashUsage);
+
